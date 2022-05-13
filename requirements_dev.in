@@ -1,0 +1,8 @@
+pre-commit
+pytest
+flake8
+black
+docformatter
+pip-tools
+pre-commit
+pre-commit-hooks

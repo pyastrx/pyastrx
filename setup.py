@@ -3,8 +3,8 @@
 from setuptools import setup
 
 setup(
-    name='astpath',
-    packages=['astpath'],
+    name='pyastsearch',
+    packages=['pyastsearch'],
     version='0.9.1',
     description='A query language for Python abstract syntax trees',
     license='MIT',
@@ -16,14 +16,13 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'astpath = astpath.cli:main',
+            'pyastsearch = pyastsearch.cli:main',
         ]
     },
     keywords='xpath xml ast asts syntax query',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',

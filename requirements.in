@@ -1,0 +1,4 @@
+typing_extensions==4.1.1
+tabulate
+rich
+lxml>=3.3.5
