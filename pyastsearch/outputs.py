@@ -37,9 +37,9 @@ def stdout_matches(
         ))
         for lineno, line in matching_lines_context:
             if lineno == match - 1 and after_context > 0 and before_context > 0:
-                print(f"[white on yellow]{f'{lineno}:':<5}{line}[/white on yellow]")
+                print(f"[white on yellow]{f'{lineno+1}:':<5}{line}[/white on yellow]")
             else:
-                print(f"{f'{lineno}:':<5}{line}")
+                print(f"{f'{lineno+1}:':<5}{line}")
         if before_context or after_context:
             print()
         print("-"*20)

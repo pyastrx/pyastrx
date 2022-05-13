@@ -43,7 +43,7 @@ def search(
         directory, expression, print_matches=False, print_xml=True,
         verbose=False, abspaths=False, recurse=True,
         extension="py",
-        before_context=2, after_context=4,
+        before_context=5, after_context=4,
         parallel=True,
 ):
     """
@@ -93,6 +93,6 @@ def search(
             print(f"[bold red]{'='*15}End of {filename}{'='*15}[/bold red]")
             print("\n\n")
     file2linenos = {
-        filename: linenos for filename, (file_lines, linenos) in file2matches.items()
+        filename: linenos for filename, (_, linenos) in file2matches.items()
     }
     return file2linenos
