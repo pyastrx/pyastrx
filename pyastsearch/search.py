@@ -10,6 +10,26 @@ from pyastsearch.ast_tools import convert_to_xml, contents2ast
 from pyastsearch.outputs import stdout_matches, stdout_xml
 
 
+def search_in_txt(
+        txt, expression, filename, print_xml=False, verbose=False):
+    node_mappings = {}
+       
+    parsed_ast = contents2ast(txt, filename, verbose=verbose)
+    xml_ast = convert_to_xml(
+        parsed_ast,
+        omit_docstrings=False,
+        node_mappings=node_mappings,
+    )
+    matching_elements = xml_ast.xpath(expression)
+    if print_xml:
+        stdout_xml(matching_elements, xml_ast) 
+
+    matching_lines = linenos_from_xml(
+        matching_elements, node_mappings=node_mappings)
+   
+    return matching_lines, matching_elements
+ 
+
 def search(
         directory, expression, print_matches=False, print_xml=True,
         verbose=False, abspaths=False, recurse=True,
@@ -44,36 +64,18 @@ def search(
             if filename.endswith(extension)
         )
         for filename in python_filenames:
-            node_mappings = {}
-            try:
-                with open(filename, 'r') as f:
-                    contents = f.read()
-                file_lines = contents.splitlines()
-                parsed_ast = contents2ast(contents, filename, verbose=verbose)
-                xml_ast = convert_to_xml(
-                    parsed_ast,
-                    omit_docstrings=False,
-                    node_mappings=node_mappings,
-                )
-                
-            except Exception:
-                if verbose:
-                    print("WARNING: Unable to parse or read {}".format(
-                        os.path.abspath(filename) if abspaths else filename
-                    ))
-                continue  # unparseable
-
-            matching_elements = xml_ast.xpath(expression)
-
-            if print_xml:
-                stdout_xml(matching_elements, xml_ast)
-
-            matching_lines = linenos_from_xml(matching_elements, node_mappings=node_mappings)
+          
+            with open(filename, 'r') as f:
+                content = f.read()
+            file_lines = content.splitlines()
+            matching_lines = search_in_txt(
+                content, expression, filename, print_xml, verbose=verbose)
             global_matches.extend(zip(repeat(filename), matching_lines))
 
             if print_matches:
                 stdout_matches(
-                    matching_lines, filename, file_lines, before_context, after_context, abspaths)
+                    matching_lines, filename, file_lines,
+                    before_context, after_context, abspaths)
 
     return global_matches
 
