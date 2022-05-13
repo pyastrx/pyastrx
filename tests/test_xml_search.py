@@ -12,3 +12,4 @@ def test_re_search():
         print_xml=False,
         print_matches=True,
     )
+    

@@ -31,10 +31,10 @@ def stdout_matches(
     path = os.path.abspath(filename) if abspaths else filename
     print(f"[bold green]File:{path}[/bold green]")
     for match in matching_lines:
-        matching_lines = list(context(
+        matching_lines_context = list(context(
             file_lines, match - 1, before_context, after_context
         ))
-        for lineno, line in matching_lines:
+        for lineno, line in matching_lines_context:
             if lineno == match - 1:
                 print(f"[white on yellow]{f'{lineno}:':<5}{line}[/white on yellow]")
             else:

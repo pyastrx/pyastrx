@@ -92,20 +92,20 @@ def convert_to_xml(node, omit_docstrings=False, node_mappings=None):
     return xml_node
 
 
-def contents2ast(
-        contents: str, filename: str = "<unknown>", 
+def txt2ast(
+        txt: str, filename: str = "<unknown>", 
         verbose: bool = True) -> ast.Module:
     """Convert Python file contents (as a string) to an AST.
 
     Args:
-        contents (str): Python file contents.
+        txt (str): Python file contents.
         filename (str): Filename to use in error messages.
         verbose (bool): If True, print error messages.
     Returns:
         ast.Module: AST of the supplied contents.
 
     """
-    parsed_ast = ast.parse(contents, filename)
+    parsed_ast = ast.parse(txt, filename)
     if verbose:
         print(ast.dump(parsed_ast, indent=4))
     return parsed_ast

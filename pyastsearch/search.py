@@ -6,7 +6,7 @@ import os
 from rich import print
 
 from pyastsearch.xml_tools import linenos_from_xml
-from pyastsearch.ast_tools import convert_to_xml, contents2ast
+from pyastsearch.ast_tools import convert_to_xml, txt2ast
 from pyastsearch.outputs import stdout_matches, stdout_xml
 
 
@@ -14,7 +14,7 @@ def search_in_txt(
         txt, expression, filename, print_xml=False, verbose=False):
     node_mappings = {}
        
-    parsed_ast = contents2ast(txt, filename, verbose=verbose)
+    parsed_ast = txt2ast(txt, filename, verbose=verbose)
     xml_ast = convert_to_xml(
         parsed_ast,
         omit_docstrings=False,
@@ -27,7 +27,7 @@ def search_in_txt(
     matching_lines = linenos_from_xml(
         matching_elements, node_mappings=node_mappings)
    
-    return matching_lines, matching_elements
+    return matching_lines
  
 
 def search(

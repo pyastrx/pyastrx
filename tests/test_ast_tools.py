@@ -1,5 +1,5 @@
 import glob
-from pyastsearch.ast_tools import  contents2ast
+from pyastsearch.ast_tools import  txt2ast
 
 
 def test_find_in_ast():
@@ -7,6 +7,6 @@ def test_find_in_ast():
     for filename in files: 
         with open(filename, 'r') as f:
             contents = f.read()
-        contents2ast(
+        txt2ast(
             contents,
         )
