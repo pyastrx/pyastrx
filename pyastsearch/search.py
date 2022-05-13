@@ -112,18 +112,6 @@ def file_contents_to_xml_ast(contents, omit_docstrings=False, node_mappings=None
     )
 
 
-def file_to_xml_ast(filename, omit_docstrings=False, node_mappings=None):
-    """Convert a file to an XML AST, for use with find_in_ast."""
-    with open(filename, 'r') as f:
-        contents = f.read()
-    return file_contents_to_xml_ast(
-        contents,
-        omit_docstrings=omit_docstrings,
-        node_mappings=node_mappings,
-        filename=filename,
-    )
-
-
 def search(
         directory, expression, print_matches=False, print_xml=False,
         verbose=False, abspaths=False, recurse=True,
