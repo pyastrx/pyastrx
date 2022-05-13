@@ -26,21 +26,22 @@ def context(lines, index, before=0, after=0, both=0):
 
 
 def stdout_matches(
-        matching_lines, filename, file_lines, 
+        matching_lines, filename, file_lines,
         before_context=0, after_context=0, abspaths=False,):
+    path = os.path.abspath(filename) if abspaths else filename
+    print(f"[bold green]File:{path}[/bold green]")
     for match in matching_lines:
         matching_lines = list(context(
             file_lines, match - 1, before_context, after_context
         ))
         for lineno, line in matching_lines:
-            print('{path}:{lineno:<5d}{sep}\t{line}'.format(
-                path=os.path.abspath(filename) if abspaths else filename,
-                lineno=lineno,
-                sep='>' if lineno == match - 1 else ' ',
-                line=line,
-            ))
+            if lineno == match - 1:
+                print(f"[white on yellow]{f'{lineno}:':<5}{line}[/white on yellow]")
+            else:
+                print(f"{f'{lineno}:':<5}{line}")
         if before_context or after_context:
             print()
+        print("-"*20)
 
 
 def stdout_xml(matching_elements, xml_ast):
