@@ -1,15 +1,11 @@
 """Convert AST to XML objects."""
 
 import ast
+from lxml import etree
 import codecs
 from numbers import Number
 from functools import partial
 from rich import print
-
-try:
-    from lxml import etree
-except ImportError:
-    import xml.etree.ElementTree as etree
 
 
 def _set_encoded_literal(set_fn, literal):

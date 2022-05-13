@@ -4,49 +4,17 @@
 from itertools import islice, repeat
 import os
 from rich import print
+from lxml.etree import tostring
 
+from pyastsearch.xml_tools import linenos_from_xml
 from pyastsearch.ast_tools import convert_to_xml, contents2ast
-from pyastsearch.xml_tools import _tostring_factory, _query_factory
-
-
-
-
-PYTHON_EXTENSION = '{}py'.format(os.path.extsep)
-
-
-
-def find_in_ast(xml_ast, expr, query=_query_factory(), node_mappings=None):
-    """Find items matching expression expr in an XML AST."""
-    results = query(xml_ast, expr)
-    return linenos_from_xml(results, query=query, node_mappings=node_mappings)
-
-
-def linenos_from_xml(elements, query=_query_factory(), node_mappings=None):
-    """Given a list of elements, return a list of line numbers."""
-    lines = []
-    for element in elements:
-        try:
-            linenos = query(element, './ancestor-or-self::*[@lineno][1]/@lineno')
-        except AttributeError:
-            raise AttributeError("Element has no ancestor with line number.")
-        except SyntaxError:
-            # we're not using lxml backend
-            if node_mappings is None:
-                raise ValueError(
-                    "Lines cannot be returned when using native "
-                    "backend without `node_mappings` supplied."
-                )
-            linenos = getattr(node_mappings[element], 'lineno', 0),
-
-        if linenos:
-            lines.append(int(linenos[0]))
-    return lines
 
 
 def search(
         directory, expression, print_matches=False, print_xml=True,
         verbose=False, abspaths=False, recurse=True,
-        before_context=0, after_context=0, extension=PYTHON_EXTENSION
+        extension=".py",
+        before_context=0, after_context=0
 ):
     """
     Perform a recursive search through Python files.
@@ -54,7 +22,7 @@ def search(
     Only for files in the given directory for items matching the specified
     expression.
     """
-    query = _query_factory(verbose=verbose)
+
 
     if os.path.isfile(directory):
         if recurse:
@@ -95,14 +63,13 @@ def search(
                     ))
                 continue  # unparseable
 
-            matching_elements = query(xml_ast, expression)
+            matching_elements = xml_ast.xpath(expression)
 
             if print_xml:
-                tostring = _tostring_factory()
                 for element in matching_elements:
                     print(tostring(xml_ast, pretty_print=True))
 
-            matching_lines = linenos_from_xml(matching_elements, query=query, node_mappings=node_mappings)
+            matching_lines = linenos_from_xml(matching_elements, node_mappings=node_mappings)
             global_matches.extend(zip(repeat(filename), matching_lines))
 
             if print_matches:
