@@ -10,5 +10,5 @@ def test_folder_search():
         "//Name[string-length(@id) > 5]",
         verbose=False,
         print_xml=False,
-        print_matches=False,
+        print_matches=True,
     )

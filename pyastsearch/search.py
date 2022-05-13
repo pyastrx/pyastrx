@@ -1,8 +1,7 @@
 """Functions for searching the XML from file, file contents, or directory."""
-
-
-from itertools import repeat
 import os
+import multiprocessing as mp
+from functools import partial
 from pathlib import Path
 from rich import print
 
@@ -31,11 +30,21 @@ def search_in_txt(
     return matching_lines
 
 
+def search_in_file(filename, expression, print_xml=False, verbose=False):
+    with open(filename, 'r') as f:
+        content = f.read()
+    file_lines = content.splitlines()
+    matching_lines = search_in_txt(
+        content, expression, filename, print_xml, verbose=verbose)
+    return filename, file_lines, matching_lines
+
+
 def search(
         directory, expression, print_matches=False, print_xml=True,
         verbose=False, abspaths=False, recurse=True,
         extension="py",
-        before_context=4, after_context=4
+        before_context=4, after_context=4,
+        parallel=True,
 ):
     """
     Perform a recursive search through Python files.
@@ -45,24 +54,41 @@ def search(
     """
     if os.path.isfile(directory):
         files = [directory]
-    elif recurse:
-        files = Path(directory).rglob(f'*.{extension}')
     else:
-        files = Path(directory).glob(f'*.{extension}')
-    global_matches = []
-    for filename in files:          
-        with open(filename, 'r') as f:
-            content = f.read()
-        file_lines = content.splitlines()
-        matching_lines = search_in_txt(
-            content, expression, filename, print_xml, verbose=verbose)
-        global_matches.extend(zip(repeat(filename), matching_lines))
+        if recurse:
+            files = Path(directory).rglob(f'*.{extension}')
+        else:
+            files = Path(directory).glob(f'*.{extension}')
+        files = [str(f) for f in files]
+    
+    if parallel:
+       
+        with mp.Pool() as pool:
+            results = pool.map(
+                partial(
+                    search_in_file,
+                    expression=expression, print_xml=print_xml, verbose=verbose
+                ),
+                files
+            )
+        file2matches = {}
+        for filename, file_lines, matching_lines in results:
+            file2matches[filename] = (file_lines, matching_lines)
 
+    else:
+        file2matches = {}
+        for filename in files:          
+            filename, file_lines, matching_lines = search_in_file(
+                filename, expression, print_xml, verbose=verbose) 
+            file2matches[filename] = (file_lines, matching_lines)
+
+    for filename, (file_lines, matching_lines) in file2matches.items():
         if print_matches:
+            if len(matching_lines) == 0:
+                continue
             stdout_matches(
                 matching_lines, filename, file_lines,
                 before_context, after_context, abspaths)
-
-    return global_matches
-
-
+            print(f"[bold red]{'='*80}[/bold red]")
+            print("\n\n")
+            
