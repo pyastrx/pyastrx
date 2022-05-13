@@ -4,6 +4,7 @@ import ast
 import codecs
 from numbers import Number
 from functools import partial
+from rich import print
 
 try:
     from lxml import etree
@@ -93,3 +94,20 @@ def convert_to_xml(node, omit_docstrings=False, node_mappings=None):
             )
 
     return xml_node
+
+
+def contents2ast(contents, filename="<unknown>", verbose=True):
+    """Convert Python file contents (as a string) to an AST.
+    
+    Args:
+        contents (str): Python file contents.
+        filename (str): Filename to use in error messages.
+        verbose (bool): If True, print error messages.
+    Returns:
+        ast.Module: AST of the supplied contents.
+
+    """
+    parsed_ast = ast.parse(contents, filename)
+    if verbose:
+        print(ast.dump(parsed_ast, indent=4))
+    return parsed_ast

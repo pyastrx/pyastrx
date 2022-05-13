@@ -4,9 +4,8 @@
 from itertools import islice, repeat
 import os
 import re
-import ast
-
-from pyastsearch.asts import convert_to_xml
+from rich import print
+from pyastsearch.ast_tools import convert_to_xml, contents2ast
 
 
 class XMLVersions:
@@ -102,14 +101,19 @@ def linenos_from_xml(elements, query=_query_factory(), node_mappings=None):
     return lines
 
 
-def file_contents_to_xml_ast(contents, omit_docstrings=False, node_mappings=None, filename='<unknown>'):
+def file_contents_to_xml_ast(
+        contents, omit_docstrings=False, node_mappings=None, filename='<unknown>'):
     """Convert Python file contents (as a string) to an XML AST, for use with find_in_ast."""
-    parsed_ast = ast.parse(contents, filename)
+    parsed_ast = contents2ast(contents, filename, verbose=True)
     return convert_to_xml(
         parsed_ast,
         omit_docstrings=omit_docstrings,
         node_mappings=node_mappings,
     )
+
+
+
+
 
 
 def search(
