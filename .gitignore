@@ -4,7 +4,7 @@ __pycache__/
 .venv
 .vscode
 *$py.class
-
+.pytest_cache/
 # C extensions
 *.so
 
