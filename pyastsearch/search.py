@@ -3,7 +3,6 @@
 
 from itertools import islice, repeat
 import os
-import re
 from rich import print
 
 from pyastsearch.ast_tools import convert_to_xml, contents2ast

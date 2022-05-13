@@ -1,15 +1,11 @@
+import re
+from lxml.etree import tostring
+from lxml import etree
+
 class XMLVersions:
     LXML = object()
     XML = object()
-
-
-try:
-    from lxml.etree import tostring
-    from lxml import etree
-    XML_VERSION = XMLVersions.LXML
-except ImportError:
-    from xml.etree.ElementTree import tostring
-    XML_VERSION = XMLVersions.XML
+XML_VERSION = XMLVersions.LXML
 
 
 def _query_factory(verbose=False):
