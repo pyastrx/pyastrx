@@ -4,6 +4,8 @@
 - [] Support for multiprocessing
 - [] Rich output
 - [] tests cases
+- [] decouple
+- [] allow to get just the line numbers and files
 - [] vscode integration
 - [] documentation
 
