@@ -11,7 +11,7 @@ from pyastsearch.outputs import stdout_matches, stdout_xml
 
 
 def search_in_txt(
-        txt, expression, filename, print_xml=False, verbose=False):
+        txt, expression, filename="<unknown>", print_xml=False, verbose=False):
     node_mappings = {}
        
     parsed_ast = txt2ast(txt, filename, verbose=verbose)
@@ -28,7 +28,7 @@ def search_in_txt(
         matching_elements, node_mappings=node_mappings)
    
     return matching_lines
- 
+
 
 def search(
         directory, expression, print_matches=False, print_xml=True,
@@ -45,8 +45,6 @@ def search(
 
     print("\n")
     if os.path.isfile(directory):
-        if recurse:
-            raise ValueError("Cannot recurse when only a single file is specified.")
         files = (('', None, [directory]),)
     elif recurse:
         files = os.walk(directory)
