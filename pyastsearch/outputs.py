@@ -29,13 +29,14 @@ def stdout_matches(
         matching_lines, filename, file_lines,
         before_context=0, after_context=0, abspaths=False,):
     path = os.path.abspath(filename) if abspaths else filename
-    print(f"[bold green]File:{path}[/bold green]")
+    print(f"[bold white on green]File:{path}[/bold white on green]")
+    print(f"[bold white on green]Matches:{len(matching_lines)}[/bold white on green]")
     for match in matching_lines:
         matching_lines_context = list(context(
             file_lines, match - 1, before_context, after_context
         ))
         for lineno, line in matching_lines_context:
-            if lineno == match - 1:
+            if lineno == match - 1 and after_context > 0 and before_context > 0:
                 print(f"[white on yellow]{f'{lineno}:':<5}{line}[/white on yellow]")
             else:
                 print(f"{f'{lineno}:':<5}{line}")
