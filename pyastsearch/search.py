@@ -1,13 +1,12 @@
 """Functions for searching the XML from file, file contents, or directory."""
 
 
-from __future__ import print_function
 from itertools import islice, repeat
 import os
 import re
 import ast
 
-from astpath.asts import convert_to_xml
+from pyastsearch.asts import convert_to_xml
 
 
 class XMLVersions:

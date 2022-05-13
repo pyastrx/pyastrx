@@ -12,7 +12,7 @@ For more help use::
 import os
 import argparse
 
-from astpath.search import search
+from pyastsearch.search import search
 
 
 parser = argparse.ArgumentParser()
