@@ -96,9 +96,11 @@ def convert_to_xml(node, omit_docstrings=False, node_mappings=None):
     return xml_node
 
 
-def contents2ast(contents, filename="<unknown>", verbose=True):
+def contents2ast(
+        contents: str, filename: str = "<unknown>", 
+        verbose: bool = True) -> ast.Module:
     """Convert Python file contents (as a string) to an AST.
-    
+
     Args:
         contents (str): Python file contents.
         filename (str): Filename to use in error messages.

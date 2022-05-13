@@ -5,72 +5,15 @@ from itertools import islice, repeat
 import os
 import re
 from rich import print
+
 from pyastsearch.ast_tools import convert_to_xml, contents2ast
+from pyastsearch.xml_tools import _tostring_factory, _query_factory
 
 
-class XMLVersions:
-    LXML = object()
-    XML = object()
-
-
-try:
-    from lxml.etree import tostring
-    from lxml import etree
-    XML_VERSION = XMLVersions.LXML
-except ImportError:
-    from xml.etree.ElementTree import tostring
-    XML_VERSION = XMLVersions.XML
 
 
 PYTHON_EXTENSION = '{}py'.format(os.path.extsep)
 
-
-def _query_factory(verbose=False):
-    def lxml_query(element, expression):
-        return element.xpath(expression)
-
-    def xml_query(element, expression):
-        return element.findall(expression)
-
-    if XML_VERSION is XMLVersions.LXML:
-        return lxml_query
-    else:
-        if verbose:
-            print(
-                "WARNING: lxml could not be imported, "
-                "falling back to native XPath engine."
-            )
-        return xml_query
-
-
-def _tostring_factory():
-    def xml_tostring(*args, **kwargs):
-        kwargs.pop('pretty_print')
-        return tostring(*args, **kwargs)
-
-    if XML_VERSION is XMLVersions.LXML:
-        return tostring
-    else:
-        return xml_tostring
-
-
-if XML_VERSION is XMLVersions.LXML:
-    regex_ns = etree.FunctionNamespace('https://github.com/hchasestevens/astpath')
-    regex_ns.prefix = 're'
-
-    @regex_ns
-    def match(ctx, pattern, strings):
-        return any(
-            re.match(pattern, s) is not None
-            for s in strings
-        )
-
-    @regex_ns
-    def search(ctx, pattern, strings):
-        return any(
-            re.search(pattern, s) is not None
-            for s in strings
-        )
 
 
 def find_in_ast(xml_ast, expr, query=_query_factory(), node_mappings=None):
@@ -101,23 +44,8 @@ def linenos_from_xml(elements, query=_query_factory(), node_mappings=None):
     return lines
 
 
-def file_contents_to_xml_ast(
-        contents, omit_docstrings=False, node_mappings=None, filename='<unknown>'):
-    """Convert Python file contents (as a string) to an XML AST, for use with find_in_ast."""
-    parsed_ast = contents2ast(contents, filename, verbose=True)
-    return convert_to_xml(
-        parsed_ast,
-        omit_docstrings=omit_docstrings,
-        node_mappings=node_mappings,
-    )
-
-
-
-
-
-
 def search(
-        directory, expression, print_matches=False, print_xml=False,
+        directory, expression, print_matches=False, print_xml=True,
         verbose=False, abspaths=False, recurse=True,
         before_context=0, after_context=0, extension=PYTHON_EXTENSION
 ):
@@ -154,10 +82,13 @@ def search(
                 with open(filename, 'r') as f:
                     contents = f.read()
                 file_lines = contents.splitlines()
-                xml_ast = file_contents_to_xml_ast(
-                    contents,
+                parsed_ast = contents2ast(contents, filename, verbose=verbose)
+                xml_ast = convert_to_xml(
+                    parsed_ast,
+                    omit_docstrings=False,
                     node_mappings=node_mappings,
                 )
+                
             except Exception:
                 if verbose:
                     print("WARNING: Unable to parse or read {}".format(
