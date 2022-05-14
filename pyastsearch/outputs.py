@@ -3,7 +3,7 @@ from itertools import islice
 from rich import print as rprint
 from lxml.etree import tostring
 from colorama import Style
-from pyastsearch.config import __severity2color
+from pyastsearch.config import __severity2color, __color_highlight
 
 
 def context(lines, index, before=0, after=0, both=0):
@@ -27,6 +27,37 @@ def context(lines, index, before=0, after=0, both=0):
     return islice(enumerate(lines), start, end)
 
 
+def print_match_description(
+        expressions, matching_lines):
+    for expression in expressions:
+        infos = matching_lines[expression]["infos"]
+        severity = infos.get("severity", "default")
+        try:
+            color = __severity2color[severity]
+        except KeyError:
+            color = __severity2color["default"]
+        why = infos.get("why", "")
+        name = infos.get("name", "")
+        print(
+            f"{color} - {name:<5}|",
+            f"{why:<18}|",
+            f"{infos['description']}{Style.RESET_ALL}"
+        )
+
+
+def print_lines_context(
+        matching_lines_context, line_match, after_context, before_context):
+    for lineno, line in matching_lines_context:
+        if lineno == line_match - 1 and after_context > 0 and before_context > 0:
+            line_str = f"{f' {lineno+1}:':<5}{line}" 
+            rprint(f"[{__color_highlight}]{line_str}[/{__color_highlight}]")
+        else:
+            rprint(f"{f' {lineno+1}:':<5}{line}")
+    if before_context or after_context:
+        print()
+    rprint("-" * 20)
+
+
 def stdout_matches_by_filename(
     matching_lines,
     filename,
@@ -46,27 +77,14 @@ def stdout_matches_by_filename(
     lines = line2expression.keys()
     rprint(f"[bold white on green]File:{path}[/bold white on green]")
     rprint(f"[bold white on green]Matches:{len(lines)}[/bold white on green]")
-    for line_match in lines:
+    for line_match in lines: 
+        expressions = line2expression[line_match]
+        print_match_description(expressions, matching_lines)
         matching_lines_context = list(
             context(file_lines, line_match - 1, before_context, after_context)
         )
-        expressions = line2expression[line_match]
-        for expression in expressions:
-            infos = matching_lines[expression]["infos"]
-            severity = infos.get("severity", "default")
-            try:
-                color = __severity2color[severity]
-            except KeyError:
-                color = __severity2color["default"]
-            print(f"{color}{infos['name']}|{infos['description']}|{infos['why']}{Style.RESET_ALL}")
-        for lineno, line in matching_lines_context:
-            if lineno == line_match - 1 and after_context > 0 and before_context > 0:
-                rprint(f"[white on yellow]{f'{lineno+1}:':<5}{line}[/white on yellow]")
-            else:
-                rprint(f"{f'{lineno+1}:':<5}{line}")
-        if before_context or after_context:
-            print()
-        rprint("-" * 20)
+        print_lines_context(
+            matching_lines_context, line_match, after_context, before_context)
 
 
 def stdout_matches(

@@ -1,6 +1,6 @@
 
-after_context: 0
-before_context: 0
+after_context: 3
+before_context: 2 
 folder: 'tests'
 parallel: true
 rules:
