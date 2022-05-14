@@ -125,7 +125,9 @@ def main():
     abspaths = config.get("abspaths", args.abspaths)
     parallel = config.get("parallel", args.parallel)
 
-    expr = " ".join(expr)
+    if isinstance(expr, str):
+        expr = [expr]
+
     if args.file != "":
         search_in_file(
             args.file,

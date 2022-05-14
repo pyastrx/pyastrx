@@ -1,7 +1,8 @@
 import os
 from itertools import islice
-from rich import print
+from rich import print as rprint
 from lxml.etree import tostring
+from colorama import Fore, Style, Back
 
 
 def context(lines, index, before=0, after=0, both=0):
@@ -34,20 +35,31 @@ def stdout_matches_by_filename(
     abspaths=False,
 ):
     path = os.path.abspath(filename) if abspaths else filename
-    print(f"[bold white on green]File:{path}[/bold white on green]")
-    print(f"[bold white on green]Matches:{len(matching_lines)}[/bold white on green]")
-    for match in matching_lines:
-        matching_lines_context = list(
-            context(file_lines, match - 1, before_context, after_context)
-        )
-        for lineno, line in matching_lines_context:
-            if lineno == match - 1 and after_context > 0 and before_context > 0:
-                print(f"[white on yellow]{f'{lineno+1}:':<5}{line}[/white on yellow]")
+    line2expression = {}
+    for expression in matching_lines.keys():
+        for line_number in matching_lines[expression]:
+            if line_number not in line2expression.keys():
+                line2expression[line_number] = [expression]
             else:
-                print(f"{f'{lineno+1}:':<5}{line}")
+                line2expression[line_number].append(expression)
+    lines = line2expression.keys()
+    rprint(f"[bold white on green]File:{path}[/bold white on green]")
+    rprint(f"[bold white on green]Matches:{len(lines)}[/bold white on green]")
+    for line_match in lines:
+        matching_lines_context = list(
+            context(file_lines, line_match - 1, before_context, after_context)
+        )
+        expressions = line2expression[line_match]
+        for expression in expressions:
+            print(f"{Fore.CYAN}{expression}{Style.RESET_ALL}")
+        for lineno, line in matching_lines_context:
+            if lineno == line_match - 1 and after_context > 0 and before_context > 0:
+                rprint(f"[white on yellow]{f'{lineno+1}:':<5}{line}[/white on yellow]")
+            else:
+                rprint(f"{f'{lineno+1}:':<5}{line}")
         if before_context or after_context:
             print()
-        print("-" * 20)
+        rprint("-" * 20)
 
 
 def stdout_matches(
@@ -68,7 +80,7 @@ def stdout_matches(
             after_context,
             abspaths,
         )
-        print(f"[bold red]{'='*15}End of {filename}{'='*15}[/bold red]")
+        rprint(f"[bold red]{'='*15}End of {filename}{'='*15}[/bold red]")
         print("\n\n")
 
 

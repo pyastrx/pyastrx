@@ -1,8 +1,8 @@
 
-after_context: 5
-before_context: 2
+after_context: 3 
+before_context: 3
 folder: 'tests'
-parallel:
+parallel: true
 rules:
   "//ClassDef[re:match('.*Var', @name)]":
     name: "B001"
@@ -10,9 +10,15 @@ rules:
     severity: "warning"
     what: "bad practice"
     ignore: false
-  # ".//Constant[not(ancestor::Assign) and @type='int']":
-  #   name: "R001"
-  #   description: "Constant with int type"
-  #   what: "bad practice"
-  #   severity: "reject"
-  #   ignore: false
+  ".//Constant[not(ancestor::Assign) and @type='int']":
+    name: "R001"
+    description: "Constant with int type"
+    what: "bad practice"
+    severity: "reject"
+    ignore: false
+  ".//Constant":
+    name: "R001"
+    description: "Constant with int type"
+    what: "bad practice"
+    severity: "reject"
+    ignore: false

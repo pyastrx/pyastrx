@@ -5,22 +5,23 @@ from pathlib import Path
 
 from pyastsearch.xml_tools import linenos_from_xml
 from pyastsearch.ast_tools import convert_to_xml, txt2ast
-from pyastsearch.outputs import stdout_matches, stdout_xml, stdout_matches_by_filename
+from pyastsearch.outputs import (
+    stdout_matches, stdout_xml, stdout_matches_by_filename)
 
 
 def search_in_txt(
-    txt, expression, filename="<unknown>", print_xml=False, verbose=False
+    txt, expressions, filename="<unknown>", print_xml=False, verbose=False
 ):
     """Search in source code string and return the matching lines.
 
     Args:
         txt (str): The source code to search.
-        expression (str): The search expression.
+        expressions (list): List of search expressions
         filename (str): The filename to use in the output.
         print_xml (bool): Print the XML of the AST.
         verbose (bool): Verbose output.
     Returns:
-        list: The matching lines.
+        dict: The matching lines.
     """
 
     node_mappings = {}
@@ -31,39 +32,44 @@ def search_in_txt(
         omit_docstrings=False,
         node_mappings=node_mappings,
     )
-    matching_elements = xml_ast.xpath(expression)
-    if print_xml:
-        stdout_xml(matching_elements, xml_ast)
+    matching_lines = {}
+    for expression in expressions:
+        matching_elements = xml_ast.xpath(expression)
+        if print_xml:
+            stdout_xml(matching_elements, xml_ast)
 
-    matching_lines = linenos_from_xml(matching_elements, node_mappings=node_mappings)
+        matching_lines_by_exp = linenos_from_xml(
+            matching_elements, node_mappings)
+        matching_lines[expression] = matching_lines_by_exp
 
     return matching_lines
 
 
-def get_matches_in_file(filename, expression, print_xml=False, verbose=False):
+def get_matches_in_file(filename, expressions, print_xml=False, verbose=False):
     """Get the matching lines in a file.
 
     Args:
         filename (str): The filename to search.
-        expression (str): The search expression.
+        expression (list): List of search expressions.
         print_xml (bool): Print the XML of the AST.
         verbose (bool): Verbose output.
     Returns:
-        (str, list, list): The filename, the lines of the file, and the matching lines.
+        (str, list, list): The filename, the lines of the file, 
+            and the matching lines.
 
     """
     with open(filename, "r") as f:
         content = f.read()
     file_lines = content.splitlines()
     matching_lines = search_in_txt(
-        content, expression, filename, print_xml, verbose=verbose
+        content, expressions, filename, print_xml, verbose=verbose
     )
     return filename, file_lines, matching_lines
 
 
 def search_in_file(
     filename,
-    expression,
+    expressions,
     print_xml=False,
     verbose=False,
     print_matches=False,
@@ -76,7 +82,7 @@ def search_in_file(
 
     Args:
         filename (str): The filename to search.
-        expression (str): The search expression.
+        expressions (list): The search expression.
         print_xml (bool): Print the XML of the AST.
         verbose (bool): Verbose output.
         print_matches (bool): Print the matches in stdout.
@@ -86,9 +92,8 @@ def search_in_file(
     Returns:
         list: The matching lines.
     """
-
     filename, file_lines, matching_lines = get_matches_in_file(
-        filename, expression, print_xml, verbose
+        filename, expressions, print_xml, verbose
     )
     if len(matching_lines) > 0 and print_matches:
         print("\n")
@@ -107,7 +112,7 @@ def search_in_file(
 
 def search_in_folder(
     folder,
-    expression,
+    expressions,
     print_matches=False,
     print_xml=True,
     verbose=False,
@@ -124,7 +129,7 @@ def search_in_folder(
 
     Args:
         folder (str): The folder to search.
-        expression (str): The search expression.
+        expression (list): The search expression.
         print_matches (bool): Print the matches in stdout.
         print_xml (bool): Print the XML of the AST.
         verbose (bool): Verbose output.
@@ -151,7 +156,7 @@ def search_in_folder(
             results = pool.map(
                 partial(
                     get_matches_in_file,
-                    expression=expression,
+                    expressions=expressions,
                     print_xml=print_xml,
                     verbose=verbose,
                 ),
@@ -165,12 +170,13 @@ def search_in_folder(
         file2matches = {}
         for filename in files:
             filename, file_lines, matching_lines = get_matches_in_file(
-                filename, expression, print_xml, verbose=verbose
+                filename, expressions, print_xml, verbose=verbose
             )
             file2matches[filename] = (file_lines, matching_lines)
 
     if print_matches:
-        stdout_matches(file2matches, before_context, after_context, abspaths=abspaths)
+        stdout_matches(
+            file2matches, before_context, after_context, abspaths)
 
     file2linenos = {
         filename: linenos for filename, (_, linenos) in file2matches.items()
