@@ -7,40 +7,41 @@ pip-compile: install-pip-tools
 
 
 ## @category Dev-build
-## Instala as dependências e configurações para o ambiente de desenvolvimento
+## Install all the dev dependencies
 install-dev:
 	pip install -r requirements_dev.txt
 	pip install -r requirements.txt
 	pre-commit install
 	python3 setup.py develop
 
-## Instala das dependências sem o pre-commit
-## Usado só para reduzir o tempo de instalacao no docker
-install-dev-no-precommit:
-	pip install -r requirements_dev.txt
-	pip install -r requirements.txt
-	python3 setup.py develop
 
 ## @category Dev-build
-## Busca pelos dependências, resolve confiltos e atualiza as versões
+## Search for all the dependencies and install them
 sync-env: pip-compile
 	pip-sync requirements.txt requirements_dev.txt
 	python3 setup.py develop
 
 ## @category Dev-Code Quality
-## Executa os testes unitários
+## Run all the tests
 test:
 	pytest -svv tests
 
+## @category Dev-Code Quality
+## Linter  
+linter:
+	flake8 pyastsearch
 
 ## @category Dev-Code Quality
-## Executa o pre-commit para verificar e executar todos os comandos
-## que garantem qualidade do código
+## reformat code through black
+reformat:
+	black pyastsearch
+
+## @category Dev-Code Quality
 pre-commit:
 	pre-commit run --all-files
 
 ## @category Users
-## Instala as dependências
+## Install
 install:
 	pip install -r requirements.txt
 	python3 setup.py develop
@@ -106,7 +107,8 @@ default_category_tag_end = "\<\\\/category-default\>"
 
 DEFAULT_CATEGORY = Targets and Arguments
 
-## Mostra ajuda
+## @category Help
+## all targets available
 help:
 	@echo "Usage: make [$(TARGET_STYLED_HELP_NAME) [$(TARGET_STYLED_HELP_NAME) ...]] [$(ARGUMENTS_HELP_NAME) [$(ARGUMENTS_HELP_NAME) ...]]"
 	@sed -n -e "/^## / { \
