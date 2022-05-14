@@ -1,0 +1,23 @@
+{
+    "mix_examples.py":[
+        ["//ClassDef[re:match('.*Var', @name)]", [4, 23]],
+        ["//ClassDef", [4, 17, 23]],
+        [".//ExceptHandler", [31]],
+        [
+            "//For/body[AugAssign/op/Add and count(child::*)=1]", 
+            [35]
+        ],
+        [
+            "//Constant", 
+            [35]
+        ],
+        [
+            ".//Constant[not(ancestor::Assign)]", 
+            [35, 39, 42]
+        ],
+        [
+            ".//Constant[not(ancestor::Assign) and @type='int']", 
+            [35, 39]
+        ]
+    ]
+}

@@ -24,3 +24,23 @@ class Example3Var(TypeVar):
     def __init__(self, name: str, value: str):
         self.name = name
         self.value = value
+
+a = 2
+try:
+    c = 1/a
+except ImportError:
+    c = 0
+
+sum_r = 0
+for i in range(10):
+    sum_r += i
+
+sum_r = 0
+for i in range(10):
+   a = i
+
+for c in "abc":
+    print(c)
+
+for val in [1, 2, 3]:
+    print(val)
