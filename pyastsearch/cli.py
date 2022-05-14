@@ -14,7 +14,6 @@ from pathlib import Path
 import argparse
 import yaml
 from pyastsearch.search import search_in_folder, search_in_file
-from pyastsearch.config import __default_expr_info
 
 
 def main():
@@ -105,12 +104,15 @@ def main():
 
     yml_file = Path(".").resolve() / ".pyastsearch.yaml"
     exclude_folders = [".venv"]
-    expr_list = args.expr
-    expr = {e: __default_expr_info.copy() for e in expr_list}
+    expr = args.expr
+    if isinstance(expr, str):
+        expr = [expr]
+
     if os.path.isfile(yml_file):
         with open(yml_file, "r") as f:
             config = yaml.safe_load(f)
             exclude_folders = config.get("exclude_folders", exclude_folders)
+        if len(expr) == 0:
             rules = config.get("rules", False)
             if rules:
                 expr = rules
@@ -128,8 +130,7 @@ def main():
     abspaths = config.get("abspaths", args.abspaths)
     parallel = config.get("parallel", args.parallel)
 
-    if isinstance(expr, str):
-        expr = [expr]
+    
 
     if args.file != "":
         search_in_file(
