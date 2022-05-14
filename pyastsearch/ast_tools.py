@@ -26,7 +26,8 @@ def _strip_docstring(body):
 
 def convert_to_xml(node, omit_docstrings=False, node_mappings=None):
     """Convert supplied AST node to XML."""
-    possible_docstring = isinstance(node, (ast.FunctionDef, ast.ClassDef, ast.Module))
+    possible_docstring = isinstance(
+        node, (ast.FunctionDef, ast.ClassDef, ast.Module))
 
     xml_node = etree.Element(node.__class__.__name__)
     for attr in ('lineno', 'col_offset'):
@@ -93,7 +94,7 @@ def convert_to_xml(node, omit_docstrings=False, node_mappings=None):
 
 
 def txt2ast(
-        txt: str, filename: str = "<unknown>", 
+        txt: str, filename: str = "<unknown>",
         verbose: bool = True) -> ast.Module:
     """Convert Python file contents (as a string) to an AST.
 

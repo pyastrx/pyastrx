@@ -25,7 +25,7 @@ def context(lines, index, before=0, after=0, both=0):
     return islice(enumerate(lines), start, end)
 
 
-def stdout_matches(
+def stdout_matches_by_filename(
         matching_lines, filename, file_lines,
         before_context=0, after_context=0, abspaths=False,):
     path = os.path.abspath(filename) if abspaths else filename
@@ -43,6 +43,20 @@ def stdout_matches(
         if before_context or after_context:
             print()
         print("-"*20)
+
+
+def stdout_matches(
+        file2matches,
+        before_context=0, after_context=0, abspaths=False,):
+    for filename, (file_lines, matching_lines) in file2matches.items():
+        if len(matching_lines) == 0:
+            continue
+        print("\n")
+        stdout_matches_by_filename(
+            matching_lines, filename, file_lines,
+            before_context, after_context, abspaths)
+        print(f"[bold red]{'='*15}End of {filename}{'='*15}[/bold red]")
+        print("\n\n")
 
 
 def stdout_xml(matching_elements, xml_ast):

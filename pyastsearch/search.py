@@ -3,7 +3,6 @@ import os
 import multiprocessing as mp
 from functools import partial
 from pathlib import Path
-from rich import print
 
 from pyastsearch.xml_tools import linenos_from_xml
 from pyastsearch.ast_tools import convert_to_xml, txt2ast
@@ -43,8 +42,9 @@ def search(
         directory, expression, print_matches=False, print_xml=True,
         verbose=False, abspaths=False, recurse=True,
         extension="py",
-        before_context=5, after_context=4,
+        before_context=0, after_context=0,
         parallel=True,
+        exclude_dirs=[".venv"]
 ):
     """
     Perform a recursive search through Python files.
@@ -59,10 +59,11 @@ def search(
             files = Path(directory).rglob(f'*.{extension}')
         else:
             files = Path(directory).glob(f'*.{extension}')
-        files = [str(f) for f in files]
-    
+        files = [
+            f for f in files 
+            if not any(d in f.parts for d in exclude_dirs)
+        ]
     if parallel:
-       
         with mp.Pool() as pool:
             results = pool.map(
                 partial(
@@ -82,16 +83,10 @@ def search(
                 filename, expression, print_xml, verbose=verbose) 
             file2matches[filename] = (file_lines, matching_lines)
 
-    for filename, (file_lines, matching_lines) in file2matches.items():
-        if print_matches:
-            if len(matching_lines) == 0:
-                continue
-            print("\n")
-            stdout_matches(
-                matching_lines, filename, file_lines,
-                before_context, after_context, abspaths)
-            print(f"[bold red]{'='*15}End of {filename}{'='*15}[/bold red]")
-            print("\n\n")
+    if print_matches:
+        stdout_matches(
+            file2matches, before_context, after_context, abspaths=abspaths)
+
     file2linenos = {
         filename: linenos for filename, (_, linenos) in file2matches.items()
     }
