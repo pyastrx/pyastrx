@@ -27,20 +27,20 @@ def context(lines, index, before=0, after=0, both=0):
     return islice(enumerate(lines), start, end)
 
 
-def print_match_description(expressions, matching_lines):
-    for expression in expressions:
-        infos = matching_lines[expression]["infos"]
+def print_match_description(rules, matching_lines):
+    for expression in rules:
+        rule = matching_lines[expression]["rule_infos"]
         # check if empty dict
-        if len(infos) == 0:
+        if len(rule) == 0:
             continue
-        severity = infos.get("severity", "default")
+        severity = rule.get("severity", "default")
         try:
             color = __severity2color[severity]
         except KeyError:
             color = __severity2color["default"]
-        why = infos.get("why", "")
-        name = infos.get("name", "")
-        description = infos.get("description", "")
+        why = rule.get("why", "")
+        name = rule.get("name", "")
+        description = rule.get("description", "")
         print(
             f"{color} - {name:<5}|",
             f"{why:<18}|",
@@ -86,8 +86,8 @@ def stdout_matches_by_filename(
     rprint(f"[bold white on green]File:{path}[/bold white on green]")
     rprint(f"[bold white on green]Matches:{len(lines)}[/bold white on green]")
     for line_match in lines:
-        expressions = line2expression[line_match]
-        print_match_description(expressions, matching_lines)
+        rules = line2expression[line_match]
+        print_match_description(rules, matching_lines)
         matching_lines_context = list(
             context(file_lines, line_match - 1, before_context, after_context)
         )

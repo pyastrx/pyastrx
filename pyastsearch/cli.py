@@ -8,16 +8,15 @@ For more help use::
     astpath -h
 
 """
-
 import os
 from pathlib import Path
 import argparse
 import yaml
 from pyastsearch.search import search_in_folder, search_in_file
+from pyastsearch.config import __available_yaml, __available_yaml_folder
 
 
-def main():
-    """Entrypoint for CLI."""
+def construct_base_argparse():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-q",
@@ -87,61 +86,60 @@ def main():
         nargs="+",
         default=[],
     )
-    args = parser.parse_args()
+    parser.add_argument(
+        "--exclude",
+        help="exclude folders",
+        nargs="+",
+        default=[".venv"],
+    )
+    return parser
 
+
+def pyxpathlinter():
+    parser = construct_base_argparse()
+    args = parser.parse_args()
+    config = {}
+    invoke_pyastsearch(args, config)
+
+
+def pyastsearch():
+    parser = construct_base_argparse()
+    args = parser.parse_args()
+    config = {}
+    invoke_pyastsearch(args, config)
+
+
+def invoke_pyastsearch(args, extra_config):
     yml_file = Path(".").resolve() / ".pyastsearch.yaml"
-    exclude_folders = [".venv"]
     expr = args.expr
     if isinstance(expr, str):
         expr = [expr]
-
+    config = {}
     if os.path.isfile(yml_file):
         with open(yml_file, "r") as f:
-            config = yaml.safe_load(f)
-            exclude_folders = config.get("exclude_folders", exclude_folders)
+            yaml_config = yaml.safe_load(f)
         if len(expr) == 0:
-            rules = config.get("rules", False)
+            rules = yaml_config.get("rules", False)
             if rules:
                 expr = rules
-    else:
-        config = {}
+    if len(expr) == 0:
+        raise ValueError("No rules or expression provided")
 
-    folder = config.get("folder", args.folder)
-    quiet = config.get("quiet", args.quiet)
-    verbose = config.get("verbose", args.verbose)
-    xml = config.get("xml", args.xml)
-    abspaths = config.get("abspaths", args.abspaths)
-    recursive = config.get("recursive", args.recursive)
-    after_context = config.get("after_context", args.after_context)
-    before_context = config.get("before_context", args.before_context)
-    abspaths = config.get("abspaths", args.abspaths)
-    parallel = config.get("parallel", args.parallel)
-    print_matches = config.get("print_matches", not quiet)
-
+    config["rules"] = expr
+    for key, val in __available_yaml.items():
+        config[key] = yaml_config.get(key, val)
+    config = {**config, **extra_config}
     if args.file != "":
         search_in_file(
             filename=args.file,
-            expressions=expr,
-            print_matches=print_matches,
-            abspaths=abspaths,
-            before_context=before_context,
-            after_context=after_context,
+            **config
         )
     else:
+        for key, val in __available_yaml_folder.items():
+            config[key] = yaml_config.get(key, val)
+        print(config)
         search_in_folder(
-            folder,
-            expr,
-            print_xml=xml,
-            print_matches=print_matches,
-            verbose=verbose,
-            abspaths=abspaths,
-            recurse=recursive,
-            before_context=before_context,
-            after_context=after_context,
-            exclude_folders=exclude_folders,
-            parallel=parallel,
+            **config,
         )
 
 
-if __name__ == "__main__":
-    main()
