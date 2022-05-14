@@ -1,4 +1,4 @@
-"""Functions for searching the XML from file, file contents, or directory."""
+"""Functions for searching the XML from file, file contents, or folder."""
 import multiprocessing as mp
 from functools import partial
 from pathlib import Path
@@ -105,8 +105,8 @@ def search_in_file(
     return matching_lines
 
 
-def search_in_dir(
-    directory,
+def search_in_folder(
+    folder,
     expression,
     print_matches=False,
     print_xml=True,
@@ -117,13 +117,13 @@ def search_in_dir(
     before_context=0,
     after_context=0,
     parallel=True,
-    exclude_dirs=[".venv"],
+    exclude_folders=[".venv"],
 ):
-    """Search in a directory and return the matching lines as well show the matches
+    """Search in a folder and return the matching lines as well show the matches
     in stdout.
 
     Args:
-        directory (str): The directory to search.
+        folder (str): The folder to search.
         expression (str): The search expression.
         print_matches (bool): Print the matches in stdout.
         print_xml (bool): Print the XML of the AST.
@@ -134,7 +134,7 @@ def search_in_dir(
         before_context (int): Lines of context to display before matching line.
         after_context (int): Lines of context to display after matching line.
         parallel (bool): Use multiprocessing.
-        exclude_dirs (list): List of directories to exclude.
+        exclude_folders (list): List of directories to exclude.
 
     Returns:
         dict: The filename is the key, and the value is the matching lines.
@@ -142,10 +142,10 @@ def search_in_dir(
     """
 
     if recurse:
-        files = Path(directory).rglob(f"*.{extension}")
+        files = Path(folder).rglob(f"*.{extension}")
     else:
-        files = Path(directory).glob(f"*.{extension}")
-    files = [f for f in files if not any(d in f.parts for d in exclude_dirs)]
+        files = Path(folder).glob(f"*.{extension}")
+    files = [f for f in files if not any(d in f.parts for d in exclude_folders)]
     if parallel:
         with mp.Pool() as pool:
             results = pool.map(

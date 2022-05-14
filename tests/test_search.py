@@ -1,6 +1,6 @@
 import os
 import json
-from pyastsearch.search import search_in_dir, search_in_file
+from pyastsearch.search import search_in_folder, search_in_file
 
 
 def test_print_ast_finds():
@@ -41,7 +41,7 @@ def test_all_code_repo():
 def test_folder_search():
     pyastsearch_folder = os.path.dirname(
         os.path.abspath(__file__)).replace("tests", "pyastsearch")
-    search_in_dir(
+    search_in_folder(
         pyastsearch_folder,
         "//Name[string-length(@id) > 5]",
         verbose=False,

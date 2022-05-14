@@ -1,14 +1,18 @@
 # Refactor 
 
 ## Todo 
-- [] Support for multiprocessing
-- [] Rich output
-- [] tests cases
-- [] decouple
-- [] allow to get just the line numbers and files
+- [x] Support for multiprocessing
+- [x] Rich output
+- [x] tests cases
+- [x] decouple
+- [x] allow to get just the line numbers and files
 - [] vscode integration
 - [] documentation
-
+- [x] execute from current directory 
+  - [x] read yaml config
+  - [x] allow to set the dir in command line
+- [] pre-commit
+- [] fix multiple expressions search
 # astpath
 [![PyPI version](https://badge.fury.io/py/astpath.svg)](https://badge.fury.io/py/astpath)
 

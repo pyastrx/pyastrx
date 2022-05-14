@@ -10,9 +10,10 @@ For more help use::
 """
 
 import os
+from pathlib import Path
 import argparse
 import yaml
-from pyastsearch.search import search_in_dir, search_in_file
+from pyastsearch.search import search_in_folder, search_in_file
 
 
 def main():
@@ -49,9 +50,15 @@ def main():
         action="store_false",
     )
     parser.add_argument(
+        "-p",
+        "--parallel",
+        help="disable parallel search",
+        action="store_false",
+    )
+    parser.add_argument(
         "-d",
-        "--dir",
-        help="search directory",
+        "--folder",
+        help="search folder",
         default=".",
     )
     parser.add_argument(
@@ -82,7 +89,7 @@ def main():
         default=0,
     )
     parser.add_argument(
-        "expr",
+        "--expr",
         help="search expression",
         nargs="+",
     )
@@ -93,29 +100,56 @@ def main():
     if (before_context or after_context) and args.quiet:
         print("ERROR: Context cannot be specified when suppressing output.")
         exit(1)
-    expr = " ".join(args.expr)
+
+    yml_file = Path(".").resolve() / ".pyastsearch.yaml"
+    exclude_folders = [".venv"]
+    expr = args.expr
+    if os.path.isfile(yml_file):
+        with open(yml_file, "r") as f:
+            config = yaml.safe_load(f)
+            exclude_folders = config.get("exclude_folders", exclude_folders)
+            rules = config.get("rules", False)
+            if rules:
+                expr = list(rules.keys())
+    else:
+        config = {}
+
+    folder = config.get("folder", args.folder)
+    quiet = config.get("quiet", args.quiet)
+    verbose = config.get("verbose", args.verbose)
+    xml = config.get("xml", args.xml)
+    abspaths = config.get("abspaths", args.abspaths)
+    recursive = config.get("recursive", args.recursive)
+    after_context = config.get("after_context", after_context)
+    before_context = config.get("before_context", before_context)
+    abspaths = config.get("abspaths", args.abspaths)
+    parallel = config.get("parallel", args.parallel)
+
+    expr = " ".join(expr)
     if args.file != "":
         search_in_file(
             args.file,
             expr,
-            args.quiet,
-            args.verbose,
-            args.xml,
-            args.abspaths,
+            quiet,
+            verbose,
+            xml,
+            abspaths,
             before_context,
             after_context,
         )
     else:
-        search_in_dir(
-            args.dir,
+        search_in_folder(
+            folder,
             expr,
-            print_xml=args.xml,
-            print_matches=not args.quiet,
-            verbose=args.verbose,
-            abspaths=args.abspaths,
-            recurse=args.recursive,
+            print_xml=xml,
+            print_matches=True,
+            verbose=verbose,
+            abspaths=abspaths,
+            recurse=recursive,
             before_context=before_context,
             after_context=after_context,
+            exclude_folders=exclude_folders,
+            parallel=parallel,
         )
 
 
