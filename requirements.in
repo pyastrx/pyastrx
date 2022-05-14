@@ -1,4 +1,5 @@
 tabulate
 rich
 pyaml
+colorama
 lxml>=3.3.5

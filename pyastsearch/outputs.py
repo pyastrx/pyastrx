@@ -2,7 +2,8 @@ import os
 from itertools import islice
 from rich import print as rprint
 from lxml.etree import tostring
-from colorama import Fore, Style, Back
+from colorama import Style
+from pyastsearch.config import __severity2color
 
 
 def context(lines, index, before=0, after=0, both=0):
@@ -37,7 +38,7 @@ def stdout_matches_by_filename(
     path = os.path.abspath(filename) if abspaths else filename
     line2expression = {}
     for expression in matching_lines.keys():
-        for line_number in matching_lines[expression]:
+        for line_number in matching_lines[expression]["lines"]:
             if line_number not in line2expression.keys():
                 line2expression[line_number] = [expression]
             else:
@@ -51,7 +52,13 @@ def stdout_matches_by_filename(
         )
         expressions = line2expression[line_match]
         for expression in expressions:
-            print(f"{Fore.CYAN}{expression}{Style.RESET_ALL}")
+            infos = matching_lines[expression]["infos"]
+            severity = infos.get("severity", "default")
+            try:
+                color = __severity2color[severity]
+            except KeyError:
+                color = __severity2color["default"]
+            print(f"{color}{infos['name']}|{infos['description']}|{infos['why']}{Style.RESET_ALL}")
         for lineno, line in matching_lines_context:
             if lineno == line_match - 1 and after_context > 0 and before_context > 0:
                 rprint(f"[white on yellow]{f'{lineno+1}:':<5}{line}[/white on yellow]")

@@ -33,14 +33,17 @@ def search_in_txt(
         node_mappings=node_mappings,
     )
     matching_lines = {}
-    for expression in expressions:
+    for expression, infos in expressions.items():
         matching_elements = xml_ast.xpath(expression)
         if print_xml:
             stdout_xml(matching_elements, xml_ast)
 
         matching_lines_by_exp = linenos_from_xml(
             matching_elements, node_mappings)
-        matching_lines[expression] = matching_lines_by_exp
+        matching_lines[expression] = {
+            "lines": matching_lines_by_exp,
+            "infos" : infos,
+        }
 
     return matching_lines
 

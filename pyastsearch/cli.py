@@ -14,7 +14,7 @@ from pathlib import Path
 import argparse
 import yaml
 from pyastsearch.search import search_in_folder, search_in_file
-
+from pyastsearch.config import __default_expr_info
 
 def main():
     """Entrypoint for CLI."""
@@ -92,6 +92,7 @@ def main():
         "--expr",
         help="search expression",
         nargs="+",
+        default=[],
     )
     args = parser.parse_args()
 
@@ -103,14 +104,15 @@ def main():
 
     yml_file = Path(".").resolve() / ".pyastsearch.yaml"
     exclude_folders = [".venv"]
-    expr = args.expr
+    expr_list = args.expr
+    expr = {e: __default_expr_info.copy() for e in expr_list}                
     if os.path.isfile(yml_file):
         with open(yml_file, "r") as f:
             config = yaml.safe_load(f)
             exclude_folders = config.get("exclude_folders", exclude_folders)
             rules = config.get("rules", False)
             if rules:
-                expr = list(rules.keys())
+                expr = rules
     else:
         config = {}
 
