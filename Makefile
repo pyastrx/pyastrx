@@ -1,5 +1,5 @@
 install-pip-tools:
-	python3 -m pip install pip-tools
+	python3 -m pip install pip-tools --upgrade
 
 pip-compile: install-pip-tools
 	pip-compile requirements.in
@@ -18,7 +18,6 @@ install-dev:
 ## @category Dev-build
 ## Search for all the dependencies and install them
 sync-env: pip-compile
-    pip install pip-tools --upgrade
 	pip-sync requirements.txt requirements_dev.txt
 	python3 setup.py develop
 
