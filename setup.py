@@ -5,12 +5,12 @@ from setuptools import setup
 setup(
     name='pyastsearch',
     packages=['pyastsearch'],
-    version='0.9.1',
-    description='A query language for Python abstract syntax trees',
+    version='0.0.1',
+    description='based on H. Chase Stevens idea',
     license='MIT',
-    author='H. Chase Stevens',
-    author_email='chase@chasestevens.com',
-    url='https://github.com/hchasestevens/astpath',
+    author='Bruno Messias',
+    author_email='devmessias@gmail.com',
+    url='',
     extras_require={
         'xpath': ['lxml>=3.3.5', ]
     },
@@ -23,7 +23,6 @@ setup(
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
         'License :: OSI Approved :: MIT License',
