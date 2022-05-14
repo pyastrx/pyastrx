@@ -12,7 +12,7 @@ For more help use::
 import os
 import argparse
 import yaml
-from pyastsearch.search import search
+from pyastsearch.search import search_in_dir, search_in_file
 
 
 def main():
@@ -44,15 +44,21 @@ def main():
     )
     parser.add_argument(
         "-R",
-        "--no-recurse",
-        help="ignore subdirectories, searching only files in the specified directory",
-        action="store_true",
+        "--recursive",
+        help="subdirectories search",
+        action="store_false",
     )
     parser.add_argument(
         "-d",
         "--dir",
-        help="search directory or file",
+        help="search directory",
         default=".",
+    )
+    parser.add_argument(
+        "-f",
+        "--file",
+        help="search in a file",
+        default="",
     )
     parser.add_argument(
         "-A",
@@ -82,30 +88,35 @@ def main():
     )
     args = parser.parse_args()
 
-    if os.path.isfile(args.dir):
-        recurse = False
-        if not args.no_recurse and args.verbose:
-            print("WARNING: Not recursing, as a single file was passed.")
-    else:
-        recurse = not args.no_recurse
-
     before_context = args.before_context or args.context
     after_context = args.after_context or args.context
     if (before_context or after_context) and args.quiet:
         print("ERROR: Context cannot be specified when suppressing output.")
         exit(1)
-
-    search(
-        args.dir,
-        " ".join(args.expr),
-        print_xml=args.xml,
-        print_matches=not args.quiet,
-        verbose=args.verbose,
-        abspaths=args.abspaths,
-        recurse=recurse,
-        before_context=before_context,
-        after_context=after_context,
-    )
+    expr = " ".join(args.expr)
+    if args.file != "":
+        search_in_file(
+            args.file,
+            expr,
+            args.quiet,
+            args.verbose,
+            args.xml,
+            args.abspaths,
+            before_context,
+            after_context,
+        )
+    else:
+        search_in_dir(
+            args.dir,
+            expr,
+            print_xml=args.xml,
+            print_matches=not args.quiet,
+            verbose=args.verbose,
+            abspaths=args.abspaths,
+            recurse=args.recursive,
+            before_context=before_context,
+            after_context=after_context,
+        )
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 import os
 import json
-from pyastsearch.search import search
+from pyastsearch.search import search_in_dir, search_in_file
 
 
 def test_print_ast_finds():
@@ -11,11 +11,10 @@ def test_print_ast_finds():
         file = f"tests/code_repo/{filename}"
         for (xpath, linenos) in items:       
             print(f"Searching in {file} for {xpath}") 
-            files2linenos = search(
+            search_in_file(
                 file,
                 xpath,
                 verbose=False,
-                recurse=False,
                 print_xml=False,
                 print_matches=True,
             )
@@ -28,26 +27,24 @@ def test_all_code_repo():
     for filename, items in xpath2linenos.items():
         file = f"tests/code_repo/{filename}"
         for (xpath, linenos) in items:
-            files2linenos = search(
+            linenos_search = search_in_file(
                 file,
                 xpath,
                 verbose=False,
-                recurse=False,
                 print_xml=False,
                 print_matches=False,
             )
-            for file, linenos_search in files2linenos.items():
-                for lineno in linenos_search:
-                    assert lineno in linenos
-    
+            for lineno in linenos_search:
+                assert lineno in linenos
+
 
 def test_folder_search():
     pyastsearch_folder = os.path.dirname(
         os.path.abspath(__file__)).replace("tests", "pyastsearch")
-    search(
+    search_in_dir(
         pyastsearch_folder,
         "//Name[string-length(@id) > 5]",
         verbose=False,
         print_xml=False,
-        print_matches=True,
+        print_matches=False,
     )

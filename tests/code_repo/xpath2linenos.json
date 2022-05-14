@@ -6,18 +6,14 @@
         [
             "//For/body[AugAssign/op/Add and count(child::*)=1]", 
             [35]
-        ],
-        [
-            "//Constant", 
-            [35]
-        ],
+        ], 
         [
             ".//Constant[not(ancestor::Assign)]", 
-            [35, 39, 42]
+            [35, 39, 42, 45]
         ],
         [
             ".//Constant[not(ancestor::Assign) and @type='int']", 
-            [35, 39]
+            [35, 39, 45]
         ]
     ]
 }

@@ -1,4 +1,4 @@
-typing_extensions==4.1.1
 tabulate
 rich
+pyaml
 lxml>=3.3.5
