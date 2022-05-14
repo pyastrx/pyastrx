@@ -4,12 +4,6 @@ before_context: 2
 folder: 'tests'
 parallel: true
 rules:
-  "//ClassDef[re:match('.*Var', @name)]":
-    name: "B001"
-    description: "Classes with 'Var' in name"
-    severity: "warning"
-    why: "bad practice"
-    ignore: false
   ".//Constant[not(ancestor::Assign) and @type='int']":
     name: "R001"
     description: "Constant with int type"

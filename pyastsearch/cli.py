@@ -82,25 +82,12 @@ def main():
         default=0,
     )
     parser.add_argument(
-        "-C",
-        "--context",
-        help="lines of context to display before and after matching line",
-        type=int,
-        default=0,
-    )
-    parser.add_argument(
         "--expr",
         help="search expression",
         nargs="+",
         default=[],
     )
     args = parser.parse_args()
-
-    before_context = args.before_context or args.context
-    after_context = args.after_context or args.context
-    if (before_context or after_context) and args.quiet:
-        print("ERROR: Context cannot be specified when suppressing output.")
-        exit(1)
 
     yml_file = Path(".").resolve() / ".pyastsearch.yaml"
     exclude_folders = [".venv"]
@@ -125,30 +112,27 @@ def main():
     xml = config.get("xml", args.xml)
     abspaths = config.get("abspaths", args.abspaths)
     recursive = config.get("recursive", args.recursive)
-    after_context = config.get("after_context", after_context)
-    before_context = config.get("before_context", before_context)
+    after_context = config.get("after_context", args.after_context)
+    before_context = config.get("before_context", args.before_context)
     abspaths = config.get("abspaths", args.abspaths)
     parallel = config.get("parallel", args.parallel)
-
-    
+    print_matches = config.get("print_matches", not quiet)
 
     if args.file != "":
         search_in_file(
-            args.file,
-            expr,
-            quiet,
-            verbose,
-            xml,
-            abspaths,
-            before_context,
-            after_context,
+            filename=args.file,
+            expressions=expr,
+            print_matches=print_matches,
+            abspaths=abspaths,
+            before_context=before_context,
+            after_context=after_context,
         )
     else:
         search_in_folder(
             folder,
             expr,
             print_xml=xml,
-            print_matches=True,
+            print_matches=print_matches,
             verbose=verbose,
             abspaths=abspaths,
             recurse=recursive,

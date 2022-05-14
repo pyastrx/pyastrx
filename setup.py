@@ -17,6 +17,8 @@ setup(
     entry_points={
         'console_scripts': [
             'pyastsearch = pyastsearch.cli:main',
+            'pyxpathlinter = pyastsearch.cli:main',
+
         ]
     },
     keywords='xpath xml ast asts syntax query',
