@@ -16,6 +16,7 @@ import yaml
 from pyastsearch.search import search_in_folder, search_in_file
 from pyastsearch.config import __default_expr_info
 
+
 def main():
     """Entrypoint for CLI."""
     parser = argparse.ArgumentParser()
@@ -105,7 +106,7 @@ def main():
     yml_file = Path(".").resolve() / ".pyastsearch.yaml"
     exclude_folders = [".venv"]
     expr_list = args.expr
-    expr = {e: __default_expr_info.copy() for e in expr_list}                
+    expr = {e: __default_expr_info.copy() for e in expr_list}
     if os.path.isfile(yml_file):
         with open(yml_file, "r") as f:
             config = yaml.safe_load(f)

@@ -23,8 +23,11 @@ def search_in_txt(
     Returns:
         dict: The matching lines.
     """
-
     node_mappings = {}
+    if isinstance(expressions, str):
+        expressions = {expressions: {}}
+    elif isinstance(expressions, list):
+        expressions = {e: {} for e in expressions}
 
     parsed_ast = txt2ast(txt, filename, verbose=verbose)
     xml_ast = convert_to_xml(
@@ -42,7 +45,7 @@ def search_in_txt(
             matching_elements, node_mappings)
         matching_lines[expression] = {
             "lines": matching_lines_by_exp,
-            "infos" : infos,
+            "infos": infos,
         }
 
     return matching_lines
@@ -57,7 +60,7 @@ def get_matches_in_file(filename, expressions, print_xml=False, verbose=False):
         print_xml (bool): Print the XML of the AST.
         verbose (bool): Verbose output.
     Returns:
-        (str, list, list): The filename, the lines of the file, 
+        (str, list, list): The filename, the lines of the file,
             and the matching lines.
 
     """
@@ -153,7 +156,10 @@ def search_in_folder(
         files = Path(folder).rglob(f"*.{extension}")
     else:
         files = Path(folder).glob(f"*.{extension}")
-    files = [f for f in files if not any(d in f.parts for d in exclude_folders)]
+    files = [
+        f for f in files
+        if not any(d in f.parts for d in exclude_folders)
+    ]
     if parallel:
         with mp.Pool() as pool:
             results = pool.map(
@@ -178,8 +184,7 @@ def search_in_folder(
             file2matches[filename] = (file_lines, matching_lines)
 
     if print_matches:
-        stdout_matches(
-            file2matches, before_context, after_context, abspaths)
+        stdout_matches(file2matches, before_context, after_context, abspaths)
 
     file2linenos = {
         filename: linenos for filename, (_, linenos) in file2matches.items()

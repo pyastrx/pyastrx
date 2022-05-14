@@ -27,10 +27,12 @@ def context(lines, index, before=0, after=0, both=0):
     return islice(enumerate(lines), start, end)
 
 
-def print_match_description(
-        expressions, matching_lines):
+def print_match_description(expressions, matching_lines):
     for expression in expressions:
         infos = matching_lines[expression]["infos"]
+        # check if empty dict
+        if len(infos) == 0:
+            continue
         severity = infos.get("severity", "default")
         try:
             color = __severity2color[severity]
@@ -38,18 +40,22 @@ def print_match_description(
             color = __severity2color["default"]
         why = infos.get("why", "")
         name = infos.get("name", "")
+        description = infos.get("description", "")
         print(
             f"{color} - {name:<5}|",
             f"{why:<18}|",
-            f"{infos['description']}{Style.RESET_ALL}"
+            f"{description}{Style.RESET_ALL}"
         )
 
 
 def print_lines_context(
-        matching_lines_context, line_match, after_context, before_context):
+    matching_lines_context, line_match, after_context, before_context
+):
     for lineno, line in matching_lines_context:
         line_is_match = lineno == line_match - 1
-        should_highlight = line_is_match and (after_context > 0 or before_context > 0) # noqa
+        should_highlight = line_is_match and (
+            after_context > 0 or before_context > 0
+        )  # noqa
         if should_highlight:
             line_str = f"{f' {lineno+1}:':<5}{line}"
             rprint(f"[{__color_highlight}]{line_str}[/{__color_highlight}]")
@@ -86,7 +92,8 @@ def stdout_matches_by_filename(
             context(file_lines, line_match - 1, before_context, after_context)
         )
         print_lines_context(
-            matching_lines_context, line_match, after_context, before_context)
+            matching_lines_context, line_match, after_context, before_context
+        )
 
 
 def stdout_matches(
