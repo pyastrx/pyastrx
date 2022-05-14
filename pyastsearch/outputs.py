@@ -48,7 +48,9 @@ def print_match_description(
 def print_lines_context(
         matching_lines_context, line_match, after_context, before_context):
     for lineno, line in matching_lines_context:
-        if lineno == line_match - 1 and after_context > 0 and before_context > 0:
+        line_is_match = lineno == line_match - 1
+        should_highlight = line_is_match and (after_context > 0 or before_context > 0)
+        if should_highlight:
             line_str = f"{f' {lineno+1}:':<5}{line}" 
             rprint(f"[{__color_highlight}]{line_str}[/{__color_highlight}]")
         else:
