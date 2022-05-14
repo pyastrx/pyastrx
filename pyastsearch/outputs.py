@@ -49,9 +49,9 @@ def print_lines_context(
         matching_lines_context, line_match, after_context, before_context):
     for lineno, line in matching_lines_context:
         line_is_match = lineno == line_match - 1
-        should_highlight = line_is_match and (after_context > 0 or before_context > 0)
+        should_highlight = line_is_match and (after_context > 0 or before_context > 0) # noqa
         if should_highlight:
-            line_str = f"{f' {lineno+1}:':<5}{line}" 
+            line_str = f"{f' {lineno+1}:':<5}{line}"
             rprint(f"[{__color_highlight}]{line_str}[/{__color_highlight}]")
         else:
             rprint(f"{f' {lineno+1}:':<5}{line}")
@@ -79,7 +79,7 @@ def stdout_matches_by_filename(
     lines = line2expression.keys()
     rprint(f"[bold white on green]File:{path}[/bold white on green]")
     rprint(f"[bold white on green]Matches:{len(lines)}[/bold white on green]")
-    for line_match in lines: 
+    for line_match in lines:
         expressions = line2expression[line_match]
         print_match_description(expressions, matching_lines)
         matching_lines_context = list(

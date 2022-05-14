@@ -15,4 +15,4 @@ __severity2color = {
     "debug": Fore.MAGENTA,
     "default": Fore.GREEN,
 }
-__color_highlight = "white on yellow"
+__color_highlight = "white on magenta"
