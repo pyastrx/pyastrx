@@ -27,40 +27,47 @@ def context(lines, index, before=0, after=0, both=0):
     return islice(enumerate(lines), start, end)
 
 
-def print_match_description(rules, matching_lines):
-    for expression in rules:
-        rule = matching_lines[expression]["rule_infos"]
-        # check if empty dict
-        if len(rule) == 0:
-            continue
-        severity = rule.get("severity", "default")
-        try:
-            color = __severity2color[severity]
-        except KeyError:
-            color = __severity2color["default"]
-        why = rule.get("why", "")
-        name = rule.get("name", "")
-        description = rule.get("description", "")
-        print(
-            f"{color} - {name:<5}|",
-            f"{why:<18}|",
-            f"{description}{Style.RESET_ALL}"
-        )
+def print_match_description(cols, rule):
+    severity = rule.get("severity", "default")
+    try:
+        color = __severity2color[severity]
+    except KeyError:
+        color = __severity2color["default"]
+
+    why = rule.get("why", "")
+    name = rule.get("name", "")
+    description = rule.get("description", "")
+    cols_str = ",".join(map(str, cols))
+    print(
+        f"{color} - {name:<5}|",
+        f"{why:<18}|",
+        f"{description}{Style.RESET_ALL}",
+        f"{Style.BRIGHT}{f'{cols_str}'}{Style.RESET_ALL}",
+    )
 
 
 def print_lines_context(
-    matching_lines_context, line_match, after_context, before_context
+    matching_lines_context, line_match, after_context, before_context,
+    cols,
 ):
-    for lineno, line in matching_lines_context:
+    for (lineno), line in matching_lines_context:
         line_is_match = lineno == line_match - 1
         should_highlight = line_is_match and (
             after_context > 0 or before_context > 0
         )  # noqa
+        if line_is_match:
+            line_mark = [" "] * len(line)
+            for col_number in cols:
+                line_mark[col_number] = "^"
+            line_mark = ''.join(line_mark)
+            line_mark = f"{'':<5}{line_mark}"
         if should_highlight:
             line_str = f"{f' {lineno+1}:':<5}{line}"
             rprint(f"[{__color_highlight}]{line_str}[/{__color_highlight}]")
         else:
             rprint(f"{f' {lineno+1}:':<5}{line}")
+        if line_is_match:
+            rprint(f"{line_mark}")
     if before_context or after_context:
         print()
     rprint("-" * 20)
@@ -76,23 +83,43 @@ def stdout_matches_by_filename(
 ):
     path = os.path.abspath(filename) if abspaths else filename
     line2expression = {}
-    for expression in matching_lines.keys():
-        for line_number in matching_lines[expression]["lines"]:
-            if line_number not in line2expression.keys():
-                line2expression[line_number] = [expression]
+    for expression, data in matching_lines.items():
+        rule = data["rule_infos"]
+        for line_match in matching_lines[expression]["lines"]:
+            line_number = line_match[0]
+            if line_number not in line2expression:
+                line2expression[line_number] = {
+                    expression: {"col_number": [], "rule_infos": rule}
+                }
             else:
-                line2expression[line_number].append(expression)
-    lines = line2expression.keys()
+                line2expression[line_number][expression] = {
+                    "col_number": [],
+                    "rule_infos": rule,
+                }
+    for expression, rule in matching_lines.items():
+        for line_match in matching_lines[expression]["lines"]:
+            line_number = line_match[0]
+            col_number = line_match[1]
+            line2expression[line_number][expression]["col_number"].append(col_number)
+    
     rprint(f"[bold white on green]File:{path}[/bold white on green]")
-    rprint(f"[bold white on green]Matches:{len(lines)}[/bold white on green]")
-    for line_match in lines:
-        rules = line2expression[line_match]
-        print_match_description(rules, matching_lines)
+    #rprint(f"[bold white on green]Matches:{len(lines)}[/bold white on green]")
+
+    for line_match, expressions in line2expression.items():
+        # rules = line2expression[(line_match, col_number)]
+        #rules = matching_lines[expression]["rule_infos"]
+        cols = []
+        for _, info in expressions.items():
+            col_numbers = info["col_number"]
+            rule_infos = info["rule_infos"]
+            cols.extend(col_numbers)
+            print_match_description(col_numbers, rule_infos)
+        
         matching_lines_context = list(
             context(file_lines, line_match - 1, before_context, after_context)
         )
         print_lines_context(
-            matching_lines_context, line_match, after_context, before_context
+            matching_lines_context, line_match, after_context, before_context, cols
         )
 
 
@@ -105,7 +132,6 @@ def stdout_matches(
     for filename, (file_lines, matching_lines) in file2matches.items():
         if len(matching_lines) == 0:
             continue
-        print("\n")
         stdout_matches_by_filename(
             matching_lines,
             filename,
@@ -114,9 +140,6 @@ def stdout_matches(
             after_context,
             abspaths,
         )
-        rprint(f"[bold red]{'='*15}End of {filename}{'='*15}[/bold red]")
-        print("\n\n")
-
 
 def stdout_xml(matching_elements, xml_ast):
     for _ in matching_elements:

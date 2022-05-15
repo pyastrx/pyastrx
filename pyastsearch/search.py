@@ -111,8 +111,6 @@ def search_in_file(
             after_context,
             abspaths,
         )
-        rprint(f"[bold red]{'='*15}End of {filename}{'='*15}[/bold red]")
-        print("\n\n")
     return matching_lines
 
 

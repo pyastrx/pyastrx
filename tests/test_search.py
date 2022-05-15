@@ -35,7 +35,7 @@ def test_all_code_repo():
                 print_matches=False,
             )
             for expression, info in matching_lines.items():
-                for lineno in info["lines"]:
+                for lineno, cols in info["lines"]:
                     assert lineno in linenos
 
 
