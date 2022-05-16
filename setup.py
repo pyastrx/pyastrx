@@ -16,8 +16,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'pyastsearch = pyastsearch.cli:main',
-            'pyxpathlinter = pyastsearch.cli:main',
+            'pyastsearch = pyastsearch.frontend.cli:pyastsearch', 
 
         ]
     },

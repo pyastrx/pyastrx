@@ -18,7 +18,7 @@ def search(ctx, pattern, strings):
 
 def linenos_from_xml(elements, node_mappings=None):
     """Given a list of elements, return a list of line numbers."""
-    lines = []
+    lines = {}
     for element in elements:
         try:
             linenos = element.xpath("./ancestor-or-self::*[@lineno][1]/@lineno")
@@ -35,7 +35,31 @@ def linenos_from_xml(elements, node_mappings=None):
             linenos = (getattr(node_mappings[element], "lineno", 0),)
 
         if linenos:
-            col = col_offset[0] if col_offset else 0
-            lines.append((int(linenos[0]), int(col)))
+            col = int(col_offset[0]) if col_offset else 0
+            linenos = int(linenos[0])
 
+            if linenos not in lines:
+                lines[linenos] = [linenos, [col]]
+            else:
+                lines[linenos][1].append(col)
+
+    lines = list(lines.values())
     return lines
+
+
+def search_in_axml(rules, axml, node_mappings, verbose=False):
+    matching_by_expression = {}
+    if isinstance(rules, str):
+        rules = {rules: {}}
+    elif isinstance(rules, list):
+        rules = {rule: {} for rule in rules}
+    for expression, rule in rules.items():
+        matching_elements = axml.xpath(expression)
+
+        matching_lines_by_exp = linenos_from_xml(
+            matching_elements, node_mappings)
+        matching_by_expression[expression] = {
+            "line_nums": matching_lines_by_exp,
+            "rule_infos": rule,
+        }
+    return matching_by_expression

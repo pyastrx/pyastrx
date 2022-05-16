@@ -12,8 +12,10 @@ import os
 from pathlib import Path
 import argparse
 import yaml
-from pyastsearch.search import search_in_folder, search_in_file
+from pyastsearch.search import Repo
 from pyastsearch.config import __available_yaml, __available_yaml_folder
+from pyastsearch.report import humanize as report_humanize
+from rich import print as rprint
 
 
 def construct_base_argparse():
@@ -31,12 +33,6 @@ def construct_base_argparse():
         action="store_true",
     )
     parser.add_argument(
-        "-x",
-        "--xml",
-        help="print only the matching XML elements",
-        action="store_true",
-    )
-    parser.add_argument(
         "-a",
         "--abspaths",
         help="show absolute paths",
@@ -51,8 +47,8 @@ def construct_base_argparse():
     parser.add_argument(
         "-p",
         "--parallel",
-        help="disable parallel search",
-        action="store_false",
+        help="parallel search",
+        action="store_true",
     )
     parser.add_argument(
         "-d",
@@ -95,13 +91,6 @@ def construct_base_argparse():
     return parser
 
 
-def pyxpathlinter():
-    parser = construct_base_argparse()
-    args = parser.parse_args()
-    config = {}
-    invoke_pyastsearch(args, config)
-
-
 def pyastsearch():
     parser = construct_base_argparse()
     args = parser.parse_args()
@@ -129,17 +118,32 @@ def invoke_pyastsearch(args, extra_config):
     for key, val in __available_yaml.items():
         config[key] = yaml_config.get(key, val)
     config = {**config, **extra_config}
+    repo = Repo()
     if args.file != "":
-        search_in_file(
-            filename=args.file,
-            **config
+        repo.load_file(args.file)
+        matching_rules_by_line = repo.search_file(
+            args.file, config["rules"],
+            before_context=config["before_context"],
+            after_context=config["after_context"],
+            verbose=config["verbose"]
         )
+        output_str = report_humanize.matches_by_filename(
+            matching_rules_by_line, args.file)
+        rprint(output_str)
     else:
         for key, val in __available_yaml_folder.items():
             config[key] = yaml_config.get(key, val)
-        print(config)
-        search_in_folder(
-            **config,
+        repo.load_folder(
+            config["folder"], recursive=config["recursive"],
+            exclude_folders=config["exclude"], verbose=config["verbose"]
         )
-
-
+        matchng_by_file = repo.search_folder(
+            config["rules"],
+            before_context=config["before_context"],
+            after_context=config["after_context"],
+            verbose=config["verbose"],
+        )
+        for filename, matching_rules_by_file in matchng_by_file.items():
+            output_str = report_humanize.matches_by_filename(
+                matching_rules_by_file, filename)
+            rprint(output_str)

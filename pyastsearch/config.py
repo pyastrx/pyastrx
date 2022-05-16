@@ -1,11 +1,8 @@
 from colorama import Fore
 
 __severity2color = {
-    "reject": Fore.RED,
-    "warning": Fore.YELLOW,
-    "info": Fore.BLUE,
-    "debug": Fore.MAGENTA,
-    "default": Fore.GREEN,
+    "reject": "red",
+    "default": "green",
 }
 __color_highlight = "white on magenta"
 
@@ -21,5 +18,6 @@ __available_yaml = {
 __available_yaml_folder = {
     "folder": ".",
     "parallel": True,
-    "exclude_folders": [".venv"],
+    "recursive": True,
+    "exclude": [".venv"],
 }

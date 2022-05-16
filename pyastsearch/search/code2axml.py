@@ -1,11 +1,10 @@
-"""Convert AST to XML objects."""
-
+import pathlib as pl
 import ast
 from lxml import etree
 import codecs
 from numbers import Number
 from functools import partial
-from rich import print
+from rich import print as rprint
 
 
 def _set_encoded_literal(set_fn, literal):
@@ -26,17 +25,19 @@ def _strip_docstring(body):
 
 def convert_to_xml(node, omit_docstrings=False, node_mappings=None):
     """Convert supplied AST node to XML."""
-    possible_docstring = isinstance(node, (ast.FunctionDef, ast.ClassDef, ast.Module))
+    possible_docstring = isinstance(
+        node, (ast.FunctionDef, ast.ClassDef, ast.Module))
 
     xml_node = etree.Element(node.__class__.__name__)
-    for attr in ("lineno", "col_offset"):
+    for attr in ("lineno", "col_offset", "end_lineno", "end_col_offset"):
         value = getattr(node, attr, None)
         if value is not None:
             _set_encoded_literal(partial(xml_node.set, attr), value)
     if node_mappings is not None:
         node_mappings[xml_node] = node
 
-    node_fields = zip(node._fields, (getattr(node, attr) for attr in node._fields))
+    node_fields = zip(
+        node._fields, (getattr(node, attr) for attr in node._fields))
 
     for field_name, field_value in node_fields:
         if isinstance(field_value, ast.AST):
@@ -79,7 +80,9 @@ def convert_to_xml(node, omit_docstrings=False, node_mappings=None):
     return xml_node
 
 
-def txt2ast(txt: str, filename: str = "<unknown>", verbose: bool = True) -> ast.Module:
+def txt2ast(
+        txt: str, filename: str = "<unknown>",
+        verbose: bool = True) -> ast.Module:
     """Convert Python file contents (as a string) to an AST.
 
     Args:
@@ -92,5 +95,30 @@ def txt2ast(txt: str, filename: str = "<unknown>", verbose: bool = True) -> ast.
     """
     parsed_ast = ast.parse(txt, filename)
     if verbose:
-        print(ast.dump(parsed_ast, indent=4))
+        rprint(ast.dump(parsed_ast, indent=4))
     return parsed_ast
+
+
+def file2axml(
+        filename: str,
+        verbose: bool = False) -> etree._Element:
+    file_path = pl.Path(filename)
+    # get last modified time
+    last_modified = file_path.stat().st_mtime
+
+    with open(filename, "r") as f:
+        txt = f.read()
+    node_mappings = {}
+    parsed_ast = txt2ast(txt, filename, verbose=verbose)
+    xml_ast = convert_to_xml(
+        parsed_ast,
+        omit_docstrings=False,
+        node_mappings=node_mappings,
+    )
+    info = {
+        "axml": xml_ast, "last_modified": last_modified,
+        "node_mappings": node_mappings,
+        "txt": txt,
+    }
+
+    return info

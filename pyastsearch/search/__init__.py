@@ -1,0 +1,1 @@
+from pyastsearch.search.main import Repo
