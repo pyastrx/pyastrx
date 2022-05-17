@@ -54,7 +54,7 @@ def matches_by_filename(
 ):
     path = os.path.abspath(filename) if abspaths else filename
 
-    output_str = f"[bold white on green]File:{path}[/bold white on green]\n"
+    output_list = [f"[bold white on green]File:{path}[/bold white on green]\n"]
     for line_match, context_and_rule in matching_rules_by_line.items():
         expressions = context_and_rule[1]
         context = context_and_rule[0]
@@ -63,6 +63,10 @@ def matches_by_filename(
             col_numbers = info["col_nums"]
             rule_infos = info["rule_infos"]
             cols.extend(col_numbers)
-            output_str += match_description(col_numbers, rule_infos)
-        output_str += str_context(context, line_match, cols)
-    return output_str
+            output_list += [match_description(col_numbers, rule_infos)]
+        output_list += [str_context(context, line_match, cols)]
+    if len(output_list) > 1:
+        output_str = "".join(output_list)
+        return output_str
+
+    return ""
