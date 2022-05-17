@@ -54,10 +54,15 @@ def search_in_axml(rules, axml, node_mappings, verbose=False):
     elif isinstance(rules, list):
         rules = {rule: {} for rule in rules}
     for expression, rule in rules.items():
-        matching_elements = axml.xpath(expression)
+        try:
+            matching_elements = axml.xpath(expression)
+            matching_lines_by_exp = linenos_from_xml(
+                matching_elements, node_mappings)
+        except etree.XPathEvalError:
+            print(f"XPath error: {expression}")
+            matching_lines_by_exp = []
+            rule = {}
 
-        matching_lines_by_exp = linenos_from_xml(
-            matching_elements, node_mappings)
         matching_by_expression[expression] = {
             "line_nums": matching_lines_by_exp,
             "rule_infos": rule,
