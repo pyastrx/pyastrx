@@ -243,7 +243,7 @@ class InterfaceMain(StateInterface):
         options = [
             ("search using All rules", "a", SearchState),
             ("search using a Specific rule", "s", InterfaceRules),
-            ("serach using a New expression", "n", InterfaceNewRule),
+            ("search using a New expression", "n", InterfaceNewRule),
         ]
         if self.context.is_file():
             options += [
