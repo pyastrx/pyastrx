@@ -12,7 +12,7 @@
   - [x] read yaml config
   - [x] allow to set the dir in command line
 - [] pre-commit
-- [] fix multiple expressions search
+- [] fix multiple rules search
 # astpath
 [![PyPI version](https://badge.fury.io/py/astpath.svg)](https://badge.fury.io/py/astpath)
 

@@ -1,10 +1,20 @@
-import pathlib as pl
+from pathlib import Path
+from dataclasses import dataclass
+from typing import Dict, Tuple
 import ast
-from lxml import etree
 import codecs
 from numbers import Number
 from functools import partial
-from rich import print as rprint
+from lxml import etree
+
+
+@dataclass
+class FileInfo:
+    filename: str
+    axml: etree._Element
+    node_mappings: Dict[etree._Element, ast.AST]
+    txt: str
+    last_modified: float
 
 
 def _set_encoded_literal(set_fn, literal):
@@ -29,7 +39,8 @@ def convert_to_xml(node, omit_docstrings=False, node_mappings=None):
         node, (ast.FunctionDef, ast.ClassDef, ast.Module))
 
     xml_node = etree.Element(node.__class__.__name__)
-    for attr in ("lineno", "col_offset", "end_lineno", "end_col_offset"):
+    # for attr in ("lineno", "col_offset", "end_lineno", "end_col_offset"):
+    for attr in ("lineno", "col_offset"):
         value = getattr(node, attr, None)
         if value is not None:
             _set_encoded_literal(partial(xml_node.set, attr), value)
@@ -75,50 +86,74 @@ def convert_to_xml(node, omit_docstrings=False, node_mappings=None):
             _set_encoded_literal(
                 partial(xml_node.set, "type"), type(field_value).__name__
             )
-            _set_encoded_literal(partial(xml_node.set, field_name), field_value)
+            _set_encoded_literal(
+                partial(xml_node.set, field_name), field_value)
 
     return xml_node
 
 
 def txt2ast(
-        txt: str, filename: str = "<unknown>",
-        verbose: bool = True) -> ast.Module:
+        txt: str, filename: str = "<unknown>") -> ast.Module:
     """Convert Python file contents (as a string) to an AST.
 
     Args:
         txt (str): Python file contents.
         filename (str): Filename to use in error messages.
-        verbose (bool): If True, print error messages.
     Returns:
         ast.Module: AST of the supplied contents.
 
     """
     parsed_ast = ast.parse(txt, filename)
-    if verbose:
-        rprint(ast.dump(parsed_ast, indent=4))
     return parsed_ast
 
 
-def file2axml(
-        filename: str,
-        verbose: bool = False) -> etree._Element:
-    file_path = pl.Path(filename)
+def file2ast(
+        filename: str) -> Tuple[ast.AST, str]:
+    """Construct the ast from a python file.
+
+    Args:
+        filename (str): Filename to use in error messages.
+    Returns:
+        (ast.AST, str): AST of the supplied contents.
+
+    """
+    file_path = Path(filename)
     # get last modified time
     last_modified = file_path.stat().st_mtime
 
     with open(filename, "r") as f:
         txt = f.read()
+    parsed_ast = txt2ast(txt, filename)
+    return parsed_ast, last_modified
+
+
+def file2axml(
+        filename: str) -> FileInfo:
+    """Construct the FileInfo obj from a python file.
+
+    Args:
+        filename (str):
+    Returns:
+        FileInfo: FileInfo object.
+
+    """
+    file_path = Path(filename)
+    last_modified = file_path.stat().st_mtime
+    with open(filename, "r") as f:
+        txt = f.read()
     node_mappings = {}
-    parsed_ast = txt2ast(txt, filename, verbose=verbose)
+    parsed_ast = txt2ast(txt, filename)
     xml_ast = convert_to_xml(
         parsed_ast,
         omit_docstrings=False,
         node_mappings=node_mappings,
     )
-    info = {
-        "axml": xml_ast, "last_modified": last_modified,
-        "node_mappings": node_mappings,
-        "txt": txt,
-    }
+    info = FileInfo(
+        filename=filename,
+        axml=xml_ast,
+        node_mappings=node_mappings,
+        txt=txt,
+        last_modified=last_modified,
+    )
 
     return info

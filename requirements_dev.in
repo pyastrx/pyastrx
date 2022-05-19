@@ -6,3 +6,5 @@ docformatter
 pip-tools
 pre-commit
 pre-commit-hooks
+Sphinx
+git+https://github.com/bashtage/sphinx-material.git

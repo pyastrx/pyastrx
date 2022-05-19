@@ -1,8 +1,8 @@
 import re
 from lxml import etree
 
-
-regex_ns = etree.FunctionNamespace("https://github.com/hchasestevens/astpath")
+regexp_url = "http://exslt.org/regular-expressions"
+regex_ns = etree.FunctionNamespace(regexp_url)
 regex_ns.prefix = "re"
 
 
@@ -47,7 +47,7 @@ def linenos_from_xml(elements, node_mappings=None):
     return lines
 
 
-def search_in_axml(rules, axml, node_mappings, verbose=False):
+def search_in_axml(rules, axml, node_mappings):
     matching_by_expression = {}
     if isinstance(rules, str):
         rules = {rules: {}}

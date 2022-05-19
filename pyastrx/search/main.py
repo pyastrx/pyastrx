@@ -4,12 +4,11 @@ from io import BytesIO
 import copyreg
 from multiprocessing import Pool
 
-from rich import print as rprint # noqa
 from lxml import etree
-from pyastsearch.search.cache import Cache
-from pyastsearch.search.code2axml import file2axml
-from pyastsearch.search.xml_search import search_in_axml
-from pyastsearch.search.txt_tools import apply_context
+from pyastrx.search.cache import Cache
+from pyastrx.search.code2axml import file2axml
+from pyastrx.search.xml_search import search_in_axml
+from pyastrx.search.txt_tools import apply_context
 
 
 def lxml_el_unpickle(el_lxml: bytes) -> etree._ElementTree:
@@ -41,6 +40,7 @@ class Repo:
 
     def load_file(self, filename):
         info, _ = self._cache.update(filename)
+        self._files = [filename]
         if not info:
             info = file2axml(filename)
             self._cache.set(filename, info)
@@ -49,16 +49,15 @@ class Repo:
             self, filename, rules,
             with_txt=True,
             before_context=0,
-            after_context=0,
-            verbose=False):
+            after_context=0):
         info = self._cache.get(filename)
         if info is None:
             print(f"{filename} not found in cache")
             return {}
         matching_lines_by_rule = search_in_axml(
             rules,
-            axml=info["axml"], node_mappings=info["node_mappings"],
-            verbose=verbose)
+            axml=info.axml,
+            node_mappings=info.node_mappings)
         matching_rules_by_line = {}
         if with_txt:
             for expression, matching_lines in matching_lines_by_rule.items():
@@ -66,7 +65,7 @@ class Repo:
                 for line_num, cols in line_nums:
                     if line_num not in matching_rules_by_line:
                         matching_lines_context = apply_context(
-                            info["txt"].splitlines(), line_num - 1,
+                            info.txt.splitlines(), line_num - 1,
                             before_context, after_context)
                         matching_rules_by_line[line_num] = [
                             matching_lines_context,
@@ -92,26 +91,27 @@ class Repo:
         parallel=True,
         extension="py",
         exclude_folders=[".venv"],
-        verbose=False,
     ):
         if recursive:
             files = Path(folder).rglob(f"*.{extension}")
         else:
             files = Path(folder).glob(f"*.{extension}")
         files = [
-            f for f in files
+            str(f.resolve()) for f in files
             if not any(d in f.parts for d in exclude_folders)
         ]
-        files2load, pathFiles2load = zip(*[
-            (str(filename.resolve()), filename) for filename in files
+        files2load = [
+            filename for filename in files
             if self._cache.update(filename)[0] is False
-        ])
+        ]
+        if len(files2load) == 0:
+            return
 
         if parallel:
             with Pool() as pool:
                 infos = pool.map(
                         file2axml, files2load)
-            for info, filename in zip(infos, pathFiles2load):
+            for info, filename in zip(infos, files2load):
                 if info is None:
                     raise Exception(f"Failed to convert {filename}")
                 self._cache.set(filename, info)
@@ -123,7 +123,6 @@ class Repo:
 
     def search_folder(
             self, rules,
-            verbose=False,
             with_txt=True,
             before_context=0,
             after_context=0,
@@ -132,8 +131,7 @@ class Repo:
         for filename in self._files:
             matching_rules_by_line = self.search_file(
                 filename, rules, with_txt,
-                before_context, after_context,
-                verbose=verbose)
+                before_context, after_context)
             file2matches[filename] = matching_rules_by_line
         return file2matches
 

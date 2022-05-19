@@ -1,8 +1,12 @@
-import os
-from pyastsearch.config import __severity2color, __color_highlight
+"""This module is used to produce human-readable reports string for
+the linter.
+
+"""
+from typing import List, Tuple
+from pyastrx.config import __severity2color, __color_highlight
 
 
-def match_description(cols, rule):
+def match_description(rule: dict) -> str:
     severity = rule.get("severity", "default")
     try:
         color = __severity2color[severity]
@@ -12,18 +16,17 @@ def match_description(cols, rule):
     why = rule.get("why", "")
     name = rule.get("name", "")
     description = rule.get("description", "")
-    cols_str = ",".join(map(str, cols))
-    match_header_str = f"[bold {color}] - {name:<5}|"\
-        + f"{why:<18}|"\
+    match_header_str = f"[bold {color}] - {name}|"\
+        + f"{why} |"\
         + f"{description}"\
-        + f"{f' {cols_str}'}[/bold {color}]\n"
+        + f"[/bold {color}]\n"
 
     return match_header_str
 
 
 def str_context(
-    context, line_match, cols
-):
+    context: Tuple, line_match: int, cols: List
+) -> str:
     output_str = ""
     for (line_num), line_str in context:
         line_is_match = line_num == line_match
@@ -48,13 +51,11 @@ def str_context(
 
 
 def matches_by_filename(
-    matching_rules_by_line,
-    filename,
-    abspaths=False,
-):
-    path = os.path.abspath(filename) if abspaths else filename
-
-    output_list = [f"[bold white on green]File:{path}[/bold white on green]\n"]
+    matching_rules_by_line: dict,
+    filename: str,
+) -> str:
+    output_str = ""
+    output_list = [f"[bold white on green]File:{filename}[/bold white on green]\n"]
     for line_match, context_and_rule in matching_rules_by_line.items():
         expressions = context_and_rule[1]
         context = context_and_rule[0]
@@ -63,10 +64,9 @@ def matches_by_filename(
             col_numbers = info["col_nums"]
             rule_infos = info["rule_infos"]
             cols.extend(col_numbers)
-            output_list += [match_description(col_numbers, rule_infos)]
+            output_list += [match_description(rule_infos)]
         output_list += [str_context(context, line_match, cols)]
     if len(output_list) > 1:
         output_str = "".join(output_list)
-        return output_str
 
-    return ""
+    return output_str

@@ -15,6 +15,29 @@ install-dev:
 	python3 setup.py develop
 
 
+## @category Dev-docs
+## Create the initial documentation
+docs-init:
+	mkdir docs
+	cd docs && sphinx-quickstart
+
+## @category Dev-docs
+## build the documentation
+docs-html:
+	cd docs && make html
+
+## @category Dev-docs
+## monitor and build the documentation
+docs-watch:
+	cd docs && ls -R | entr make html
+## @category Dev-docs
+## serve the documentation
+docs-serve:
+	cd docs/build/html && python -m http.server
+
+
+
+
 ## @category Dev-build
 ## Search for all the dependencies and install them
 sync-env: pip-compile
@@ -27,14 +50,14 @@ test:
 	pytest -svv tests
 
 ## @category Dev-Code Quality
-## Linter  
+## Linter
 linter:
-	flake8 pyastsearch
+	flake8 pyastrx
 
 ## @category Dev-Code Quality
 ## reformat code through black
 reformat:
-	black pyastsearch
+	black pyastrx
 
 ## @category Dev-Code Quality
 pre-commit:

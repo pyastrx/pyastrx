@@ -3,8 +3,8 @@
 from setuptools import setup
 
 setup(
-    name='pyastsearch',
-    packages=['pyastsearch'],
+    name='pyastrx',
+    packages=['pyastrx'],
     version='0.0.1',
     description='based on H. Chase Stevens idea',
     license='MIT',
@@ -16,7 +16,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'pyastsearch = pyastsearch.frontend.cli:pyastsearch', 
+            'pyastrx = pyastrx.frontend.cli:pyastrx',
 
         ]
     },

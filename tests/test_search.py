@@ -1,7 +1,7 @@
 import os
 import json
 from rich import print as rprint # noqa
-from pyastsearch.search import Repo
+from pyastrx.search import Repo
 
 
 def test_print_ast_finds():
@@ -32,9 +32,9 @@ def test_all_code_repo():
 
 
 def test_folder_search():
-    pyastsearch_folder = os.path.dirname(
-        os.path.abspath(__file__)).replace("tests", "pyastsearch")
+    pyastrx_folder = os.path.dirname(
+        os.path.abspath(__file__)).replace("tests", "pyastrx")
     repo = Repo()
-    repo.load_folder(pyastsearch_folder)
+    repo.load_folder(pyastrx_folder)
     repo.search_folder(
                 "//Name[string-length(@id) > 5]")

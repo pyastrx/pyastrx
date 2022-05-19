@@ -20,5 +20,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - pip-tools
 
 
-[Unreleased]: https://github.com/devmessias/pyastsearch/compare/0.1.0...master
+[Unreleased]: https://github.com/devmessias/pyastrx/compare/0.1.0...master
 [0.1.0]: https://github.com/devmessias/edgeseraser/compare/0.1.0...0.1.0

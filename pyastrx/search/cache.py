@@ -5,9 +5,9 @@ from pathlib import Path
 
 class Cache:
     """
-    A file cache for pyastsearch.
+    A file cache for pyastrx.
     """
-    def __init__(self, cache_dir="/tmp/pyastsearch"):
+    def __init__(self, cache_dir="/tmp/pyastrx"):
         self.cache_dir = cache_dir
         self.cache_file = os.path.join(self.cache_dir, 'cache.json')
         self.cache = {}
@@ -41,7 +41,7 @@ class Cache:
             return False, last_modified
 
         # check cache
-        if info.get("last_modified") == last_modified:
+        if info.last_modified == last_modified:
             return info, last_modified
         return False, last_modified
 

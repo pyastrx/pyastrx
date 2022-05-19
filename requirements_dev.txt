@@ -4,28 +4,52 @@
 #
 #    pip-compile requirements_dev.in
 #
+alabaster==0.7.12
+    # via sphinx
 attrs==21.4.0
     # via pytest
+babel==2.10.1
+    # via sphinx
+beautifulsoup4==4.11.1
+    # via sphinx-material
 black==22.3.0
     # via -r requirements_dev.in
+certifi==2021.10.8
+    # via requests
 cfgv==3.3.1
     # via pre-commit
+charset-normalizer==2.0.12
+    # via requests
 click==8.1.2
     # via
     #   black
     #   pip-tools
+css-html-js-minify==2.5.5
+    # via sphinx-material
 distlib==0.3.4
     # via virtualenv
 docformatter==1.4
     # via -r requirements_dev.in
+docutils==0.17.1
+    # via sphinx
 filelock==3.6.0
     # via virtualenv
 flake8==4.0.1
     # via -r requirements_dev.in
 identify==2.4.12
     # via pre-commit
+idna==3.3
+    # via requests
+imagesize==1.3.0
+    # via sphinx
 iniconfig==1.1.1
     # via pytest
+jinja2==3.1.2
+    # via sphinx
+lxml==4.8.0
+    # via sphinx-material
+markupsafe==2.1.1
+    # via jinja2
 mccabe==0.6.1
     # via flake8
 mypy-extensions==0.4.3
@@ -33,7 +57,9 @@ mypy-extensions==0.4.3
 nodeenv==1.6.0
     # via pre-commit
 packaging==21.3
-    # via pytest
+    # via
+    #   pytest
+    #   sphinx
 pathspec==0.9.0
     # via black
 pep517==0.12.0
@@ -56,18 +82,50 @@ pycodestyle==2.8.0
     # via flake8
 pyflakes==2.4.0
     # via flake8
+pygments==2.12.0
+    # via sphinx
 pyparsing==3.0.8
     # via packaging
 pytest==7.1.1
     # via -r requirements_dev.in
+python-slugify[unidecode]==6.1.2
+    # via sphinx-material
+pytz==2022.1
+    # via babel
 pyyaml==6.0
     # via pre-commit
+requests==2.27.1
+    # via sphinx
 ruamel-yaml==0.17.21
     # via pre-commit-hooks
 ruamel-yaml-clib==0.2.6
     # via ruamel-yaml
 six==1.16.0
     # via virtualenv
+snowballstemmer==2.2.0
+    # via sphinx
+soupsieve==2.3.2.post1
+    # via beautifulsoup4
+sphinx==4.5.0
+    # via
+    #   -r requirements_dev.in
+    #   sphinx-material
+sphinx-material @ git+https://github.com/bashtage/sphinx-material.git
+    # via -r requirements_dev.in
+sphinxcontrib-applehelp==1.0.2
+    # via sphinx
+sphinxcontrib-devhelp==1.0.2
+    # via sphinx
+sphinxcontrib-htmlhelp==2.0.0
+    # via sphinx
+sphinxcontrib-jsmath==1.0.1
+    # via sphinx
+sphinxcontrib-qthelp==1.0.3
+    # via sphinx
+sphinxcontrib-serializinghtml==1.1.5
+    # via sphinx
+text-unidecode==1.3
+    # via python-slugify
 toml==0.10.2
     # via
     #   pre-commit
@@ -77,8 +135,12 @@ tomli==2.0.1
     #   black
     #   pep517
     #   pytest
+unidecode==1.3.4
+    # via python-slugify
 untokenize==0.1.1
     # via docformatter
+urllib3==1.26.9
+    # via requests
 virtualenv==20.14.1
     # via pre-commit
 wheel==0.37.1
