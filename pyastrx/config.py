@@ -7,9 +7,10 @@ __severity2color = {
 __color_highlight = "white on magenta"
 
 __available_yaml = {
-    "after_context": 0,
-    "before_context": 0,
+    "after_context": 3,
+    "before_context": 3,
     "linter": False,
+    "parallel": True,
 }
 
 __available_yaml_folder = {

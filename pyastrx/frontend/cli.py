@@ -91,22 +91,38 @@ def pyastrx():
     invoke_pyastrx(args, config)
 
 
+def get_config_from_yaml() -> dict:
+    """Will check if .pyastrx.yaml exists in the current directory.
+    If it does, it will load the config from it. If not, it will
+    create a new one with the default values.
+
+    """
+    yml_file = Path(".").resolve() / ".pyastrx.yaml"
+    if not yml_file.exists():
+        config = __available_yaml
+        with open(yml_file, "w") as f:
+            f.write(yaml.dump(config))
+        return config
+
+    with open(yml_file, "r") as f:
+        config = yaml.safe_load(f)
+
+    return config
+
 @profile
 def invoke_pyastrx(args, extra_config):
-    yml_file = Path(".").resolve() / ".pyastrx.yaml"
     expr = args.expr
     if isinstance(expr, str):
         expr = [expr]
     config = {}
-    if os.path.isfile(yml_file):
-        with open(yml_file, "r") as f:
-            yaml_config = yaml.safe_load(f)
-        if len(expr) == 0:
-            rules = yaml_config.get("rules", False)
-            if rules:
-                expr = rules
+    yaml_config = get_config_from_yaml()
     if len(expr) == 0:
-        raise ValueError("No rules or expression provided")
+        rules = yaml_config.get("rules", False)
+        if rules:
+            expr = rules
+        else:
+            expr = {}
+
     config["interactive"] = args.interactive
     config["rules"] = expr
     for key, val in __available_yaml.items():
@@ -115,6 +131,9 @@ def invoke_pyastrx(args, extra_config):
     if args.linter:
         config["linter"] = True
         config["interactive"] = False
+
+    if len(expr) == 0 and config["interactive"] == False:
+        raise ValueError("No rules or expression provided")
 
     config = {**config, **extra_config}
     config["file"] = ""
