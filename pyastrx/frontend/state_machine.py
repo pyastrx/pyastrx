@@ -450,6 +450,8 @@ class SearchState(State):
         config = self.context._config
         rules = self.context.get_current_rules()
         file = config["file"]
+
+        num_matches = 0
         if file != "":
             matching_rules_by_line = self.context.repo.search_file(
                     file, rules,
@@ -459,7 +461,6 @@ class SearchState(State):
             output_str, num_matches = report_humanize.matches_by_filename(
                 matching_rules_by_line, file)
         else:
-            num_mathces = 0
             matchng_by_file = self.context.repo.search_folder(
                     rules,
                     before_context=config["before_context"],
@@ -472,10 +473,10 @@ class SearchState(State):
                         report_humanize.matches_by_filename(
                             matching_rules_by_file, filename)
                 output_str += output_str_file
-                num_mathces += num_matches_file
+                num_matches += num_matches_file
         if not self.context._interactive:
             rprint(output_str)
-            exit_code = 1 if num_mathces > 0 else 0
+            exit_code = 1 if num_matches > 0 else 0
             self.context.set_state(Exit(exit_code))
         else:
             rich_paging(output_str)

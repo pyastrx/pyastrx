@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """
 The Command Line Interface for PyASTrix.
 
@@ -35,7 +35,7 @@ def construct_base_argparse():
     parser.add_argument(
         "-l",
         "--linter",
-        help= "Run in the linter mode. "\
+        help = "Run in the linter mode. "\
             + "No interactive mode, all the rules "\
             + "with use_in_linter=false will be ignored",
         action="store_true",
