@@ -9,6 +9,7 @@ __color_highlight = "white on magenta"
 __available_yaml = {
     "after_context": 0,
     "before_context": 0,
+    "linter": False,
 }
 
 __available_yaml_folder = {

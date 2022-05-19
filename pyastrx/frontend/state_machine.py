@@ -149,6 +149,7 @@ class Context:
     def __init__(self, initial_state: State, config: dict) -> None:
         self._config = config
         self._interactive = config["interactive"]
+        self._linter_mode = config["linter"]
         self._expression = ""
         self._current_file = None
         self.__current_rule = {}
@@ -189,8 +190,12 @@ class Context:
     def get_current_rules(self) -> dict:
         if self._expression:
             return self.__current_rule
-        else:
-            return self._config["rules"]
+        rules = self._config["rules"]
+        if self._linter_mode:
+            return {
+                k: v for k, v in rules.items()
+                if v.get("use_in_linter", True)}
+        return rules
 
     def set_state(self, state: State) -> None:
         state.context = self
@@ -219,8 +224,12 @@ class StartState(State):
 
 
 class Exit(State):
+    def __init__(self, exit_code: int = 0) -> None:
+        super().__init__()
+        self.exit_code = exit_code
+
     def run(self) -> None:
-        exit()
+        exit(self.exit_code)
         # if not self.context._interactive:
         #     exit()
         # while True:
@@ -447,9 +456,10 @@ class SearchState(State):
                     before_context=config["before_context"],
                     after_context=config["after_context"],
                 )
-            output_str = report_humanize.matches_by_filename(
+            output_str, num_matches = report_humanize.matches_by_filename(
                 matching_rules_by_line, file)
         else:
+            num_mathces = 0
             matchng_by_file = self.context.repo.search_folder(
                     rules,
                     before_context=config["before_context"],
@@ -458,11 +468,15 @@ class SearchState(State):
 
             output_str = ""
             for filename, matching_rules_by_file in matchng_by_file.items():
-                output_str += report_humanize.matches_by_filename(
-                    matching_rules_by_file, filename)
+                output_str_file, num_matches_file = \
+                        report_humanize.matches_by_filename(
+                            matching_rules_by_file, filename)
+                output_str += output_str_file
+                num_mathces += num_matches_file
         if not self.context._interactive:
             rprint(output_str)
-            self.context.set_state(Exit())
+            exit_code = 1 if num_mathces > 0 else 0
+            self.context.set_state(Exit(exit_code))
         else:
             rich_paging(output_str)
             self.context.set_state(self.context._search_interface())

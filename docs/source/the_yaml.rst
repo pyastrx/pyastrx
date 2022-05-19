@@ -20,7 +20,7 @@ command line interface and the code analysis.
             description: "Classes with 'Var' in name"
             severity: "warning"
             why: "bad practice"
-            ignore: false
+            use_in_linter: true
 
 Options
 -------
@@ -88,6 +88,6 @@ severity
 why
 ~~~
 
-ignore
-~~~~~~
+use_in_linter
+~~~~~~~~~~~~~
     A boolean value to indicate if the rule should be ignored.

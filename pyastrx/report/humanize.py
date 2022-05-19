@@ -53,9 +53,10 @@ def str_context(
 def matches_by_filename(
     matching_rules_by_line: dict,
     filename: str,
-) -> str:
+) -> Tuple[str, int]:
     output_str = ""
     output_list = [f"[bold white on green]File:{filename}[/bold white on green]\n"]
+    num_matches = 0
     for line_match, context_and_rule in matching_rules_by_line.items():
         expressions = context_and_rule[1]
         context = context_and_rule[0]
@@ -64,9 +65,10 @@ def matches_by_filename(
             col_numbers = info["col_nums"]
             rule_infos = info["rule_infos"]
             cols.extend(col_numbers)
+            num_matches += 1
             output_list += [match_description(rule_infos)]
         output_list += [str_context(context, line_match, cols)]
     if len(output_list) > 1:
         output_str = "".join(output_list)
 
-    return output_str
+    return output_str, num_matches

@@ -35,6 +35,15 @@ def construct_base_argparse():
         default=False,
     )
     parser.add_argument(
+        "-l",
+        "--linter",
+        help= "Run in the linter mode. "\
+            + "No interactive mode, all the rules "\
+            + "with use_in_linter=false will be ignored",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
         "-d",
         "--folder",
         help="search folder",
@@ -103,6 +112,9 @@ def invoke_pyastrx(args, extra_config):
     for key, val in __available_yaml.items():
         if key not in config:
             config[key] = yaml_config.get(key, val)
+    if args.linter:
+        config["linter"] = True
+        config["interactive"] = False
 
     config = {**config, **extra_config}
     config["file"] = ""
