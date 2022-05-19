@@ -1,25 +1,11 @@
-import re
 from lxml import etree
-
-regexp_url = "http://exslt.org/regular-expressions"
-regex_ns = etree.FunctionNamespace(regexp_url)
-regex_ns.prefix = "re"
+from pyastrx.search.xml.xpath_extensions import (
+    lxml_ext_pyastrx, lxml_ext_regex)
 
 
-@regex_ns
-def match(ctx, pattern, strings):
-    for s in strings:
-        if re.match(pattern, s) is not None:
-            return True
-    return False
-
-
-@regex_ns
-def search(ctx, pattern, strings):
-    for s in strings:
-        if re.search(pattern, s) is not None:
-            return True
-    return False
+# initialize the extension functions
+lxml_ext_regex.prefix = "re"
+lxml_ext_pyastrx.prefix = "pyastrx"
 
 
 def linenos_from_xml(elements, node_mappings=None):
