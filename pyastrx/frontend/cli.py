@@ -3,13 +3,11 @@
 The Command Line Interface for PyASTrix.
 
 """
-import os
 from pathlib import Path
 import argparse
 import yaml
 from pyastrx.config import __available_yaml, __available_yaml_folder
 from pyastrx.frontend.state_machine import Context, StartState
-from memory_profiler import profile
 
 
 def construct_base_argparse():
@@ -109,7 +107,7 @@ def get_config_from_yaml() -> dict:
 
     return config
 
-@profile
+
 def invoke_pyastrx(args, extra_config):
     expr = args.expr
     if isinstance(expr, str):
