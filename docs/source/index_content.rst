@@ -34,14 +34,16 @@ PyASTrX allows you to define new code analysis patterns using just XPATH
 expressions. No need to write a parser, creating a python file and shipping
 to use in flake8 or pylint!
 
+.. include:: install.rst
 
+========
 Features
 ========
 
 PyASTrX provides the following features:
 
 An easy customizable code quality analysis tool.
-------------------------------------------------
+================================================
 
 Type :code:`pyastrx -h` to see the all the options.
 
@@ -50,7 +52,7 @@ See the following page for more details :doc:`the_yaml`.
 
 
 Human friendly outputs
-----------------------
+======================
 
 If your code base or pull request is huge, looking for
 possible mistakes, bad practices or code smeels can be a pain,
@@ -63,7 +65,7 @@ so PyASTrX provides a human friendly output as default.
 
 
 Human friendly interface
-------------------------
+========================
 
 - autocomplete the previous queries
 - combo box to select the files
@@ -74,10 +76,62 @@ Human friendly interface
     :scale: 80%
     :align: center
 
-An interactive interface to explore the AST and XML
----------------------------------------------------
+Explore the AST and XML
+=======================
 
 Using the :code: `-i` arg or adding a :code: `interactive: true` in your
 `.pyastrx.yaml` you can explore the AST and XML parsed AST of your code.
 This can be useful to understand your code base and helps you to write
 you custom XPATH queries to be used in your project.
+
+Folder exploration
+~~~~~~~~~~~~~~~~~~
+
+**Start the interactive interface**
+
+.. code:: console
+
+    $ pyastrx -i -d path_to_folder (or just save that in yaml)
+
+.. image:: _static/imgs/ast_explorer1.png
+    :alt: Interactive interface
+    :align: center
+    :width: 45%
+
+**Press f and choose a file**
+
+.. image:: _static/imgs/ast_explorer2.png
+    :alt: Interactive interface
+    :align: center
+    :width: 45%
+
+**Choose the ast (t), xml (x) or code exploration (o)**
+
+.. image:: _static/imgs/ast_explorer3.png
+    :alt: Interactive interface
+    :align: center
+    :width: 45%
+
+**Learn!**
+
+.. image:: _static/imgs/ast_explorer4.png
+    :alt: Interactive interface
+    :align: center
+    :width: 45%
+
+.. image:: _static/imgs/ast_explorer5.png
+    :alt: Interactive interface
+    :align: center
+    :width: 45%
+
+File exploration (one key-press distance)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Open the interactive with the python file**
+
+.. code:: console
+
+    $ pyastrx -i -f path_to_file (or just save that in yaml)
+
+
+**Choose the ast (t), xml (x) or code exploration (o)**

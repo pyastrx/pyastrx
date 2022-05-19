@@ -1,7 +1,6 @@
 
 .. include:: index_content.rst
 
-.. include:: install.rst
 
 .. toctree::
    :maxdepth: 2
