@@ -214,9 +214,12 @@ class LoadFiles(State):
             self.context.repo.load_file(file)
             self.context.set_current_file(file)
         elif len(files) > 0:
-            self.context.repo.load_files(files)
+            self.context.repo.load_files(
+                files, parallel=self.context._config["parallel"])
         else:
-            self.context.repo.load_folder(self.context._config["folder"])
+            self.context.repo.load_folder(
+                self.context._config["folder"],
+                parallel=self.context._config["parallel"])
         if not self.context._interactive:
             self.context.set_state(SearchState())
         else:
@@ -469,10 +472,11 @@ class SearchState(State):
             output_str, num_matches = report_humanize.matches_by_filename(
                 matching_rules_by_line, file)
         else:
-            matchng_by_file = self.context.repo.search_folder(
+            matchng_by_file = self.context.repo.search_files(
                     rules,
                     before_context=config["before_context"],
                     after_context=config["after_context"],
+                    parallel=config["parallel"],
                 )
 
             output_str = ""

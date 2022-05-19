@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Tuple, Callable
 from pathlib import Path
 from io import BytesIO
@@ -6,7 +7,7 @@ from multiprocessing import Pool
 
 from lxml import etree
 from pyastrx.search.cache import Cache
-from pyastrx.search.code2axml import file2axml
+from pyastrx.search.code2axml import file2axml, FileInfo
 from pyastrx.search.xml_search import search_in_axml
 from pyastrx.search.txt_tools import apply_context
 
@@ -31,6 +32,41 @@ def lxml_el_pickle(el_lxml: etree._Element) -> Tuple[Callable, Tuple[bytes]]:
 
 # This registers the unpickling function for lxml elements.
 copyreg.pickle(etree._Element, lxml_el_pickle, lxml_el_unpickle)
+copyreg.pickle(etree._ElementTree, lxml_el_pickle, lxml_el_unpickle)
+
+
+def search_in_file_info(
+        file_info: FileInfo, rules: dict,
+        before_context: int = 0, after_context: int = 0):
+    if file_info is None:
+        return {}
+
+    matching_lines_by_rule = search_in_axml(
+            rules,
+            axml=file_info.axml)
+    matching_rules_by_line = {}
+    for expression, matching_lines in matching_lines_by_rule.items():
+        line_nums = matching_lines["line_nums"]
+        for line_num, cols in line_nums:
+            if line_num not in matching_rules_by_line:
+                matching_lines_context = apply_context(
+                    file_info.txt.splitlines(), line_num - 1,
+                    before_context, after_context)
+                matching_rules_by_line[line_num] = [
+                    matching_lines_context,
+                    {
+                        expression: {
+                            "col_nums": cols,
+                            "rule_infos": matching_lines["rule_infos"]
+                        }
+                    }
+                ]
+            else:
+                matching_rules_by_line[line_num][1][expression] = {
+                    "col_nums": cols,
+                    "rule_infos": matching_lines["rule_infos"]
+                }
+    return matching_rules_by_line
 
 
 class Repo:
@@ -47,39 +83,14 @@ class Repo:
 
     def search_file(
             self, filename, rules,
-            with_txt=True,
             before_context=0,
             after_context=0):
         info = self._cache.get(filename)
         if info is None:
             print(f"{filename} not found in cache")
             return {}
-        matching_lines_by_rule = search_in_axml(
-            rules,
-            axml=info.axml)
-        matching_rules_by_line = {}
-        if with_txt:
-            for expression, matching_lines in matching_lines_by_rule.items():
-                line_nums = matching_lines["line_nums"]
-                for line_num, cols in line_nums:
-                    if line_num not in matching_rules_by_line:
-                        matching_lines_context = apply_context(
-                            info.txt.splitlines(), line_num - 1,
-                            before_context, after_context)
-                        matching_rules_by_line[line_num] = [
-                            matching_lines_context,
-                            {
-                                expression: {
-                                    "col_nums": cols,
-                                    "rule_infos": matching_lines["rule_infos"]
-                                }
-                            }
-                        ]
-                    else:
-                        matching_rules_by_line[line_num][1][expression] = {
-                            "col_nums": cols,
-                            "rule_infos": matching_lines["rule_infos"]
-                        }
+        matching_rules_by_line = search_in_file_info(
+            info, rules, before_context, after_context)
 
         return matching_rules_by_line
 
@@ -130,17 +141,31 @@ class Repo:
 
         self._files = files
 
-    def search_folder(
+    def search_files(
             self, rules,
-            with_txt=True,
             before_context=0,
             after_context=0,
+            parallel=True
     ):
         file2matches = {}
-        for filename in self._files:
-            matching_rules_by_line = self.search_file(
-                filename, rules, with_txt,
-                before_context, after_context)
-            file2matches[filename] = matching_rules_by_line
+        if parallel:
+            with Pool() as pool:
+                matches = pool.map(
+                        partial(
+                            search_in_file_info,
+                            rules=rules,
+                            before_context=before_context,
+                            after_context=after_context
+                        ),
+                        map(self._cache.get, self._files)
+                )
+            for matching_rules_by_line, filename in zip(matches, self._files):
+                file2matches[filename] = matching_rules_by_line
+        else:
+            for filename in self._files:
+                matching_rules_by_line = self.search_file(
+                    filename, rules,
+                    before_context, after_context)
+                file2matches[filename] = matching_rules_by_line
         return file2matches
 
