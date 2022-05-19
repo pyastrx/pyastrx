@@ -56,8 +56,7 @@ class Repo:
             return {}
         matching_lines_by_rule = search_in_axml(
             rules,
-            axml=info.axml,
-            node_mappings=info.node_mappings)
+            axml=info.axml)
         matching_rules_by_line = {}
         if with_txt:
             for expression, matching_lines in matching_lines_by_rule.items():

@@ -12,7 +12,6 @@ from lxml import etree
 class FileInfo:
     filename: str
     axml: etree._Element
-    node_mappings: Dict[etree._Element, ast.AST]
     txt: str
     last_modified: float
 
@@ -33,7 +32,7 @@ def _strip_docstring(body):
     return body
 
 
-def convert_to_xml(node, omit_docstrings=False, node_mappings=None):
+def convert_to_xml(node, omit_docstrings=False):
     """Convert supplied AST node to XML."""
     possible_docstring = isinstance(
         node, (ast.FunctionDef, ast.ClassDef, ast.Module))
@@ -44,8 +43,6 @@ def convert_to_xml(node, omit_docstrings=False, node_mappings=None):
         value = getattr(node, attr, None)
         if value is not None:
             _set_encoded_literal(partial(xml_node.set, attr), value)
-    if node_mappings is not None:
-        node_mappings[xml_node] = node
 
     node_fields = zip(
         node._fields, (getattr(node, attr) for attr in node._fields))
@@ -57,7 +54,6 @@ def convert_to_xml(node, omit_docstrings=False, node_mappings=None):
                 convert_to_xml(
                     field_value,
                     omit_docstrings,
-                    node_mappings,
                 )
             )
 
@@ -72,7 +68,6 @@ def convert_to_xml(node, omit_docstrings=False, node_mappings=None):
                         convert_to_xml(
                             item,
                             omit_docstrings,
-                            node_mappings,
                         )
                     )
                 else:
@@ -141,17 +136,14 @@ def file2axml(
     last_modified = file_path.stat().st_mtime
     with open(filename, "r") as f:
         txt = f.read()
-    node_mappings = {}
     parsed_ast = txt2ast(txt, filename)
     xml_ast = convert_to_xml(
         parsed_ast,
         omit_docstrings=False,
-        node_mappings=node_mappings,
     )
     info = FileInfo(
         filename=filename,
         axml=xml_ast,
-        node_mappings=node_mappings,
         txt=txt,
         last_modified=last_modified,
     )

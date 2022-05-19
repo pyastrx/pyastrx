@@ -8,7 +8,7 @@ lxml_ext_regex.prefix = "re"
 lxml_ext_pyastrx.prefix = "pyastrx"
 
 
-def linenos_from_xml(elements, node_mappings=None):
+def linenos_from_xml(elements):
     """Given a list of elements, return a list of line numbers."""
     lines = {}
     for element in elements:
@@ -17,14 +17,6 @@ def linenos_from_xml(elements, node_mappings=None):
             col_offset = element.xpath("./ancestor-or-self::*[@col_offset][1]/@col_offset")
         except AttributeError:
             raise AttributeError("Element has no ancestor with line number.")
-        except SyntaxError:
-            # we're not using lxml backend
-            if node_mappings is None:
-                raise ValueError(
-                    "Lines cannot be returned when using native "
-                    "backend without `node_mappings` supplied."
-                )
-            linenos = (getattr(node_mappings[element], "lineno", 0),)
 
         if linenos:
             col = int(col_offset[0]) if col_offset else 0
@@ -39,7 +31,7 @@ def linenos_from_xml(elements, node_mappings=None):
     return lines
 
 
-def search_in_axml(rules, axml, node_mappings):
+def search_in_axml(rules, axml):
     matching_by_expression = {}
     if isinstance(rules, str):
         rules = {rules: {}}
@@ -49,7 +41,7 @@ def search_in_axml(rules, axml, node_mappings):
         try:
             matching_elements = axml.xpath(expression)
             matching_lines_by_exp = linenos_from_xml(
-                matching_elements, node_mappings)
+                matching_elements)
         except etree.XPathEvalError:
             print(f"XPath error: {expression}")
             matching_lines_by_exp = []
