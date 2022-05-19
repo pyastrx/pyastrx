@@ -13,15 +13,7 @@
 
     cli
     the_yaml
-
-.. toctree::
-    :caption: Tools:
-    :maxdepth: 1
-
-    xml_explorer
-    ast_explorer
-    new_astxpath
-
+    examples
 
 Indices and tables
 ==================
