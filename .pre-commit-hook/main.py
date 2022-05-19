@@ -8,18 +8,19 @@ import subprocess
 
 
 if __name__ == "__main__":
-    files = sys.argv
+    files = [
+        f for f in sys.argv if f.endswith(".py")
+    ]
     if len(files) == 0:
         print("No files to check")
         exit(0)
-    exit_code = 0
-    for f in files:
-        process = subprocess.Popen(
-            ["pyastrx", "-l", "-f", f"{f}"],
-            shell=False
-        )
-        process.communicate()
-        exit_code += process.wait()
+
+    process = subprocess.Popen(
+        ["pyastrx", "-l", "-f", *files],
+        shell=False
+    )
+    process.communicate()
+    exit_code = process.wait()
 
     sys.exit(exit_code)
 

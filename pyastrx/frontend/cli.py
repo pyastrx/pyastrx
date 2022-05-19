@@ -35,9 +35,9 @@ def construct_base_argparse():
     parser.add_argument(
         "-l",
         "--linter",
-        help = "Run in the linter mode. "\
-            + "No interactive mode, all the rules "\
-            + "with use_in_linter=false will be ignored",
+        help="""Run in the linter mode.
+            No interactive mode, all the rules
+            with use_in_linter=false will be ignored""",
         action="store_true",
         default=False,
     )
@@ -50,8 +50,10 @@ def construct_base_argparse():
     parser.add_argument(
         "-f",
         "--file",
-        help="search in a file",
-        default="",
+        help="search in a file or list of files",
+        type=str,
+        nargs="+",
+        default=[],
     )
     parser.add_argument(
         "-a",
@@ -134,10 +136,8 @@ def invoke_pyastrx(args, extra_config):
         raise ValueError("No rules or expression provided")
 
     config = {**config, **extra_config}
-    config["file"] = ""
-    if args.file != "":
-        config["file"] = args.file
-    if config["file"] == "":
+    config["files"] = args.file
+    if len(config["files"]) == 0:
         for key, val in __available_yaml_folder.items():
             config[key] = yaml_config.get(key, val)
 

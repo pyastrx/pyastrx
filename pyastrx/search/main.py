@@ -90,8 +90,10 @@ class Repo:
         recursive=True,
         parallel=True,
         extension="py",
-        exclude_folders=[".venv"],
+        exclude_folders=None,
     ):
+        if exclude_folders is None:
+            exclude_folders = [".venv"]
         if recursive:
             files = Path(folder).rglob(f"*.{extension}")
         else:
@@ -100,6 +102,14 @@ class Repo:
             str(f.resolve()) for f in files
             if not any(d in f.parts for d in exclude_folders)
         ]
+        self.load_files(files, parallel)
+
+    def load_files(
+        self,
+        files,
+        parallel=True,
+    ):
+
         files2load = [
             filename for filename in files
             if self._cache.update(filename)[0] is False

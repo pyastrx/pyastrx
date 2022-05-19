@@ -166,8 +166,11 @@ class Context:
     def expression(self, xpath: str) -> None:
         self._expression = xpath
 
-    def is_file(self) -> bool:
+    def is_unique_file(self) -> bool:
         return len(self.repo._files) == 1
+
+    def is_folder(self) -> bool:
+        return len(self.repo._files) > 1
 
     def resset_custom_expression(self) -> None:
         self._expression = ""
@@ -204,10 +207,14 @@ class Context:
 
 class LoadFiles(State):
     def run(self) -> None:
-        file = self.context._config.get("file", "")
-        if file != "":
+
+        files = self.context._config.get("files")
+        if len(files) == 1:
+            file = files[0]
             self.context.repo.load_file(file)
             self.context.set_current_file(file)
+        elif len(files) > 0:
+            self.context.repo.load_files(files)
         else:
             self.context.repo.load_folder(self.context._config["folder"])
         if not self.context._interactive:
@@ -254,7 +261,7 @@ class InterfaceMain(StateInterface):
             ("search using a Specific rule", "s", InterfaceRules),
             ("search using a New expression", "n", InterfaceNewRule),
         ]
-        if self.context.is_file():
+        if self.context.is_unique_file():
             options += [
                 ("-", "-", ""),
                 ("show XML", "x", ShowXML),
@@ -438,7 +445,7 @@ class ShowAST(State):
 
 class FileCond(State):
     def run(self) -> None:
-        if self.context.is_file():
+        if self.context.is_unique_file():
             state = InterfaceMain
         else:
             state = InterfaceFiles
@@ -449,10 +456,11 @@ class SearchState(State):
     def run(self) -> None:
         config = self.context._config
         rules = self.context.get_current_rules()
-        file = config["file"]
+        is_unique_file = self.context.is_unique_file()
 
         num_matches = 0
-        if file != "":
+        if is_unique_file:
+            file = self.context.repo._files[0]
             matching_rules_by_line = self.context.repo.search_file(
                     file, rules,
                     before_context=config["before_context"],
