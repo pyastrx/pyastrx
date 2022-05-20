@@ -11,7 +11,8 @@ __available_yaml = {
     "before_context": 3,
     "linter": False,
     "parallel": True,
-    "interactive_files": True
+    "interactive_files": False,
+    "pagination": True
 }
 
 __available_yaml_folder = {

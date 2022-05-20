@@ -24,6 +24,7 @@ from rich import print as rprint
 
 from pyastrx import __info__
 from pyastrx.ast.things2ast import txt2ASTtxt
+from pyastrx.config import __available_yaml as available_yaml
 from pyastrx.config import _prompt_dialog_style
 from pyastrx.folder_utils import get_location_and_create
 from pyastrx.report import humanize as report_humanize
@@ -159,10 +160,14 @@ class Context:
         self.set_state(initial_state)
 
     def reload_yaml(self):
+        print(available_yaml)
         with open(Path(".pyastrx.yaml").resolve(), "r") as f:
             _config = yaml.safe_load(f)
-        for k in ("rules", "interactive_files", ):
-            self._config[k] = _config[k]
+        for k in ("rules", "interactive_files", "pagination"):
+            if k not in _config.keys():
+                _config[k] = available_yaml[k]
+            else:
+                self._config[k] = _config[k]
         self._config["rules"] = _config["rules"]
 
     @property
@@ -196,6 +201,9 @@ class Context:
     @search_interface.setter
     def search_interface(self, state: StateInterface) -> None:
         self._search_interface = state
+
+    def use_pager(self) -> bool:
+        return self._config["pagination"]
 
     def is_unique_file(self) -> bool:
         return len(self.repo.get_files()) == 1
@@ -660,7 +668,10 @@ class SearchState(State):
         else:
             interactive_files = self.context.interactive_files and num_files > 1
             if not interactive_files:
-                rich_paging(output_str)
+                if self.context.use_pager():
+                    rich_paging(output_str)
+                else:
+                    rprint(output_str)
                 self.context.set_state(self.context._search_interface())
                 return
             style = Style.from_dict(_prompt_dialog_style)
@@ -685,7 +696,10 @@ class SearchState(State):
                 output_str = "".join(
                     str_by_file[i][1] for i in selected
                 )
-                rich_paging(output_str)
+                if self.context.use_pager():
+                    rich_paging(output_str)
+                else:
+                    rprint(output_str)
             self.context.set_state(self.context.search_interface())
 
 
