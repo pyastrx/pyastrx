@@ -7,7 +7,6 @@ A image diagram of the state machine can be found in the
 `state_machine.png` file.
 
 """
-import ast
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List, Tuple, Union
@@ -21,10 +20,12 @@ from prompt_toolkit.key_binding import KeyBindings
 from rich import print as rprint
 
 from pyastrx import __info__
-from pyastrx.ast.things2ast import txt2ast
+from pyastrx.ast.things2ast import txt2ASTtxt
+from pyastrx.folder_utils import get_location_and_create
 from pyastrx.report import humanize as report_humanize
 from pyastrx.report.stdout import paging_lxml, rich_paging
 from pyastrx.search import Repo
+from pyastrx.xml.misc import el_lxml2str
 
 if not Path(".pyastrx").exists():
     Path(".pyastrx").mkdir()
@@ -228,6 +229,7 @@ class LoadFiles(State):
         else:
             self.context.set_state(InterfaceMain())
 
+
 class Exit(State):
     def __init__(self, exit_code: int = 0) -> None:
         super().__init__()
@@ -273,9 +275,23 @@ class InterfaceMain(StateInterface):
             ]
         options += [
             ("-", "-", ""),
+            ("Export results", "e", InterfaceExport),
             ("Reload files", "r", LoadFiles),
             ("Help", "h", InterfaceHelp),
             ("Quit", "q", Exit)
+        ]
+        self.default_prompt(options)
+
+
+class InterfaceExport(StateInterface):
+    def start(self):
+        self.title = "Export current files"
+
+    def run(self) -> None:
+        options = [
+            ("Export all aXML", "x", ExportXML),
+            ("Export all AST", "t", ExportAST),
+            ("Cancel", "q", InterfaceMain)
         ]
         self.default_prompt(options)
 
@@ -388,7 +404,7 @@ class InterfaceFiles(StateInterface):
         def _(event):
             event.current_buffer.go_to_completion(0)
             event.current_buffer.validate_and_handle()
-        commands = ["c"] + self.context.repo._files
+        commands = ["q"] + self.context.repo._files
 
         completer = FuzzyWordCompleter(commands)
         command = prompt(
@@ -397,7 +413,7 @@ class InterfaceFiles(StateInterface):
             complete_while_typing=True,
             key_bindings=key_bindings,
         )
-        if command == "c":
+        if command == "q":
             self.context.set_state(InterfaceMain())
         file = command
         self.context.set_current_file(file)
@@ -435,8 +451,7 @@ class ShowXML(State):
 
 class ShowAST(State):
     def run(self) -> None:
-        ast_obj = txt2ast(self.context._current_file.txt)
-        ast_txt = f"{ast.dump(ast_obj, indent=2)}"
+        ast_txt = txt2ASTtxt(self.context._current_file.txt)
         rich_paging(ast_txt)
         self.context.set_state(FileCond())
 
@@ -448,6 +463,36 @@ class FileCond(State):
         else:
             state = InterfaceFiles
         self.context.set_state(state())
+
+
+class ExportXML(State):
+    def run(self) -> None:
+        files = self.context.repo._files
+        for filename in files:
+            file_info = self.context.repo._cache.get(filename)
+            axml = file_info.axml
+            axml_str = el_lxml2str(axml)
+            export_location = get_location_and_create(
+                ".pyastrx/export_data/axml/", filename)
+
+            with open(export_location, "w") as f:
+                f.write(axml_str)
+        self.context.set_state(InterfaceMain())
+
+
+class ExportAST(State):
+    def run(self) -> None:
+        files = self.context.repo._files
+        for filename in files:
+            file_info = self.context.repo._cache.get(filename)
+            txt = file_info.txt
+            ast_txt = txt2ASTtxt(txt)
+            export_location = get_location_and_create(
+                ".pyastrx/export_data/ast/", filename)
+
+            with open(export_location, "w") as f:
+                f.write(ast_txt)
+        self.context.set_state(InterfaceMain())
 
 
 class SearchState(State):
