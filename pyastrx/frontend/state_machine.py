@@ -17,6 +17,7 @@ from prompt_toolkit.completion import FuzzyWordCompleter
 from prompt_toolkit.filters import completion_is_selected, has_completions
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.shortcuts import checkboxlist_dialog
 from rich import print as rprint
 
 from pyastrx import __info__
@@ -150,6 +151,7 @@ class Context:
         self._expression = ""
         self._current_file = None
         self.__current_rule = {}
+        self.selected_rules = {}
         self._state = None
         self.repo = Repo()
         self._search_interface = InterfaceMain
@@ -177,6 +179,9 @@ class Context:
         info = self.repo._cache.get(file)
         self._current_file = info
 
+    def set_xpath_selection(self, xpath_keys: List) -> None:
+        self.selected_rules = xpath_keys
+
     def set_rule(self, xpath: str) -> bool:
         self.expression = xpath
         try:
@@ -187,10 +192,24 @@ class Context:
             self.__current_rule = {xpath: {}}
             return False
 
+    def all_rules(self) -> List:
+        """Return all rules in the config file
+
+        TODO: This should return a only the rules that
+        has been found in the current files
+
+        """
+        rules = self._config.get("rules")
+        return rules
+
     def get_current_rules(self) -> dict:
         if self._expression:
             return self.__current_rule
-        rules = self._config["rules"]
+
+        rules = self.all_rules()
+        if len(self.selected_rules) > 0:
+            rules = {k: rules[k] for k in self.selected_rules}
+
         if self._linter_mode:
             return {
                 k: v for k, v in rules.items()
@@ -252,6 +271,7 @@ class Exit(State):
 class InterfaceMain(StateInterface):
     def start(self):
         self.title = "Main Menu"
+        self.selected_rules = {}
 
     def run(self) -> None:
         self.context.resset_custom_expression()
@@ -259,6 +279,7 @@ class InterfaceMain(StateInterface):
         options = [
             ("search using All rules", "a", SearchState),
             ("search using a Specific rule", "s", InterfaceRules),
+            ("search using a selection of rules", "l", InterfaceSelectRules),
             ("search using a New expression", "n", InterfaceNewRule),
         ]
         if self.context.is_unique_file():
@@ -294,6 +315,48 @@ class InterfaceExport(StateInterface):
             ("Cancel", "q", InterfaceMain)
         ]
         self.default_prompt(options)
+
+
+class InterfaceSelectRules(StateInterface):
+    def start(self):
+        self.title = "Select a rule"
+        self.help_text = "Type anything related to the rule"\
+            + "or [bold red]q[/] to cancel"
+
+    def get_options(self):
+        rules = self.context.all_rules()
+        options = []
+        opt2xpath = {}
+        default_values = []
+        for i, (expression, info) in enumerate(rules.items()):
+            str_info = f"{info['name']}({info['why']}-){info['description']}"
+            options.append((i, str_info))
+            opt2xpath[i] = expression
+            check = expression in self.context.selected_rules
+            if check:
+                default_values.append(i)
+        return options, opt2xpath, default_values
+
+    def run(self) -> None:
+        options, opt2xpath, default_values = self.get_options()
+        dialog = checkboxlist_dialog(
+            title="Rules selection",
+            text="Choose all which will be used for searching",
+            values=options,
+            default_values=default_values,
+        )
+        selected = dialog.run()
+        selected = [] if selected is None else selected
+        if len(selected) == 0:
+            self.context.selected_rules = []
+            self.context.set_state(InterfaceMain())
+            return
+        self.context.set_xpath_selection([opt2xpath[i] for i in selected])
+
+        state = SearchState
+        self.context._search_interface = InterfaceSelectRules
+
+        self.context.set_state(state())
 
 
 class InterfaceRules(StateInterface):
