@@ -122,6 +122,8 @@ class Repo:
         parallel=True,
     ):
 
+        files = [
+            str(Path(file).resolve()) for file in files]
         files2load = [
             filename for filename in files
             if self.cache.update(filename)[0] is False
