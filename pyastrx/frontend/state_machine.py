@@ -11,6 +11,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List, Tuple, Union
 
+import yaml
 from prompt_toolkit import PromptSession, prompt
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import FuzzyWordCompleter
@@ -149,17 +150,36 @@ class StateInterface(State):
 class Context:
     def __init__(self, initial_state: State, config: dict) -> None:
         self._config = config
-        self._interactive = config["interactive"]
-        self._linter_mode = config["linter"]
-        self._interactive_files = config["interactive_files"]
         self._expression = ""
-        self._current_file = None
-        self.__current_rule = {}
+        self.current_file = None
         self.selected_rules = {}
         self._state = None
         self.repo = Repo()
         self._search_interface = InterfaceMain
         self.set_state(initial_state)
+
+    def reload_yaml(self):
+        with open(Path(".pyastrx.yaml").resolve(), "r") as f:
+            _config = yaml.safe_load(f)
+        for k in ("rules", "interactive_files", ):
+            self._config[k] = _config[k]
+        self._config["rules"] = _config["rules"]
+
+    @property
+    def rules(self) -> List[dict]:
+        return self._config["rules"]
+
+    @property
+    def interactive_files(self) -> bool:
+        return self._config["interactive_files"]
+
+    @property
+    def interactive(self) -> bool:
+        return self._config["interactive"]
+
+    @property
+    def linter_mode(self) -> bool:
+        return self._config["linter"]
 
     @property
     def expression(self) -> str:
@@ -169,19 +189,26 @@ class Context:
     def expression(self, xpath: str) -> None:
         self._expression = xpath
 
+    @property
+    def search_interface(self) -> State:
+        return self._search_interface
+
+    @search_interface.setter
+    def search_interface(self, state: StateInterface) -> None:
+        self._search_interface = state
+
     def is_unique_file(self) -> bool:
-        return len(self.repo._files) == 1
+        return len(self.repo.get_files()) == 1
 
     def is_folder(self) -> bool:
-        return len(self.repo._files) > 1
+        return len(self.repo.get_files()) > 1
 
     def resset_custom_expression(self) -> None:
         self._expression = ""
 
     def set_current_file(self, file: str) -> None:
-        file = self.repo._files[0]
-        info = self.repo._cache.get(file)
-        self._current_file = info
+        info = self.repo.cache.get(file)
+        self.current_fileinfo = info
 
     def set_xpath_selection(self, xpath_keys: List) -> None:
         self.selected_rules = xpath_keys
@@ -214,11 +241,17 @@ class Context:
         if len(self.selected_rules) > 0:
             rules = {k: rules[k] for k in self.selected_rules}
 
-        if self._linter_mode:
+        if self.linter_mode:
             return {
                 k: v for k, v in rules.items()
                 if v.get("use_in_linter", True)}
         return rules
+
+    def get_files(self) -> List:
+        return self._config["files"]
+
+    def is_parallel(self) -> bool:
+        return self._config["parallel"]
 
     def set_state(self, state: State) -> None:
         state.context = self
@@ -227,7 +260,7 @@ class Context:
 
 class StartState(State):
     def run(self) -> None:
-        if self.context._interactive:
+        if self.context.interactive:
             __info__()
         self.context.set_state(LoadFiles())
 
@@ -235,19 +268,20 @@ class StartState(State):
 class LoadFiles(State):
     def run(self) -> None:
 
-        files = self.context._config.get("files")
+        parallel = self.context.is_parallel()
+        files = self.context.get_files()
         if len(files) == 1:
             file = files[0]
             self.context.repo.load_file(file)
             self.context.set_current_file(file)
         elif len(files) > 0:
             self.context.repo.load_files(
-                files, parallel=self.context._config["parallel"])
+                files, parallel=parallel)
         else:
             self.context.repo.load_folder(
                 self.context._config["folder"],
-                parallel=self.context._config["parallel"])
-        if not self.context._interactive:
+                parallel=parallel)
+        if not self.context.interactive:
             self.context.set_state(SearchState())
         else:
             self.context.set_state(InterfaceMain())
@@ -260,7 +294,7 @@ class Exit(State):
 
     def run(self) -> None:
         exit(self.exit_code)
-        # if not self.context._interactive:
+        # if not self.context.interactive:
         #     exit()
         # while True:
         #     rprint("Are you sure [bold red]you want to exit?[/](y/n)")
@@ -279,7 +313,7 @@ class InterfaceMain(StateInterface):
 
     def run(self) -> None:
         self.context.resset_custom_expression()
-        self.context._search_interface = InterfaceMain
+        self.context.search_interface = InterfaceMain
         options = [
             ("search using All rules", "a", SearchState),
             ("search using a Specific rule", "s", InterfaceRules),
@@ -303,10 +337,17 @@ class InterfaceMain(StateInterface):
             ("Export AST and aXML", "e", InterfaceExport),
             ("-", "-", ""),
             ("Reload files", "r", LoadFiles),
+            ("Reload YAML", "y", ReloadYAML),
             ("Help", "h", InterfaceHelp),
             ("Quit", "q", Exit)
         ]
         self.default_prompt(options)
+
+
+class ReloadYAML(State):
+    def run(self) -> None:
+        self.context.reload_yaml()
+        self.context.set_state(InterfaceMain())
 
 
 class InterfaceExport(StateInterface):
@@ -362,7 +403,7 @@ class InterfaceSelectRules(StateInterface):
         self.context.set_xpath_selection([opt2xpath[i] for i in selected])
 
         state = SearchState
-        self.context._search_interface = InterfaceSelectRules
+        self.context.search_interface = InterfaceSelectRules
 
         self.context.set_state(state())
 
@@ -374,9 +415,9 @@ class InterfaceRules(StateInterface):
             + "or [bold red]q[/] to cancel"
 
     def get_humanized_rules(self):
-        self.context._search_interface = InterfaceRules
+        self.context.search_interface = InterfaceRules
 
-        rules = self.context._config.get("rules")
+        rules = self.context.rules
         rules_str = []
         str2expression = {}
         for expression, info in rules.items():
@@ -424,7 +465,7 @@ class InterfaceNewRule(StateInterface):
             + " or type [bold red]q[/] to cancel\n"
 
     def run(self) -> None:
-        self.context._search_interface = InterfaceNewRule
+        self.context.search_interface = InterfaceNewRule
         while True:
             command = _PromptSessionExpr.prompt(
                 ":",
@@ -441,7 +482,7 @@ class InterfaceNewRule(StateInterface):
 
 class AvailableRules(State):
     def run(self) -> None:
-        rules = self.context._config.get("rules")
+        rules = self.context.rules
         for rule in rules.values():
             for key, val in rule.items():
                 rprint(f"{' '*3}{key}: {val}")
@@ -475,7 +516,7 @@ class InterfaceFiles(StateInterface):
         def _(event):
             event.current_buffer.go_to_completion(0)
             event.current_buffer.validate_and_handle()
-        commands = ["q"] + self.context.repo._files
+        commands = ["q"] + self.context.repo.get_files()
 
         completer = FuzzyWordCompleter(commands)
         command = prompt(
@@ -508,21 +549,21 @@ class InterfaceFile(StateInterface):
 
 class ShowCode(State):
     def run(self) -> None:
-        code = self.context._current_file.txt
+        code = self.context.current_fileinfo.txt
         rich_paging(code)
         self.context.set_state(FileCond())
 
 
 class ShowXML(State):
     def run(self) -> None:
-        axml = self.context._current_file.axml
+        axml = self.context.current_fileinfo.axml
         paging_lxml(axml)
         self.context.set_state(FileCond())
 
 
 class ShowAST(State):
     def run(self) -> None:
-        ast_txt = txt2ASTtxt(self.context._current_file.txt)
+        ast_txt = txt2ASTtxt(self.context.current_fileinfo.txt)
         rich_paging(ast_txt)
         self.context.set_state(FileCond())
 
@@ -538,9 +579,9 @@ class FileCond(State):
 
 class ExportXML(State):
     def run(self) -> None:
-        files = self.context.repo._files
+        files = self.context.repo.get_files()
         for filename in files:
-            file_info = self.context.repo._cache.get(filename)
+            file_info = self.context.repo.cache.get(filename)
             axml = file_info.axml
             axml_str = el_lxml2str(axml)
             export_location = get_location_and_create(
@@ -553,9 +594,9 @@ class ExportXML(State):
 
 class ExportAST(State):
     def run(self) -> None:
-        files = self.context.repo._files
+        files = self.context.repo.get_files()
         for filename in files:
-            file_info = self.context.repo._cache.get(filename)
+            file_info = self.context.repo.cache.get(filename)
             txt = file_info.txt
             ast_txt = txt2ASTtxt(txt)
             export_location = get_location_and_create(
@@ -575,7 +616,7 @@ class SearchState(State):
         num_matches = 0
         num_files = 0
         if is_unique_file:
-            file = self.context.repo._files[0]
+            file = self.context.repo.get_file()
             matching_rules_by_line = self.context.repo.search_file(
                     file, rules,
                     before_context=config["before_context"],
@@ -607,12 +648,12 @@ class SearchState(State):
                     num_matches += num_matches_file
                     num_files += 1
                     output_str += output_str_file
-        if not self.context._interactive:
+        if not self.context.interactive:
             rprint(output_str)
             exit_code = 1 if num_matches > 0 else 0
             self.context.set_state(Exit(exit_code))
         else:
-            interactive_files = self.context._interactive_files and num_files > 1
+            interactive_files = self.context.interactive_files and num_files > 1
             if not interactive_files:
                 rich_paging(output_str)
                 self.context.set_state(self.context._search_interface())
@@ -640,6 +681,6 @@ class SearchState(State):
                     str_by_file[i][1] for i in selected
                 )
                 rich_paging(output_str)
-            self.context.set_state(self.context._search_interface())
+            self.context.set_state(self.context.search_interface())
 
 

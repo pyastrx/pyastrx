@@ -73,21 +73,21 @@ def search_in_file_info(
 
 class Repo:
     def __init__(self):
-        self._cache = Cache()
-        self._cache.load()
+        self.cache = Cache()
+        self.cache.load()
 
     def load_file(self, filename):
-        info, _ = self._cache.update(filename)
+        info, _ = self.cache.update(filename)
         self._files = [filename]
         if not info:
             info = file2axml(filename)
-            self._cache.set(filename, info)
+            self.cache.set(filename, info)
 
     def search_file(
             self, filename, rules,
             before_context=0,
             after_context=0):
-        info = self._cache.get(filename)
+        info = self.cache.get(filename)
         if info is None:
             print(f"{filename} not found in cache")
             return {}
@@ -124,7 +124,7 @@ class Repo:
 
         files2load = [
             filename for filename in files
-            if self._cache.update(filename)[0] is False
+            if self.cache.update(filename)[0] is False
         ]
         if len(files2load) == 0:
             return
@@ -136,12 +136,18 @@ class Repo:
             for info, filename in zip(infos, files2load):
                 if info is None:
                     raise Exception(f"Failed to convert {filename}")
-                self._cache.set(filename, info)
+                self.cache.set(filename, info)
         else:
             for filename in files2load:
                 self.load_file(filename)
 
         self._files = files
+
+    def get_files(self):
+        return self._files
+
+    def get_file(self):
+        return self._files[0]
 
     def search_files(
             self, rules,
@@ -159,7 +165,7 @@ class Repo:
                             before_context=before_context,
                             after_context=after_context
                         ),
-                        map(self._cache.get, self._files)
+                        map(self.cache.get, self._files)
                 )
             for matching_rules_by_line, filename in zip(matches, self._files):
                 file2matches[filename] = matching_rules_by_line
