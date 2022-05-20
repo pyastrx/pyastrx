@@ -20,3 +20,10 @@ __available_yaml_folder = {
     "recursive": True,
     "exclude": [".venv", "docs", ".git"],
 }
+
+_prompt_dialog_style = {
+    'dialog':             'bg:#FFE873',
+    'dialog frame.label': 'bg:#306998 #000000',
+    'dialog.body':        'bg:#4B8BBE',
+    'dialog shadow':      'bg:#306998',
+}

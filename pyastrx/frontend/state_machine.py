@@ -18,16 +18,19 @@ from prompt_toolkit.filters import completion_is_selected, has_completions
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.shortcuts import checkboxlist_dialog
+from prompt_toolkit.styles import Style
 from rich import print as rprint
 
 from pyastrx import __info__
 from pyastrx.ast.things2ast import txt2ASTtxt
+from pyastrx.config import _prompt_dialog_style
 from pyastrx.folder_utils import get_location_and_create
 from pyastrx.report import humanize as report_humanize
 from pyastrx.report.stdout import paging_lxml, rich_paging
 from pyastrx.search import Repo
 from pyastrx.xml.misc import el_lxml2str
 
+#  prompt dialog auto suggest history
 if not Path(".pyastrx").exists():
     Path(".pyastrx").mkdir()
 _PromptSessionExpr = PromptSession(
@@ -297,7 +300,8 @@ class InterfaceMain(StateInterface):
             ]
         options += [
             ("-", "-", ""),
-            ("Export results", "e", InterfaceExport),
+            ("Export AST and aXML", "e", InterfaceExport),
+            ("-", "-", ""),
             ("Reload files", "r", LoadFiles),
             ("Help", "h", InterfaceHelp),
             ("Quit", "q", Exit)
@@ -340,11 +344,14 @@ class InterfaceSelectRules(StateInterface):
 
     def run(self) -> None:
         options, opt2xpath, default_values = self.get_options()
+        style = Style.from_dict(_prompt_dialog_style)
+
         dialog = checkboxlist_dialog(
             title="Rules selection",
-            text="Choose all which will be used for searching",
+            text="Choose which rules to use for the search",
             values=options,
             default_values=default_values,
+            style=style
         )
         selected = dialog.run()
         selected = [] if selected is None else selected
@@ -610,6 +617,7 @@ class SearchState(State):
                 rich_paging(output_str)
                 self.context.set_state(self.context._search_interface())
                 return
+            style = Style.from_dict(_prompt_dialog_style)
             selected_files = []
             while True:
                 options = [
@@ -618,9 +626,10 @@ class SearchState(State):
                 ]
                 dialog = checkboxlist_dialog(
                     title=f"Files selection: ({num_files} files matched the rules)",
-                    text="To disable this dialog, set interactive_files to False in .pyastrx.yaml",
+                    text="To disable this dialog, set interactive_files to False in pyastrx.yaml",
                     values=options,
-                    default_values=selected_files
+                    default_values=selected_files,
+                    style=style
                 )
                 selected = dialog.run()
                 selected = [] if selected is None else selected
