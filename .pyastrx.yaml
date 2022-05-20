@@ -2,6 +2,8 @@ after_context: 5
 before_context: 3
 #folder: 'tests'
 parallel: true
+exclude: [".venv", "docs"]
+interactive_files: True
 rules:
   "//defaults/*[self::Dict or self::List or self::Set or self::Caller]":
     name: "mutable-defaults"

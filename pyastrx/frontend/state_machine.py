@@ -148,6 +148,7 @@ class Context:
         self._config = config
         self._interactive = config["interactive"]
         self._linter_mode = config["linter"]
+        self._interactive_files = config["interactive_files"]
         self._expression = ""
         self._current_file = None
         self.__current_rule = {}
@@ -565,6 +566,7 @@ class SearchState(State):
         is_unique_file = self.context.is_unique_file()
 
         num_matches = 0
+        num_files = 0
         if is_unique_file:
             file = self.context.repo._files[0]
             matching_rules_by_line = self.context.repo.search_file(
@@ -575,6 +577,7 @@ class SearchState(State):
             output_str, num_matches = report_humanize.matches_by_filename(
                 matching_rules_by_line, file)
         else:
+            parent_folder = Path(".").resolve()
             matchng_by_file = self.context.repo.search_files(
                     rules,
                     before_context=config["before_context"],
@@ -582,17 +585,52 @@ class SearchState(State):
                     parallel=config["parallel"],
                 )
 
+            str_by_file = {}
             output_str = ""
-            for filename, matching_rules_by_file in matchng_by_file.items():
+            for i, (filename, matching_rules_by_file) in enumerate(
+                    matchng_by_file.items()):
                 output_str_file, num_matches_file = \
                         report_humanize.matches_by_filename(
                             matching_rules_by_file, filename)
-                output_str += output_str_file
-                num_matches += num_matches_file
+                if num_matches_file > 0:
+                    str_by_file[i] = (
+                        str(Path(filename).relative_to(parent_folder)),
+                        output_str_file
+                    )
+                    num_matches += num_matches_file
+                    num_files += 1
+                    output_str += output_str_file
         if not self.context._interactive:
             rprint(output_str)
             exit_code = 1 if num_matches > 0 else 0
             self.context.set_state(Exit(exit_code))
         else:
-            rich_paging(output_str)
+            interactive_files = self.context._interactive_files and num_files > 1
+            if not interactive_files:
+                rich_paging(output_str)
+                self.context.set_state(self.context._search_interface())
+                return
+            selected_files = []
+            while True:
+                options = [
+                    (i, filename)
+                    for i, (filename, _) in str_by_file.items()
+                ]
+                dialog = checkboxlist_dialog(
+                    title=f"Files selection: ({num_files} files matched the rules)",
+                    text="To disable this dialog, set interactive_files to False in .pyastrx.yaml",
+                    values=options,
+                    default_values=selected_files
+                )
+                selected = dialog.run()
+                selected = [] if selected is None else selected
+                if len(selected) == 0:
+                    break
+                selected_files = selected
+                output_str = "".join(
+                    str_by_file[i][1] for i in selected
+                )
+                rich_paging(output_str)
             self.context.set_state(self.context._search_interface())
+
+

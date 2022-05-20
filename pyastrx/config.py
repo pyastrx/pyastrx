@@ -11,11 +11,12 @@ __available_yaml = {
     "before_context": 3,
     "linter": False,
     "parallel": True,
+    "interactive_files": True
 }
 
 __available_yaml_folder = {
     "folder": ".",
     "parallel": True,
     "recursive": True,
-    "exclude": [".venv"],
+    "exclude": [".venv", "docs", ".git"],
 }
