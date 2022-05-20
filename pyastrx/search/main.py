@@ -102,17 +102,17 @@ class Repo:
         recursive=True,
         parallel=True,
         extension="py",
-        exclude_folders=None,
+        exclude=None,
     ):
-        if exclude_folders is None:
-            exclude_folders = [".venv"]
+        if exclude is None:
+            exclude = [".venv"]
         if recursive:
             files = Path(folder).rglob(f"*.{extension}")
         else:
             files = Path(folder).glob(f"*.{extension}")
         files = [
             str(f.resolve()) for f in files
-            if not any(d in f.parts for d in exclude_folders)
+            if not any(d in f.parts for d in exclude)
         ]
         self.load_files(files, parallel)
 

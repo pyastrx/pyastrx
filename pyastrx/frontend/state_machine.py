@@ -257,6 +257,24 @@ class Context:
         state.context = self
         self._state = state
 
+    def load_files(self) -> None:
+        parallel = self.is_parallel()
+        files = self.get_files()
+        if len(files) == 1:
+            file = files[0]
+            self.repo.load_file(file)
+            self.set_current_file(file)
+        elif len(files) > 0:
+            self.repo.load_files(
+                files, parallel=parallel)
+        else:
+            self.repo.load_folder(
+                self._config["folder"],
+                parallel=parallel,
+                exclude=self._config["exclude"],
+                recursive=self._config["recursive"]
+            )
+
 
 class StartState(State):
     def run(self) -> None:
@@ -267,20 +285,7 @@ class StartState(State):
 
 class LoadFiles(State):
     def run(self) -> None:
-
-        parallel = self.context.is_parallel()
-        files = self.context.get_files()
-        if len(files) == 1:
-            file = files[0]
-            self.context.repo.load_file(file)
-            self.context.set_current_file(file)
-        elif len(files) > 0:
-            self.context.repo.load_files(
-                files, parallel=parallel)
-        else:
-            self.context.repo.load_folder(
-                self.context._config["folder"],
-                parallel=parallel)
+        self.context.load_files()
         if not self.context.interactive:
             self.context.set_state(SearchState())
         else:
