@@ -2,6 +2,11 @@
 # See https://pre-commit.com/hooks.html for more hooks
 exclude: ".md$"
 repos:
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+        name: isort (python)
   - repo: local
     hooks:
       - id: pyastrix
@@ -39,24 +44,24 @@ repos:
     #     language: python
     #     types: [text]
     #     stages: [commit, push, manual]
-    #   - id: check-yaml
-    #     name: check yaml
-    #     description: checks yaml files for parseable syntax.
-    #     entry: check-yaml
-    #     language: python
-    #     types: [yaml]
-    #     stages: [commit]
-    #   - id: check-added-large-files
-    #     name: check for added large files
-    #     description: prevents giant files from being committed.
-    #     entry: check-added-large-files
-    #     language: python
-    #   - id: check-ast
-    #     name: check python ast
-    #     description: simply checks whether the files parse as valid python.
-    #     entry: check-ast
-    #     language: python
-    #     types: [python]
+      # - id: check-yaml
+      #   name: check yaml
+      #   description: checks yaml files for parseable syntax.
+      #   entry: check-yaml
+      #   language: python
+      #   types: [yaml]
+      #   stages: [commit]
+      # - id: check-added-large-files
+      #   name: check for added large files
+      #   description: prevents giant files from being committed.
+      #   entry: check-added-large-files
+      #   language: python
+      # - id: check-ast
+      #   name: check python ast
+      #   description: simply checks whether the files parse as valid python.
+      #   entry: check-ast
+      #   language: python
+      #   types: [python]
     #   - id: check-docstring-first
     #     name: check docstring is first
     #     description: checks a common error of defining a docstring after code.

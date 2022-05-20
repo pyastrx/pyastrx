@@ -1,19 +1,13 @@
-from pathlib import Path
-from dataclasses import dataclass
-from typing import Dict, Tuple
 import ast
 import codecs
-from numbers import Number
 from functools import partial
+from numbers import Number
+from pathlib import Path
+
 from lxml import etree
 
-
-@dataclass
-class FileInfo:
-    filename: str
-    axml: etree._Element
-    txt: str
-    last_modified: float
+from pyastrx.ast.things2ast import txt2ast
+from pyastrx.data_typing import FileInfo
 
 
 def _set_encoded_literal(set_fn, literal):
@@ -85,41 +79,6 @@ def convert_to_xml(node, omit_docstrings=False):
                 partial(xml_node.set, field_name), field_value)
 
     return xml_node
-
-
-def txt2ast(
-        txt: str, filename: str = "<unknown>") -> ast.Module:
-    """Convert Python file contents (as a string) to an AST.
-
-    Args:
-        txt (str): Python file contents.
-        filename (str): Filename to use in error messages.
-    Returns:
-        ast.Module: AST of the supplied contents.
-
-    """
-    parsed_ast = ast.parse(txt, filename)
-    return parsed_ast
-
-
-def file2ast(
-        filename: str) -> Tuple[ast.AST, str]:
-    """Construct the ast from a python file.
-
-    Args:
-        filename (str): Filename to use in error messages.
-    Returns:
-        (ast.AST, str): AST of the supplied contents.
-
-    """
-    file_path = Path(filename)
-    # get last modified time
-    last_modified = file_path.stat().st_mtime
-
-    with open(filename, "r") as f:
-        txt = f.read()
-    parsed_ast = txt2ast(txt, filename)
-    return parsed_ast, last_modified
 
 
 def file2axml(

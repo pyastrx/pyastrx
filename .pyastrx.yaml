@@ -1,21 +1,20 @@
-
-after_context: 3
+after_context: 5
 before_context: 3
 #folder: 'tests'
 parallel: true
 rules:
-  # "//defaults/*[self::Dict or self::List or self::Set or self::Caller]":
-  #   name: "mutable-defaults"
-  #   description: "Can create bugs that are hard to find"
-  #   severity: "error"
-  #   why: "bad practice"
-  #   use_in_linter: true
-  # ".//Constant[not(ancestor::Assign) and re:match('https?://', @value)]":
-  #   name: "deafult with url"
-  #   description: "In the past, this behavior a lot of trouble for ours iot team"
-  #   why: "bad practice"
-  #   severity: "warning"
-  #   use_in_linter: false
+  "//defaults/*[self::Dict or self::List or self::Set or self::Caller]":
+    name: "mutable-defaults"
+    description: "Can create bugs that are hard to find"
+    severity: "error"
+    why: "bad practice"
+    use_in_linter: true
+  ".//Constant[not(ancestor::Assign) and re:match('https?://', @value)]":
+    name: "deafult with url"
+    description: "In the past, this behavior a lot of trouble for ours iot team"
+    why: "bad practice"
+    severity: "warning"
+    use_in_linter: false
   "//ClassDef[re:match('.*Var', @name)]":
     name: "B001"
     description: "Classes with 'Var' in name"

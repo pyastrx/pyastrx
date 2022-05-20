@@ -12,6 +12,7 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('..'))
 
 
@@ -50,6 +51,8 @@ html_theme = 'sphinx_material'
 html_sidebars = {
     "**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]
 }
+html_show_sourcelink = False
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
@@ -86,9 +89,14 @@ html_theme_options = {
     'globaltoc_includehidden': False,
     'nav_links': [
         {'title': 'How to use', 'href': 'cli', 'internal': True},
-        {'title': 'Whant to see some video?', 'href': 'videos', 'internal': True},
-        {'title': 'Examples', 'href': 'videos', 'internal': True},
-        {'title': 'Bruno Messias', 'href': 'videos', 'internal': True},
-        {'title': 'Need help?', 'href': 'videos', 'internal': True},
+        {'title': 'Examples', 'href': 'examples', 'internal': True},
+        {
+            'title': 'Who I am? Bruno Messias',
+            'href': 'https://devmessias.github.io', 'internal': False},
+        {
+            'title': 'Need help?',
+            'href': 'https://github.com/devmessias/pyastrx/issues/new',
+            'internal': False
+        },
     ]
 }

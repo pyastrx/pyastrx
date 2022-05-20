@@ -1,6 +1,8 @@
-import os
 import json
-from rich import print as rprint # noqa
+import os
+
+from rich import print as rprint  # noqa
+
 from pyastrx.search import Repo
 
 
@@ -36,5 +38,5 @@ def test_folder_search():
         os.path.abspath(__file__)).replace("tests", "pyastrx")
     repo = Repo()
     repo.load_folder(pyastrx_folder)
-    repo.search_folder(
+    repo.search_files(
                 "//Name[string-length(@id) > 5]")

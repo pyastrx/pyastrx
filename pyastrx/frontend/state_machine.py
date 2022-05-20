@@ -7,28 +7,24 @@ A image diagram of the state machine can be found in the
 `state_machine.png` file.
 
 """
-from abc import ABC, abstractmethod
 import ast
+from abc import ABC, abstractmethod
 from pathlib import Path
-
 from typing import List, Tuple, Union
-from prompt_toolkit import prompt
-from prompt_toolkit.completion import FuzzyWordCompleter
-from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.filters import (
-    has_completions,
-    completion_is_selected,
-)
-from prompt_toolkit import PromptSession
-from prompt_toolkit.history import FileHistory
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from rich import print as rprint
-from pyastrx.report.stdout import rich_paging, paging_lxml
-from pyastrx.search import Repo
-from pyastrx.report import humanize as report_humanize
-from pyastrx.search.code2axml import txt2ast
-from pyastrx import __info__
 
+from prompt_toolkit import PromptSession, prompt
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.completion import FuzzyWordCompleter
+from prompt_toolkit.filters import completion_is_selected, has_completions
+from prompt_toolkit.history import FileHistory
+from prompt_toolkit.key_binding import KeyBindings
+from rich import print as rprint
+
+from pyastrx import __info__
+from pyastrx.ast.things2ast import txt2ast
+from pyastrx.report import humanize as report_humanize
+from pyastrx.report.stdout import paging_lxml, rich_paging
+from pyastrx.search import Repo
 
 if not Path(".pyastrx").exists():
     Path(".pyastrx").mkdir()
@@ -205,6 +201,13 @@ class Context:
         self._state = state
 
 
+class StartState(State):
+    def run(self) -> None:
+        if self.context._interactive:
+            __info__()
+        self.context.set_state(LoadFiles())
+
+
 class LoadFiles(State):
     def run(self) -> None:
 
@@ -224,14 +227,6 @@ class LoadFiles(State):
             self.context.set_state(SearchState())
         else:
             self.context.set_state(InterfaceMain())
-
-
-class StartState(State):
-    def run(self) -> None:
-        if self.context._interactive:
-            __info__()
-        self.context.set_state(LoadFiles())
-
 
 class Exit(State):
     def __init__(self, exit_code: int = 0) -> None:

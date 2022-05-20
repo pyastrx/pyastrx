@@ -2,8 +2,11 @@
     readable report on stdout.
 """
 import pydoc
+
 from lxml import etree
 from rich.console import Console
+
+from pyastrx.xml.misc import el_lxml2str
 
 
 def rich_paging(text: str) -> None:
@@ -19,5 +22,5 @@ def rich_paging(text: str) -> None:
 
 def paging_lxml(el_lxml: etree._Element) -> None:
     "Use rich to page the lxml element through less and pydoc."
-    text = str(etree.tostring(el_lxml, pretty_print=True), "utf-8")
+    text = el_lxml2str(el_lxml)
     rich_paging(text)

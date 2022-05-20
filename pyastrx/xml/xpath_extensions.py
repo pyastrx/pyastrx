@@ -1,8 +1,8 @@
 """All the xpath extensions should be defined here."""
 import re
 from typing import List
-from lxml import etree
 
+from lxml import etree
 
 regexp_url = "https://pyastrx.readthedocs.io/regex"
 lxml_ext_regex = etree.FunctionNamespace(regexp_url)
@@ -13,6 +13,7 @@ lxml_ext_pyastrx = etree.FunctionNamespace(pyastrx_url)
 
 @lxml_ext_pyastrx
 def anyin(context, values_check: List, values: List) -> bool:
+    print(f"anyin: {values_check} in {values}")
     """Allows to check if the results of a xpath are inside
     of a list of another xpath results.
 

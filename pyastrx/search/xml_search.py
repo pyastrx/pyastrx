@@ -1,7 +1,6 @@
 from lxml import etree
-from pyastrx.search.xml.xpath_extensions import (
-    lxml_ext_pyastrx, lxml_ext_regex)
 
+from pyastrx.xml.xpath_extensions import lxml_ext_pyastrx, lxml_ext_regex
 
 # initialize the extension functions
 lxml_ext_regex.prefix = "re"

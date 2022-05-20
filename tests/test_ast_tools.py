@@ -1,5 +1,6 @@
 import glob
-from pyastrx.search.code2axml import  txt2ast
+
+from pyastrx.ast.things2ast import txt2ast
 
 
 def test_find_in_ast():

@@ -1,15 +1,17 @@
-from functools import partial
-from typing import Tuple, Callable
-from pathlib import Path
-from io import BytesIO
 import copyreg
+from functools import partial
+from io import BytesIO
 from multiprocessing import Pool
+from pathlib import Path
+from typing import Callable, Tuple
 
 from lxml import etree
+
+from pyastrx.ast.ast2xml import file2axml
+from pyastrx.data_typing import FileInfo
 from pyastrx.search.cache import Cache
-from pyastrx.search.code2axml import file2axml, FileInfo
-from pyastrx.search.xml_search import search_in_axml
 from pyastrx.search.txt_tools import apply_context
+from pyastrx.search.xml_search import search_in_axml
 
 
 def lxml_el_unpickle(el_lxml: bytes) -> etree._ElementTree:
