@@ -686,8 +686,8 @@ class SearchState(State):
             exit_code = 1 if num_matches > 0 else 0
             self.context.set_state(Exit(exit_code))
         else:
-
-            self.context.filter_rules(filter_rules)
+            if not self.context._search_interface == InterfaceNewRule:
+                self.context.filter_rules(filter_rules)
             interactive_files = self.context.interactive_files and num_files > 1
             if not interactive_files:
                 if self.context.use_pager():
