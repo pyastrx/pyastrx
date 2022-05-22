@@ -3,9 +3,11 @@
 The Command Line Interface for PyASTrix.
 
 """
-from pathlib import Path
 import argparse
+from pathlib import Path
+
 import yaml
+
 from pyastrx.config import __available_yaml, __available_yaml_folder
 from pyastrx.frontend.state_machine import Context, StartState
 
@@ -140,7 +142,10 @@ def invoke_pyastrx(args, extra_config):
     if len(config["files"]) == 0:
         for key, val in __available_yaml_folder.items():
             config[key] = yaml_config.get(key, val)
-
+    if args.folder:
+        config["folder"] = args.folder
     sm = Context(initial_state=StartState(), config=config)
     while True:
         sm._state.run()
+
+
