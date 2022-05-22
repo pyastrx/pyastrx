@@ -19,17 +19,8 @@ def _set_encoded_literal(set_fn, literal):
         set_fn("")  # Null byte - failover to empty string
 
 
-def _strip_docstring(body):
-    first = body[0]
-    if isinstance(first, ast.Expr) and isinstance(first.value, ast.Str):
-        return body[1:]
-    return body
-
-
-def convert_to_xml(node, omit_docstrings=False):
+def convert_to_xml(node):
     """Convert supplied AST node to XML."""
-    possible_docstring = isinstance(
-        node, (ast.FunctionDef, ast.ClassDef, ast.Module))
 
     xml_node = etree.Element(node.__class__.__name__)
     # for attr in ("lineno", "col_offset", "end_lineno", "end_col_offset"):
@@ -47,21 +38,17 @@ def convert_to_xml(node, omit_docstrings=False):
             field.append(
                 convert_to_xml(
                     field_value,
-                    omit_docstrings,
                 )
             )
 
         elif isinstance(field_value, list):
             field = etree.SubElement(xml_node, field_name)
-            if possible_docstring and omit_docstrings and field_name == "body":
-                field_value = _strip_docstring(field_value)
 
             for item in field_value:
                 if isinstance(item, ast.AST):
                     field.append(
                         convert_to_xml(
                             item,
-                            omit_docstrings,
                         )
                     )
                 else:
@@ -95,7 +82,6 @@ def file2axml(
     parsed_ast = txt2ast(txt, filename, normalize_by_gast)
     xml_ast = convert_to_xml(
         parsed_ast,
-        omit_docstrings=False,
     )
     info = FileInfo(
         filename=filename,
