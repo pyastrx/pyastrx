@@ -1,5 +1,6 @@
 from lxml import etree
 
+from pyastrx.xml.xpath_expressions import XpathExpressions
 from pyastrx.xml.xpath_extensions import lxml_ext_pyastrx, lxml_ext_regex
 
 # initialize the extension functions
@@ -7,22 +8,23 @@ lxml_ext_regex.prefix = "re"
 lxml_ext_pyastrx.prefix = "pyastrx"
 
 
+def get_xml_el_value(element, xpath_name):
+    xpath_expr = getattr(XpathExpressions, xpath_name)
+    try:
+        return element.xpath(xpath_expr)
+    except AttributeError:
+        return None
+
+
 def linenos_from_xml(elements):
     """Given a list of elements, return a list of line numbers."""
     lines = {}
     for element in elements:
-        try:
-            linenos = element.xpath("./ancestor-or-self::*[@lineno][1]/@lineno")
-        except AttributeError:
-            linenos = []
-
-        try:
-            col_offset = element.xpath("./ancestor-or-self::*[@col_offset][1]/@col_offset")
-        except AttributeError:
-            col_offset = []
+        linenos = get_xml_el_value(element, "linenos")
+        cols_offset = get_xml_el_value(element, "cols_offset")
 
         if linenos:
-            col = int(col_offset[0]) if col_offset else 0
+            col = int(cols_offset[0]) if cols_offset else 0
             linenos = int(linenos[0])
 
             if linenos not in lines:
