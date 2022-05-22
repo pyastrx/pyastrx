@@ -49,5 +49,6 @@ def search_in_axml(rules, axml):
         matching_by_expression[expression] = {
             "line_nums": matching_lines_by_exp,
             "rule_infos": rule,
+            "num_matches": len(matching_lines_by_exp)
         }
     return matching_by_expression

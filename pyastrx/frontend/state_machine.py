@@ -160,7 +160,6 @@ class Context:
         self.set_state(initial_state)
 
     def reload_yaml(self):
-        print(available_yaml)
         with open(Path(".pyastrx.yaml").resolve(), "r") as f:
             _config = yaml.safe_load(f)
         for k in ("rules", "interactive_files", "pagination"):
@@ -254,6 +253,12 @@ class Context:
                 k: v for k, v in rules.items()
                 if v.get("use_in_linter", True)}
         return rules
+
+    def filter_rules(self, rules: List[dict]) -> None:
+        for expression, num_matches in rules.items():
+            if num_matches == 0:
+                self.selected_rules = []
+                del self._config["rules"][expression]
 
     def get_files(self) -> List:
         return self._config["files"]
@@ -388,7 +393,10 @@ class InterfaceSelectRules(StateInterface):
         opt2xpath = {}
         default_values = []
         for i, (expression, info) in enumerate(rules.items()):
-            str_info = f"{info['name']}({info['why']}-){info['description']}"
+            name = info.get("name", expression)
+            description = info.get("description", "")
+            why = info.get("why", "")
+            str_info = f"{name}({why}-){description}"
             options.append((i, str_info))
             opt2xpath[i] = expression
             check = expression in self.context.selected_rules
@@ -434,7 +442,10 @@ class InterfaceRules(StateInterface):
         rules_str = []
         str2expression = {}
         for expression, info in rules.items():
-            str_info = f"{info['name']}({info['why']}-){info['description']}"
+            name = info.get("name", expression)
+            description = info.get("description", "")
+            why = info.get("why", "")
+            str_info = f"{name}({why}-){description}"
             rules_str.append(str_info)
             str2expression[str_info] = expression
         return rules_str, str2expression
@@ -628,6 +639,7 @@ class SearchState(State):
 
         num_matches = 0
         num_files = 0
+        filter_rules = {k: 0 for k in rules.keys()}
         if is_unique_file:
             file = self.context.repo.get_file()
             matching_rules_by_line = self.context.repo.search_file(
@@ -635,6 +647,10 @@ class SearchState(State):
                     before_context=config["before_context"],
                     after_context=config["after_context"],
                 )
+            if isinstance(rules, dict):
+                for (lines, rules) in matching_rules_by_line.values():
+                    for expr, info in rules.items():
+                        filter_rules[expr] += info["num_matches"]
             output_str, num_matches = report_humanize.matches_by_filename(
                 matching_rules_by_line, file)
         else:
@@ -648,11 +664,15 @@ class SearchState(State):
 
             str_by_file = {}
             output_str = ""
-            for i, (filename, matching_rules_by_file) in enumerate(
+
+            for i, (filename, matching_rules_by_line) in enumerate(
                     matchng_by_file.items()):
+                for (lines, rules) in matching_rules_by_line.values():
+                    for expr, info in rules.items():
+                        filter_rules[expr] += info["num_matches"]
                 output_str_file, num_matches_file = \
-                        report_humanize.matches_by_filename(
-                            matching_rules_by_file, filename)
+                    report_humanize.matches_by_filename(
+                            matching_rules_by_line, filename)
                 if num_matches_file > 0:
                     str_by_file[i] = (
                         str(Path(filename).relative_to(parent_folder)),
@@ -666,6 +686,8 @@ class SearchState(State):
             exit_code = 1 if num_matches > 0 else 0
             self.context.set_state(Exit(exit_code))
         else:
+
+            self.context.filter_rules(filter_rules)
             interactive_files = self.context.interactive_files and num_files > 1
             if not interactive_files:
                 if self.context.use_pager():
