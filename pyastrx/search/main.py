@@ -59,14 +59,16 @@ def search_in_file_info(
                     {
                         expression: {
                             "col_nums": cols,
-                            "rule_infos": matching_lines["rule_infos"]
+                            "rule_infos": matching_lines["rule_infos"],
+                            "num_matches": matching_lines["num_matches"]
                         }
                     }
                 ]
             else:
                 matching_rules_by_line[line_num][1][expression] = {
                     "col_nums": cols,
-                    "rule_infos": matching_lines["rule_infos"]
+                    "rule_infos": matching_lines["rule_infos"],
+                    "num_matches": matching_lines["num_matches"]
                 }
     return matching_rules_by_line
 
