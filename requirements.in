@@ -2,4 +2,5 @@ rich
 pyaml
 colorama
 lxml
+gast
 prompt_toolkit

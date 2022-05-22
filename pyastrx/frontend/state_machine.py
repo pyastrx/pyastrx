@@ -170,6 +170,10 @@ class Context:
         self._config["rules"] = _config["rules"]
 
     @property
+    def normalize_by_gast(self) -> bool:
+        return self._config["normalize_by_gast"]
+
+    @property
     def rules(self) -> List[dict]:
         return self._config["rules"]
 
@@ -275,14 +279,16 @@ class Context:
         files = self.get_files()
         if len(files) == 1:
             file = files[0]
-            self.repo.load_file(file)
+            self.repo.load_file(file, normalize_by_gast=self.normalize_by_gast)
             self.set_current_file(file)
         elif len(files) > 0:
             self.repo.load_files(
-                files, parallel=parallel)
+                files,
+                parallel=parallel, normalize_by_gast=self.normalize_by_gast)
         else:
             self.repo.load_folder(
                 self._config["folder"],
+                normalize_by_gast=self.normalize_by_gast,
                 parallel=parallel,
                 exclude=self._config["exclude"],
                 recursive=self._config["recursive"]
@@ -587,7 +593,9 @@ class ShowXML(State):
 
 class ShowAST(State):
     def run(self) -> None:
-        ast_txt = txt2ASTtxt(self.context.current_fileinfo.txt)
+        ast_txt = txt2ASTtxt(
+            self.context.current_fileinfo.txt,
+            normalize_by_gast=self.context.normalize_by_gast)
         rich_paging(ast_txt)
         self.context.set_state(FileCond())
 
@@ -622,7 +630,10 @@ class ExportAST(State):
         for filename in files:
             file_info = self.context.repo.cache.get(filename)
             txt = file_info.txt
-            ast_txt = txt2ASTtxt(txt)
+            ast_txt = txt2ASTtxt(
+                txt,
+                normalize_by_gast=self.context.normalize_by_gast
+            )
             export_location = get_location_and_create(
                 ".pyastrx/export_data/ast/", filename)
 

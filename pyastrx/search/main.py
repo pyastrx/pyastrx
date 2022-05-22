@@ -78,11 +78,11 @@ class Repo:
         self.cache = Cache()
         self.cache.load()
 
-    def load_file(self, filename):
+    def load_file(self, filename, normalize_by_gast):
         info, _ = self.cache.update(filename)
         self._files = [filename]
         if not info:
-            info = file2axml(filename)
+            info = file2axml(filename, normalize_by_gast)
             self.cache.set(filename, info)
 
     def search_file(
@@ -101,6 +101,7 @@ class Repo:
     def load_folder(
         self,
         folder,
+        normalize_by_gast,
         recursive=True,
         parallel=True,
         extension="py",
@@ -116,12 +117,13 @@ class Repo:
             str(f.resolve()) for f in files
             if not any(d in f.parts for d in exclude)
         ]
-        self.load_files(files, parallel)
+        self.load_files(files, parallel, normalize_by_gast)
 
     def load_files(
         self,
         files,
-        parallel=True,
+        parallel,
+        normalize_by_gast,
     ):
 
         files = [
@@ -136,14 +138,16 @@ class Repo:
         if parallel:
             with Pool() as pool:
                 infos = pool.map(
-                        file2axml, files2load)
+                        partial(
+                            file2axml, normalize_by_gast=normalize_by_gast),
+                        files2load)
             for info, filename in zip(infos, files2load):
                 if info is None:
                     raise Exception(f"Failed to convert {filename}")
                 self.cache.set(filename, info)
         else:
             for filename in files2load:
-                self.load_file(filename)
+                self.load_file(filename, normalize_by_gast=normalize_by_gast)
 
         self._files = files
 

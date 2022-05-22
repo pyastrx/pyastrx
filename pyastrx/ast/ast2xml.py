@@ -69,9 +69,6 @@ def convert_to_xml(node, omit_docstrings=False):
                     _set_encoded_literal(partial(setattr, subfield, "text"), item)
 
         elif field_value is not None:
-            ## add type attribute e.g. so we can distinguish strings from numbers etc
-            ## in older Python (< 3.8) type could be identified by Str vs Num and s vs n etc
-            ## e.g. <Constant lineno="1" col_offset="6" type="int" value="1"/>
             _set_encoded_literal(
                 partial(xml_node.set, "type"), type(field_value).__name__
             )
@@ -82,7 +79,7 @@ def convert_to_xml(node, omit_docstrings=False):
 
 
 def file2axml(
-        filename: str) -> FileInfo:
+        filename: str, normalize_by_gast: bool) -> FileInfo:
     """Construct the FileInfo obj from a python file.
 
     Args:
@@ -95,7 +92,7 @@ def file2axml(
     last_modified = file_path.stat().st_mtime
     with open(filename, "r") as f:
         txt = f.read()
-    parsed_ast = txt2ast(txt, filename)
+    parsed_ast = txt2ast(txt, filename, normalize_by_gast)
     xml_ast = convert_to_xml(
         parsed_ast,
         omit_docstrings=False,

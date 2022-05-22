@@ -1,3 +1,8 @@
+from sys import version_info
+
+IS_PYTHON_37 = version_info.minor < 8
+
+
 __severity2color = {
     "error": "red",
     "default": "green",
@@ -12,6 +17,7 @@ __available_yaml = {
     "linter": False,
     "parallel": True,
     "interactive_files": False,
+    "normalize_by_gast": True,
     "pagination": True
 }
 
@@ -19,7 +25,7 @@ __available_yaml_folder = {
     "folder": ".",
     "parallel": True,
     "recursive": True,
-    "exclude": [".venv", "docs", ".git"],
+    "exclude": [".venv", "docs", ".git", ".tox", ".pyastrx"],
 }
 
 _prompt_dialog_style = {
