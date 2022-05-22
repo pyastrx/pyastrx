@@ -13,9 +13,13 @@ def linenos_from_xml(elements):
     for element in elements:
         try:
             linenos = element.xpath("./ancestor-or-self::*[@lineno][1]/@lineno")
+        except AttributeError:
+            linenos = []
+
+        try:
             col_offset = element.xpath("./ancestor-or-self::*[@col_offset][1]/@col_offset")
         except AttributeError:
-            raise AttributeError("Element has no ancestor with line number.")
+            col_offset = []
 
         if linenos:
             col = int(col_offset[0]) if col_offset else 0
