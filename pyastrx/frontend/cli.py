@@ -115,15 +115,15 @@ def get_config_from_yaml() -> dict:
 def invoke_pyastrx(args, extra_config):
     expr = args.expr
     if isinstance(expr, str):
-        expr = [expr]
+        expr = {expr: {}}
+    elif isinstance(expr, list):
+        expr = {e: {} for e in expr}
     config = {}
     yaml_config = get_config_from_yaml()
     if len(expr) == 0:
         rules = yaml_config.get("rules", False)
         if rules:
             expr = rules
-        else:
-            expr = {}
 
     config["interactive"] = args.interactive
     config["rules"] = expr
@@ -135,7 +135,8 @@ def invoke_pyastrx(args, extra_config):
         config["interactive"] = False
 
     if len(expr) == 0 and config["interactive"] == False:
-        raise ValueError("No rules or expression provided")
+        raise ValueError(
+                "No rules found in the yaml file and no expression provided")
 
     config = {**config, **extra_config}
     config["files"] = args.file
