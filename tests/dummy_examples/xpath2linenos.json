@@ -4,10 +4,6 @@
         ["//ClassDef", [4, 17, 23]],
         [".//ExceptHandler", [31]],
         [
-            "//For/body[AugAssign/op/Add and count(child::*)=1]",
-            [35]
-        ],
-        [
             ".//Constant[not(ancestor::Assign)]",
             [35, 39, 42, 45]
         ],
@@ -30,6 +26,19 @@
     "defaults.py": [
         ["//defaults/*[self::Dict or self::List or self::Set or self::Call]",
         [8, 25, 37, 40, 43]
+        ]
+    ],
+    "var_names.py": [
+        ["//FunctionDef[@name=body/Assign/targets/Name/@id]", [9]]
+    ],
+    "recursion.py": [
+        [
+            "//ClassDef/body/FunctionDef[@name=body//Call/func/Attribute[value/Name[@id='self']]/@attr]",
+            [34]
+        ],
+        [
+            "//FunctionDef[@name=body//Call/func/Name/@id and not(parent::node()/parent::ClassDef)]",
+            [1, 11, 21, 46]
         ]
     ]
 }
