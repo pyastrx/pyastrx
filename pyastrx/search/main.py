@@ -3,15 +3,14 @@ from functools import partial
 from io import BytesIO
 from multiprocessing import Pool
 from pathlib import Path
-from typing import Callable, Tuple
+from typing import Callable, List, Tuple, Union
 
 from lxml import etree
 
 from pyastrx.ast.ast2xml import file2axml
-from pyastrx.data_typing import FileInfo
+from pyastrx.data_typing import Files2Matches, Lines2Matches, RulesDict
 from pyastrx.search.cache import Cache
-from pyastrx.search.txt_tools import apply_context
-from pyastrx.search.xml_search import search_in_axml
+from pyastrx.search.xml_search import search_in_file_info
 
 
 def lxml_el_unpickle(el_lxml: bytes) -> etree._ElementTree:
@@ -37,78 +36,40 @@ copyreg.pickle(etree._Element, lxml_el_pickle, lxml_el_unpickle)
 copyreg.pickle(etree._ElementTree, lxml_el_pickle, lxml_el_unpickle)
 
 
-def search_in_file_info(
-        file_info: FileInfo, rules: dict,
-        before_context: int = 0, after_context: int = 0):
-    if file_info is None:
-        return {}
-
-    matching_lines_by_rule = search_in_axml(
-            rules,
-            axml=file_info.axml)
-    matching_rules_by_line = {}
-    for expression, matching_lines in matching_lines_by_rule.items():
-        line_nums = matching_lines["line_nums"]
-        for line_num, cols in line_nums:
-            if line_num not in matching_rules_by_line:
-                matching_lines_context = apply_context(
-                    file_info.txt.splitlines(), line_num - 1,
-                    before_context, after_context)
-                matching_rules_by_line[line_num] = [
-                    matching_lines_context,
-                    {
-                        expression: {
-                            "col_nums": cols,
-                            "rule_infos": matching_lines["rule_infos"],
-                            "num_matches": matching_lines["num_matches"]
-                        }
-                    }
-                ]
-            else:
-                matching_rules_by_line[line_num][1][expression] = {
-                    "col_nums": cols,
-                    "rule_infos": matching_lines["rule_infos"],
-                    "num_matches": matching_lines["num_matches"]
-                }
-    return matching_rules_by_line
-
-
 class Repo:
-    def __init__(self):
+    def __init__(self) -> None:
         self.cache = Cache()
-        self.cache.load()
+        self._files: List[str] = []
 
-    def load_file(self, filename, normalize_by_gast):
-        info, _ = self.cache.update(filename)
+    def load_file(
+            self, filename: str, normalize_ast: bool) -> None:
+        should_update, _ = self.cache.update(filename)
         self._files = [filename]
-        if not info:
-            info = file2axml(filename, normalize_by_gast)
+        if should_update:
+            info = file2axml(filename, normalize_ast)
             self.cache.set(filename, info)
 
     def search_file(
-            self, filename, rules,
-            before_context=0,
-            after_context=0):
+            self, filename: str, rules: RulesDict,
+            before_context: int = 0,
+            after_context: int = 0) -> Lines2Matches:
         info = self.cache.get(filename)
-        if info is None:
-            print(f"{filename} not found in cache")
-            return {}
-        matching_rules_by_line = search_in_file_info(
+        matching_by_line = search_in_file_info(
             info, rules, before_context, after_context)
 
-        return matching_rules_by_line
+        return matching_by_line
 
     def load_folder(
         self,
-        folder,
-        normalize_by_gast,
-        recursive=True,
-        parallel=True,
-        extension="py",
-        exclude=None,
-    ):
+        folder: str,
+        normalize_ast: bool,
+        recursive: bool = True,
+        parallel: bool = True,
+        extension: str = "py",
+        exclude: Union[List[str], None] = None,
+    ) -> None:
         if exclude is None:
-            exclude = [".venv"]
+            exclude = [".venv", ".tox"]
         if recursive:
             files = Path(folder).rglob(f"*.{extension}")
         else:
@@ -117,20 +78,20 @@ class Repo:
             str(f.resolve()) for f in files
             if not any(d in f.parts for d in exclude)
         ]
-        self.load_files(files, parallel, normalize_by_gast)
+        self.load_files(files, parallel, normalize_ast)
 
     def load_files(
         self,
-        files,
-        parallel,
-        normalize_by_gast,
-    ):
+        files: List[str],
+        parallel: bool,
+        normalize_ast: bool,
+    ) -> None:
 
         files = [
             str(Path(file).resolve()) for file in files]
         files2load = [
             filename for filename in files
-            if self.cache.update(filename)[0] is False
+            if self.cache.update(filename)[0] is True
         ]
         if len(files2load) == 0:
             return
@@ -139,7 +100,7 @@ class Repo:
             with Pool() as pool:
                 infos = pool.map(
                         partial(
-                            file2axml, normalize_by_gast=normalize_by_gast),
+                            file2axml, normalize_ast=normalize_ast),
                         files2load)
             for info, filename in zip(infos, files2load):
                 if info is None:
@@ -147,26 +108,27 @@ class Repo:
                 self.cache.set(filename, info)
         else:
             for filename in files2load:
-                self.load_file(filename, normalize_by_gast=normalize_by_gast)
+                self.load_file(filename, normalize_ast=normalize_ast)
 
         self._files = files
 
-    def get_files(self):
+    def get_files(self) -> List[str]:
         return self._files
 
-    def get_file(self):
+    def get_file(self) -> str:
         return self._files[0]
 
     def search_files(
-            self, rules,
-            before_context=0,
-            after_context=0,
-            parallel=True
-    ):
+            self, rules: RulesDict,
+            before_context: int = 0,
+            after_context: int = 0,
+            parallel: bool = True
+    ) -> Files2Matches:
+
         file2matches = {}
         if parallel:
             with Pool() as pool:
-                matches = pool.map(
+                matches_by_file = pool.map(
                         partial(
                             search_in_file_info,
                             rules=rules,
@@ -175,13 +137,14 @@ class Repo:
                         ),
                         map(self.cache.get, self._files)
                 )
-            for matching_rules_by_line, filename in zip(matches, self._files):
-                file2matches[filename] = matching_rules_by_line
+            for filename, matches_by_line in zip(self._files, matches_by_file):
+                file2matches[filename] = matches_by_line
+
         else:
             for filename in self._files:
-                matching_rules_by_line = self.search_file(
+                match_by_lines = self.search_file(
                     filename, rules,
                     before_context, after_context)
-                file2matches[filename] = matching_rules_by_line
-        return file2matches
+                file2matches[filename] = match_by_lines
+        return Files2Matches(file2matches)
 

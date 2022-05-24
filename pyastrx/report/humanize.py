@@ -3,29 +3,30 @@ the linter.
 
 """
 from typing import List, Tuple
-from pyastrx.config import __severity2color, __color_highlight
+
+from pyastrx.config import __color_highlight, __severity2color
+from pyastrx.data_typing import CodeContext, Lines2Matches, RuleInfo
 
 
-def match_description(rule: dict) -> str:
-    severity = rule.get("severity", "default")
+def match_description(rule: RuleInfo) -> str:
+    severity = rule.severity
     try:
         color = __severity2color[severity]
     except KeyError:
         color = __severity2color["default"]
 
-    why = rule.get("why", "")
-    name = rule.get("name", "")
-    description = rule.get("description", "")
+    why = rule.why
+    name = rule.name
+    description = rule.description
     match_header_str = f"[bold {color}] - {name}|"\
         + f"{why} |"\
         + f"{description}"\
         + f"[/bold {color}]\n"
-
     return match_header_str
 
 
 def str_context(
-    context: Tuple, line_match: int, cols: List
+    context: CodeContext, line_match: int, cols: List
 ) -> str:
     output_str = ""
     for (line_num), line_str in context:
@@ -38,11 +39,11 @@ def str_context(
             line_mark = ''.join(line_mark)
             line_mark = f"{'':<5}{line_mark}"
         if should_highlight:
-            line_str = f"{f' {line_num+1}:':<5}{line_str}"
+            line_str = f"{f' {line_num}:':<5}{line_str}"
             output_str += f"[{__color_highlight}]"
             output_str += f"{line_str}[/{__color_highlight}]\n"
         else:
-            output_str += f"{f' {line_num+1}:':<5}{line_str}\n"
+            output_str += f"{f' {line_num}:':<5}{line_str}\n"
         if line_is_match:
             output_str += f"{line_mark}\n"
 
@@ -51,22 +52,20 @@ def str_context(
 
 
 def matches_by_filename(
-    matching_rules_by_line: dict,
+    line2matches: Lines2Matches,
     filename: str,
 ) -> Tuple[str, int]:
     output_str = ""
     output_list = [f"[bold white on green]File:{filename}[/bold white on green]\n"]
     num_matches = 0
-    for line_match, context_and_rule in matching_rules_by_line.items():
-        expressions = context_and_rule[1]
-        context = context_and_rule[0]
+    for line_match, matches_by_line in line2matches.items():
+        context = matches_by_line.code_context
         cols = []
-        for _, info in expressions.items():
-            col_numbers = info["col_nums"]
-            rule_infos = info["rule_infos"]
+        for expr, match in matches_by_line.match_by_expr.items():
+            col_numbers = match.cols_by_line[line_match]
             cols.extend(col_numbers)
             num_matches += 1
-            output_list += [match_description(rule_infos)]
+            output_list += [match_description(match.rule_info)]
         output_list += [str_context(context, line_match, cols)]
     if len(output_list) > 1:
         output_str = "".join(output_list)

@@ -9,10 +9,13 @@ from pathlib import Path
 import yaml
 
 from pyastrx.config import __available_yaml, __available_yaml_folder
+from pyastrx.data_typing import Config, RuleInfo, RulesDict
+from pyastrx.frontend.manager import Manager
 from pyastrx.frontend.state_machine import Context, StartState
+from pyastrx.search.main import Repo
 
 
-def construct_base_argparse():
+def construct_base_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-R",
@@ -35,6 +38,13 @@ def construct_base_argparse():
         default=False,
     )
     parser.add_argument(
+        "-n",
+        "--no-interface",
+        help="disable CLI interface",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
         "-l",
         "--linter",
         help="""Run in the linter mode.
@@ -44,10 +54,15 @@ def construct_base_argparse():
         default=False,
     )
     parser.add_argument(
+        "-q",
+        "--quiet",
+        help="Do not print the results.",
+        action="store_true",
+    )
+    parser.add_argument(
         "-d",
         "--folder",
         help="search folder",
-        default=".",
     )
     parser.add_argument(
         "-f",
@@ -86,11 +101,10 @@ def construct_base_argparse():
     return parser
 
 
-def pyastrx():
+def pyastrx() -> None:
     parser = construct_base_argparse()
     args = parser.parse_args()
-    config = {}
-    invoke_pyastrx(args, config)
+    invoke_pyastrx(args)
 
 
 def get_config_from_yaml() -> dict:
@@ -112,41 +126,62 @@ def get_config_from_yaml() -> dict:
     return config
 
 
-def invoke_pyastrx(args, extra_config):
-    expr = args.expr
-    if isinstance(expr, str):
-        expr = {expr: {}}
-    elif isinstance(expr, list):
-        expr = {e: {} for e in expr}
+def invoke_pyastrx(args) -> None:
+    rules: RulesDict
     config = {}
     yaml_config = get_config_from_yaml()
-    if len(expr) == 0:
-        rules = yaml_config.get("rules", False)
-        if rules:
-            expr = rules
+    if len(args.expr) > 0:
+        rules = RulesDict({str(e): RuleInfo() for e in args.expr})
+
+    else:
+        rules_yaml = yaml_config.get("rules", {})
+        rules = RulesDict({
+            k: RuleInfo(**v) for k, v in rules_yaml.items()
+        })
 
     config["interactive"] = args.interactive
-    config["rules"] = expr
+    config["rules"] = rules
     for key, val in __available_yaml.items():
         if key not in config:
             config[key] = yaml_config.get(key, val)
     if args.linter:
         config["linter"] = True
         config["interactive"] = False
+    if args.quiet:
+        config["quiet"] = True
+        config["interactive"] = False
 
-    if len(expr) == 0 and config["interactive"] == False:
+    if args.no_interface:
+        config["interactive"] = False
+
+    if len(rules) == 0 and config["interactive"] == False:
         raise ValueError(
                 "No rules found in the yaml file and no expression provided")
 
-    config = {**config, **extra_config}
     config["files"] = args.file
-    if len(config["files"]) == 0:
-        for key, val in __available_yaml_folder.items():
-            config[key] = yaml_config.get(key, val)
+    for key, val in __available_yaml_folder.items():
+        config[key] = yaml_config.get(key, val)
     if args.folder:
         config["folder"] = args.folder
-    sm = Context(initial_state=StartState(), config=config)
-    while True:
-        sm._state.run()
+    config_pyastrx = Config(**config)
+
+    repo = Repo()
+    if not config_pyastrx.interactive:
+        manager = Manager(config_pyastrx, repo)
+        manager.load_files()
+        num_matches = manager.search()[0]
+        if config_pyastrx.linter:
+            exit_code = 1 if num_matches > 0 else 0
+            exit(exit_code)
+        return
+    else:
+        sm = Context(
+            initial_state=StartState, config=config_pyastrx, repo=repo)
+        while True:
+            sm._state.run()
+
+
+if __name__ == "__main__":
+    pyastrx()
 
 

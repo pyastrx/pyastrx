@@ -10,7 +10,7 @@ from pyastrx.ast.things2ast import txt2ast
 from pyastrx.data_typing import FileInfo
 
 
-def _set_encoded_literal(set_fn, literal):
+def _set_encoded_literal(set_fn, literal) -> None:
     if isinstance(literal, Number):
         literal = str(literal)
     try:
@@ -49,16 +49,9 @@ def transformer_ast_node_field(field_value, field_name, xml_node):
             partial(xml_node.set, field_name), field_value)
 
 
-def encode_location(node: ast.AST, xml_node: etree.Element):
+def encode_location(node: ast.AST, xml_node: etree.Element) -> None:
     """This encode the code location available in the AST node
     into the XML node.
-
-    Args:
-        node (ast.AST):
-        xml_node (etree.Element):
-
-    Returns:
-        None
 
     """
     # for attr in ("lineno", "col_offset", "end_lineno", "end_col_offset"):
@@ -85,20 +78,15 @@ def ast2xml(node: ast.AST) -> etree.Element:
 
 
 def file2axml(
-        filename: str, normalize_by_gast: bool) -> FileInfo:
+        filename: str, normalize_ast: bool) -> FileInfo:
     """Construct the FileInfo obj from a python file.
-
-    Args:
-        filename (str):
-    Returns:
-        FileInfo: FileInfo object.
 
     """
     file_path = Path(filename)
     last_modified = file_path.stat().st_mtime
     with open(filename, "r") as f:
         txt = f.read()
-    parsed_ast = txt2ast(txt, filename, normalize_by_gast)
+    parsed_ast = txt2ast(txt, filename, normalize_ast)
     xml_ast = ast2xml(
         parsed_ast,
     )

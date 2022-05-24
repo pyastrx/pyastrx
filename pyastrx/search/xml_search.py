@@ -1,5 +1,10 @@
+from typing import Dict, List, Tuple
+
 from lxml import etree
 
+from pyastrx.data_typing import (Expression2Match, FileInfo, Lines2Matches,
+                                 Match, MatchesByLine, RulesDict)
+from pyastrx.search.txt_tools import apply_context
 from pyastrx.xml.xpath_expressions import XpathExpressions
 from pyastrx.xml.xpath_extensions import lxml_ext_pyastrx, lxml_ext_regex
 
@@ -8,53 +13,73 @@ lxml_ext_regex.prefix = "re"
 lxml_ext_pyastrx.prefix = "pyastrx"
 
 
-def get_xml_el_value(element, xpath_name):
+def get_xml_el_value(
+        element: etree._Element,
+        xpath_name: str) -> Tuple[List[int], bool]:
     xpath_expr = getattr(XpathExpressions, xpath_name)
     try:
-        return element.xpath(xpath_expr)
+        result = [int(r) for r in element.xpath(xpath_expr)]
+        return result, True
     except AttributeError:
-        return None
+        return [0], False
 
 
-def linenos_from_xml(elements):
+def linenos_from_xml(
+        elements: List[etree._Element]) -> Dict[int, List[int]]:
     """Given a list of elements, return a list of line numbers."""
-    lines = {}
+    lines: Dict[int, List[int]] = {}
     for element in elements:
-        linenos = get_xml_el_value(element, "linenos")
-        cols_offset = get_xml_el_value(element, "cols_offset")
+        linenos, success_line = get_xml_el_value(element, "linenos")
+        cols_offset, _ = get_xml_el_value(element, "cols_offset")
 
-        if linenos:
-            col = int(cols_offset[0]) if cols_offset else 0
-            linenos = int(linenos[0])
+        if success_line:
+            col = cols_offset[0]
+            line_num = linenos[0]
 
-            if linenos not in lines:
-                lines[linenos] = [linenos, [col]]
-            else:
-                lines[linenos][1].append(col)
+            if line_num not in lines:
+                lines[line_num] = []
+            lines[line_num].append(col)
 
-    lines = list(lines.values())
     return lines
 
 
-def search_in_axml(rules, axml):
-    matching_by_expression = {}
-    if isinstance(rules, str):
-        rules = {rules: {}}
-    elif isinstance(rules, list):
-        rules = {rule: {} for rule in rules}
-    for expression, rule in rules.items():
+def search_in_axml(
+        rules: RulesDict, axml: etree._Element) -> Expression2Match:
+    matching_by_expression = Expression2Match({})
+    for expression, rule_info in rules.items():
         try:
             matching_elements = axml.xpath(expression)
-            matching_lines_by_exp = linenos_from_xml(
+            cols_by_line = linenos_from_xml(
                 matching_elements)
+            matching_by_expression[expression] = Match(
+                cols_by_line,
+                rule_info,
+                len(cols_by_line)
+            )
         except etree.XPathEvalError:
             print(f"XPath error: {expression}")
-            matching_lines_by_exp = []
-            rule = {}
 
-        matching_by_expression[expression] = {
-            "line_nums": matching_lines_by_exp,
-            "rule_infos": rule,
-            "num_matches": len(matching_lines_by_exp)
-        }
     return matching_by_expression
+
+
+def search_in_file_info(
+        file_info: FileInfo, rules: RulesDict,
+        before_context: int = 0, after_context: int = 0) -> Lines2Matches:
+    if file_info is None:
+        return {}
+
+    matching_by_expression = search_in_axml(
+            rules,
+            axml=file_info.axml)
+    match_expr_by_line = {}
+    for expression, match in matching_by_expression.items():
+        for line_num, cols in match.cols_by_line.items():
+            if line_num not in match_expr_by_line:
+                code_context = apply_context(
+                    file_info.txt.splitlines(), line_num - 1,
+                    before_context, after_context)
+                match_expr_by_line[line_num] = MatchesByLine(code_context, {})
+            match_expr_by_line[line_num].match_by_expr[expression] = Match(
+                {line_num: cols}, match.rule_info, match.num_matches
+            )
+    return Lines2Matches(match_expr_by_line)

@@ -11,13 +11,20 @@ __severity2color = {
 }
 __color_highlight = "white on magenta"
 
+_prompt_dialog_style = {
+    'dialog':             'bg:#FFE873',
+    'dialog frame.label': 'bg:#306998 #000000',
+    'dialog.body':        'bg:#4B8BBE',
+    'dialog shadow':      'bg:#306998',
+}
 __available_yaml = {
     "after_context": 3,
     "before_context": 3,
     "linter": False,
     "parallel": True,
+    "quiet": False,
     "interactive_files": False,
-    "normalize_by_gast": True,
+    "normalize_ast": True,
     "pagination": True
 }
 
@@ -28,9 +35,3 @@ __available_yaml_folder = {
     "exclude": [".venv", "docs", ".git", ".tox", ".pyastrx"],
 }
 
-_prompt_dialog_style = {
-    'dialog':             'bg:#FFE873',
-    'dialog frame.label': 'bg:#306998 #000000',
-    'dialog.body':        'bg:#4B8BBE',
-    'dialog shadow':      'bg:#306998',
-}

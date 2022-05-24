@@ -1,4 +1,4 @@
-"""Setup for astpath, adds astpath console_script."""
+"""."""
 
 from setuptools import setup
 
@@ -6,7 +6,7 @@ setup(
     name='pyastrx',
     packages=['pyastrx'],
     version='0.0.1',
-    description='based on H. Chase Stevens idea',
+    description='',
     license='MIT',
     author='Bruno Messias',
     author_email='devmessias@gmail.com',

@@ -12,8 +12,7 @@ lxml_ext_pyastrx = etree.FunctionNamespace(pyastrx_url)
 
 
 @lxml_ext_pyastrx
-def anyin(context, values_check: List, values: List) -> bool:
-    print(f"anyin: {values_check} in {values}")
+def anyin(context, values_check: List[str], values: List[str]) -> bool:
     """Allows to check if the results of a xpath are inside
     of a list of another xpath results.
 
@@ -33,7 +32,7 @@ def anyin(context, values_check: List, values: List) -> bool:
 
 
 @lxml_ext_regex
-def match(context, pattern, strings):
+def match(context, pattern: str, strings: List[str]) -> bool:
     for s in strings:
         if re.match(pattern, s) is not None:
             return True
@@ -41,7 +40,7 @@ def match(context, pattern, strings):
 
 
 @lxml_ext_regex
-def search(context, pattern, strings):
+def search(context, pattern: str, strings: List[str]) -> bool:
     for s in strings:
         if re.search(pattern, s) is not None:
             return True

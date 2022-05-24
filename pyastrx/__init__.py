@@ -17,7 +17,7 @@ __author_email__ = 'devmessias@gmail.com'
 __license__ = 'MIT'
 
 
-def __info__():
+def __info__() -> None:
     # print pkg_name centered in a 80 chars width
     hs = 60
     c = "!"

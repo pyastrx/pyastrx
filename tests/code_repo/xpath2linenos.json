@@ -4,16 +4,32 @@
         ["//ClassDef", [4, 17, 23]],
         [".//ExceptHandler", [31]],
         [
-            "//For/body[AugAssign/op/Add and count(child::*)=1]", 
+            "//For/body[AugAssign/op/Add and count(child::*)=1]",
             [35]
-        ], 
+        ],
         [
-            ".//Constant[not(ancestor::Assign)]", 
+            ".//Constant[not(ancestor::Assign)]",
             [35, 39, 42, 45]
         ],
         [
-            ".//Constant[not(ancestor::Assign) and @type='int']", 
+            ".//Constant[not(ancestor::Assign) and @type='int']",
             [35, 39, 45]
+        ]
+    ],
+    "globals.py": [
+        [
+            "//Global",
+            [4, 8, 19, 31, 35]
+        ],
+        [
+            "//FunctionDef/body/Global/names[not(item=../../Assign/targets/Name/@id)]",
+            [31, 8]
+
+        ]
+    ],
+    "defaults.py": [
+        ["//defaults/*[self::Dict or self::List or self::Set or self::Call]",
+        [8, 25, 37, 40, 43]
         ]
     ]
 }

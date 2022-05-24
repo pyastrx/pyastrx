@@ -2,17 +2,18 @@
 # See https://pre-commit.com/hooks.html for more hooks
 exclude: ".md$"
 repos:
-  - repo: https://github.com/pycqa/isort
-    rev: 5.10.1
-    hooks:
-      - id: isort
-        name: isort (python)
+  # - repo: https://github.com/pycqa/isort
+  #   rev: 5.10.1
+  #   hooks:
+  #     - id: isort
+  #       name: isort (python)
   - repo: local
     hooks:
-      - id: pyastrix
+      - id: pyastrx
         name: PyASTrX linter
         entry: ./.pre-commit-hook/main.py
         language: script
+        args: ["-q"]
         types: ["python"]
         description: Check for any violations using the .pyastrx.yaml config
       # - id: pyastrix

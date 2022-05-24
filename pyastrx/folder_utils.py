@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 def get_location_and_create(
-        base_location: str, filename: str, extension: str = ".txt")-> Path:
+        base_location: str, filename: str, extension: str = ".txt") -> Path:
     """Create a folder if it doesn't exist and return the path
 
     Args:
