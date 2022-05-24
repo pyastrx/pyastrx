@@ -25,7 +25,9 @@ __available_yaml = {
     "quiet": False,
     "interactive_files": False,
     "normalize_ast": True,
-    "pagination": True
+    "vscode_output": False,
+    "pagination": True,
+    "rules": {}
 }
 
 __available_yaml_folder = {

@@ -45,6 +45,11 @@ def construct_base_argparse() -> argparse.ArgumentParser:
         default=False,
     )
     parser.add_argument(
+        "--vscode-output",
+        help="This saves the output in a format that can be read by VSCode PyASTrX extension",
+        action="store_true",
+    )
+    parser.add_argument(
         "-l",
         "--linter",
         help="""Run in the linter mode.
@@ -163,6 +168,9 @@ def invoke_pyastrx(args) -> None:
         config[key] = yaml_config.get(key, val)
     if args.folder:
         config["folder"] = args.folder
+    if args.vscode_output:
+        config["vscode_output"] = True
+
     config_pyastrx = Config(**config)
 
     repo = Repo()

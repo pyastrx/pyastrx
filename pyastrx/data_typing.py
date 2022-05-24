@@ -67,6 +67,6 @@ class Config:
     interactive_files: bool = False
     pagination: bool = True
     normalize_ast: bool = True
-    vscode_output: bool = True
+    vscode_output: bool = False
     quiet: bool = False
     folder: str = "."
