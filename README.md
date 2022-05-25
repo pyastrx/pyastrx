@@ -4,16 +4,15 @@
 
 
 
-<h1 style="text-align:center;">
-<em>
+<h2 style="text-align:center;">
+<em style="text-align:center;!important">
     "Simple projects are all alike; each complex project
     is complex in its own way."
-</em>
--
+</em>-
 <strong>
     (adapted from Tolstoy's Anna Karenina)
 </strong>
-</h1>
+</h2>
 
 The PyASTrX philosophy is to provide a simple, easy-to-use, and
 extensible framework for code quality analysis, refactoring and codebase analysis.
@@ -25,6 +24,12 @@ project. In other words, we should **walk a **mile in **someone's** shoes** befo
 
 PyASTrX allows you to define new code analysis patterns using just XPATH
 expressions.
+
+## Install
+
+```bash
+$ pip install pyastrx
+```
 
 ## Features and Characteristics
 
@@ -46,7 +51,7 @@ If your codebase or pull request is huge, looking for possible
 mistakes, bad practices or code smells can be a pain, so PyASTrX
 provides a human-friendly output as default.
 
-![Human friendly outputs](docs/source/_static/imgs/human_outputs.png){.align-center}
+![Human friendly outputs](docs/source/_static/imgs/human_outputs.png)
 
 #### Friendly interface
 
@@ -54,12 +59,13 @@ provides a human-friendly output as default.
 -   combo box to select the files
 -   colorized syntax highlighting
 
-![Human friendly outputs](docs/source/_static/imgs/interface.png){.align-center}
+![Human friendly outputs](docs/source/_static/imgs/interface.png)
+
 
 ### pre-commit
 
 
-Copy the [main.py]{.title-ref} available at
+Copy the `main.py` available at
 [pyastrx/.pre-commit-hook](https://github.com/devmessias/pyastrx/blob/main/.pre-commit-hook/main.py)
 in your folder and add the following entry in your
 `.pre-commit-config.yaml` file:
@@ -97,21 +103,17 @@ $ pyastrx -i -d path_to_folder (or just save that in yaml)
 
 **Press f and choose a file**
 
-![Interactive interface](docs/source/_static/imgs/ast_explorer2.png){.align-center
-width="45.0%"}
+![Interactive interface](docs/source/_static/imgs/ast_explorer2.png)
 
 **Choose the ast (t), xml (x) or code exploration (o)**
 
-![Interactive interface](docs/source/_static/imgs/ast_explorer3.png){.align-center
-width="45.0%"}
+![Interactive interface](docs/source/_static/imgs/ast_explorer3.png)
 
 **Learn!**
 
-![Interactive interface](docs/source/_static/imgs/ast_explorer4.png){.align-center
-width="45.0%"}
+![Interactive interface](docs/source/_static/imgs/ast_explorer4.png)
 
-![Interactive interface](docs/source/_static/imgs/ast_explorer5.png){.align-center
-width="45.0%"}
+![Interactive interface](docs/source/_static/imgs/ast_explorer5.png)
 
 #### File exploration (one key-press distance)
 
