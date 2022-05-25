@@ -1,8 +1,3 @@
-from sys import version_info
-
-IS_PYTHON_37 = version_info.minor < 8
-
-
 __severity2color = {
     "error": "red",
     "default": "green",

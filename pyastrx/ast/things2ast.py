@@ -1,10 +1,9 @@
+from sys import version_info
 import ast
 from pathlib import Path
 from typing import Tuple
 
 import gast
-
-from pyastrx.config import IS_PYTHON_37
 
 
 def txt2ast(
@@ -47,7 +46,7 @@ def txt2ASTtxt(
 
     """
     ast_obj = txt2ast(txt, filename, normalize_ast)
-    if IS_PYTHON_37:
+    if version_info.minor < 9:
         return f"{ast.dump(ast_obj)}"
     return f"{ast.dump(ast_obj, indent=indent)}"
 
