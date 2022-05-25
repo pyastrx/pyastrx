@@ -29,7 +29,7 @@ Global definition
 
     //FunctionDef/body/Global:
         name: "Global keyword being used"
-        description: "Creates side effects that are hard to track"
+        description: "This can create annoying side effects"
         severity: "info"
         use_in_linter: false
         why: ""
@@ -42,8 +42,8 @@ Unnecessary global keyword in function
 
     //FunctionDef/body/Global/names[not(item=../../Assign/targets/Name/@id)]:
         name: "mutable-defaults"
-        description: "Can create bugs that are hard to find"
-        severity: "error"
+        description: "An unnecessary global keyword is being used"
+        severity: "info"
         why: "bad practice"
 
 
@@ -80,6 +80,6 @@ New variable with the same name as the current function
 
     //FunctionDef[@name=body/Assign/targets/Name/@id]:
         name: "redefinition-of-function-var"
-        description: "You should not define a new variable with the same name as the current function"
+        description: "Please, avoid defining a new variable with the same name as the current function"
         severity: "error"
         why: "bad practice"
