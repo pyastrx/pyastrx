@@ -6,18 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [0.1.0] - 2022-05-14
+## [0.1.0] - 2022-05-25
 ### Added
-- Pytest requirements
-- Makefile
-- Changelog
+
 
 ### Fixed
 
 
 ### Changed
-- pkg name to avoid conflict with astpath
-- pip-tools
+
 
 
 [Unreleased]: https://github.com/devmessias/pyastrx/compare/0.1.0...master

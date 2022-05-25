@@ -99,6 +99,12 @@ in your folder and add the following entry in your `.pre-commit-config.yaml`.
 
 Later on, I will ship this to be used in the pre-commit channels.
 
+VsCode extension
+===============
+
+
+Soon, I will ship a VS Code extension.
+
 
 Explore the AST and XML
 =======================

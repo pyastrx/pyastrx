@@ -81,8 +81,11 @@ in your folder and add the following entry in your
             types: ["python"]
             description: Check for any violations using the .pyastrx.yaml config
 ```
-
 Later on, I will ship this to be used in the pre-commit channels.
+
+## VS Code Extension
+
+Soon, I will ship a VS Code extension.
 
 ### Explore the AST and XML
 
