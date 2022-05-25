@@ -6,8 +6,6 @@ docformatter
 pip-tools
 pre-commit
 pre-commit-hooks
-Sphinx
-git+https://github.com/bashtage/sphinx-material.git
 mypy
 types-PyYAML
 lxml-stubs
