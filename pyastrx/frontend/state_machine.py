@@ -277,7 +277,8 @@ class InterfaceSelectRules(StateInterface):
             name = info.name
             description = info.description
             why = info.why
-            str_info = f"{name}({why}-){description}"
+            severity = info.severity
+            str_info = f"({severity})-{name}-({why}):\n\t{description}"
             options.append((i, str_info))
             opt2xpath[i] = expression
             check = expression in self.context.selected_rules
@@ -411,7 +412,7 @@ class InterfaceFiles(StateInterface):
     def start(self) -> None:
         self.title = "Available Files"
         self.help_text = "Select a file to open"\
-            + "or [bold red]q[/] to cancel"
+            + " or [bold red]q[/] to cancel"
 
     def run(self) -> None:
         key_bindings = KeyBindings()
