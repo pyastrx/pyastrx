@@ -31,7 +31,7 @@ Global definition
         name: "Global keyword being used"
         description: "Creates side effects that are hard to track"
         severity: "info"
-        use_in_liner: false
+        use_in_linter: false
         why: ""
 
 

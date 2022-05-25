@@ -34,7 +34,7 @@ __available_yaml = {
             "description": "Can create bugs that are hard to find",
             "severity": "error",
             "why": "bad practice",
-            "use_in_liner": True,
+            "use_in_linter": True,
         }
     }
 }
