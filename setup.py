@@ -2,14 +2,14 @@
 
 from setuptools import setup, find_packages
 
-with open("README.md", "r") as f:
+with open("README.rst", "r") as f:
     README_TEXT = f.read()
 
 setup(
     name='pyastrx',
-    version='0.1.0',
+    version='0.1.1',
     long_description=README_TEXT,
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     description="'Simple projects are all alike; each complex"\
         +"project is complex in its own way.' - (adapted from Tolstoy's Anna Karenina)\n"\
         +"\nThe PyASTrX philosophy is to provide a simple, easy-to-use,"\
@@ -19,7 +19,7 @@ setup(
         +"and extensible framework for code quality analysis, refactoring"\
         +"and codebase analysis.",
     license='MIT',
-    instal_requires=[
+    install_requires=[
         'colorama==0.4.4', 'commonmark==0.9.1', 'gast==0.5.3', 'lxml==4.8.0',
         'prompt-toolkit==3.0.29', 'pyaml==21.10.1', 'pygments==2.12.0',
         'pyyaml==6.0', 'rich==12.4.1', 'wcwidth==0.2.5'],

@@ -1,6 +1,6 @@
-============
-Installation
-============
+==============
+How to install
+==============
 
 .. code-block:: bash
 

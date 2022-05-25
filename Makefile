@@ -44,6 +44,19 @@ sync-env: pip-compile
 	pip-sync requirements.txt requirements_dev.txt
 	python3 setup.py develop
 
+
+## @category Dev-dist
+## Create the distribution
+pypi-dist:
+	python3 -m build
+	twine check dist/*
+
+
+## @category Dev-dist
+## Upload the distribution to PyPI
+pypi-upload:
+	twine upload dist/*
+
 ## @category Dev-Code Quality
 ## Run all the tests
 test:

@@ -1,4 +1,5 @@
-requirements.txt
-requirements_dev.txt
-README.md
-docs/souce/_static/imgs/*
+include requirements.txt
+include requirements_dev.txt
+include README.rst
+include docs/souce/_static/imgs/*
+include LICENSE.md
