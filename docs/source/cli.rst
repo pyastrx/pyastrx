@@ -1,44 +1,60 @@
-===============
-How to use this
-===============
+==================
+How to use PyASTrX
+==================
 
 
 CLI: Interactive mode
 ---------------------
 
 
-Investigate all folder files
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Start the interactive mode in src folder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: console
 
     $ pyastrx -i -d src
 
-Investigate a single file
-~~~~~~~~~~~~~~~~~~~~~~~~~
+For specific files
+~~~~~~~~~~~~~~~~~~
 
 .. code-block:: console
 
-    $ pyastrx -i -f src/module.py
+    $ pyastrx -i -f src/script_1.py
 
+or
+
+.. code-block:: console
+
+    $ pyastrx -i -f src/script_1.py -f src/script_2.py
+
+
+Using an inline expression
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Supose you want to look for all the defaults in your
+code base, do the following:
+
+.. code-block:: console
+
+    $ pyastrx -i -expr //defaults
 
 As a linter
 -----------
 
+The linter mode will run outside of the CLI
+and also will ignore any rule in the `pyastrx.yaml`
+file that has the `use_in_linter: false`  flag.
 
 .. code-block:: console
 
-    $ pyastrx -l -d src
-
-pre-commit hook
-~~~~~~~~~~~~~~~~
-
-Options:
-~~~~~~~~
+    $ pyastrx -l
 
 
-Human readable output
-^^^^^^^^^^^^^^^^^^^^^
+More options
+------------
 
-JSON output
-^^^^^^^^^^^
+.. code-block:: console
+
+    $ pyastrx --help
+
+

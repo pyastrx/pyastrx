@@ -10,17 +10,24 @@ command line interface and the code analysis.
 
 .. code-block:: yaml
 
-    after_context: 3
-    before_context: 3
-    folder: "tests"
-    parallel: true
-    rules:
-        "//ClassDef[re:match('.*Var', @name)]":
-            name: "B001"
-            description: "Classes with 'Var' in name"
-            severity: "warning"
-            why: "bad practice"
-            use_in_linter: true
+        after_context: 3
+        before_context: 3
+        exclude:
+        - .venv
+        - .tox
+        - .pyastrx
+        folder: .
+        interactive_files: false
+        normalize_ast: true
+        pagination: true
+        parallel: true
+        quiet: false
+        rules:
+            //defaults/*[self::Dict or self::List or self::Set or self::Call]:
+                description: Can create bugs that are hard to find
+                name: mutable-defaults
+                severity: error
+                why: bad practice
 
 Options
 -------
@@ -28,12 +35,24 @@ Options
 after_context
 ~~~~~~~~~~~~~~
 
-The number of lines of context to show after the line of the violation.
+The number of lines of context to show after the line match
 
 before_context
 ~~~~~~~~~~~~~~~
 
-The number of lines of context to show before the line of the violation.
+The number of lines of context to show before the line match
+
+interactive_files
+~~~~~~~~~~~~~~~~~
+
+Shows a selection interface listing the files that a match was found in.
+
+
+pagination
+~~~~~~~~~~
+
+Uses `pydoc` and `less` to paginate the output.
+
 
 parallel
 ~~~~~~~~
@@ -50,14 +69,12 @@ exclude
 
 A list of folders to be excluded from the analysis.
 
-output
-~~~~~~
+normalize_ast
+~~~~~~~~~~~~~
 
-The output format.
+This uses the great `gast project`_ to normalize the AST between different Python versions.
 
-- "human"
-- "json"
-- "pylint"
+.. _gast project: https://github.com/serge-sans-paille/gast
 
 Rules for code quality
 ----------------------
@@ -66,28 +83,32 @@ Rules for code quality
 
     rules:
         <XPATH_EXPRESSION (You can also use re:match or re:search)>:
-            name: "SHORT_NAME"
-            description: "DESCRIPTION"
-            severity: "How severe the violation is"
-            why: "Why this rule is important"
-            ignore: A boolean value to indicate if the rule should be ignored
+            name: ("", optional, recommended)
+            description: ("", optional)
+            severity: ("info", optional)
+            why: ("", optional)
+            use_in_linter: (true, optional)
 
 
 XPATH Expression
 ~~~~~~~~~~~~~~~~~~
-    The name of the rule.
+
+The name of the rule.
 
 description
 ~~~~~~~~~~~
-    A description of the rule.
+
+A description of the rule.
 
 severity
 ~~~~~~~~
-    The severity of the rule.
+
+The severity of the rule.
 
 why
 ~~~
 
 use_in_linter
 ~~~~~~~~~~~~~
-    A boolean value to indicate if the rule should be ignored.
+
+A boolean value to indicate if the rule should be ignored.

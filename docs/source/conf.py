@@ -71,14 +71,14 @@ html_theme_options = {
 
     # Specify a base_url used to generate sitemap.xml. If not
     # specified, then no sitemap will be built.
-    'base_url': 'https://project.github.io/project',
+    'base_url': 'https://pyastrx.readthedocs.io/',
 
     # Set the color and the accent color
     'color_primary': 'blue',
     'color_accent': 'light-blue',
 
     # Set the repo location to get a badge with stats
-    'repo_url': 'https://github.com/devmessias/pyastrx/',
+    'repo_url': 'https://github.com/pyastrx/pyastrx/',
     'repo_name': 'pyastrx',
 
     # Visible levels of the global TOC; -1 means unlimited
@@ -95,7 +95,7 @@ html_theme_options = {
             'href': 'https://devmessias.github.io', 'internal': False},
         {
             'title': 'Need help?',
-            'href': 'https://github.com/devmessias/pyastrx/issues/new',
+            'href': 'https://github.com/pyastrx/pyastrx/issues/new',
             'internal': False
         },
     ]
