@@ -1,12 +1,12 @@
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import yaml
 from rich import print as rprint
 
 from pyastrx.config import __available_yaml as available_yaml
-from pyastrx.data_typing import Config, RuleInfo, RulesDict
+from pyastrx.data_typing import Config, RuleInfo, RulesDict, FileInfo
 from pyastrx.report import data_friendly as data_friendly_report
 from pyastrx.report import humanize as humanized_report
 from pyastrx.report.stdout import rich_paging
@@ -19,6 +19,7 @@ class Manager:
         self.repo = repo
         self._expression = ""
         self._current_rule: RulesDict = RulesDict({})
+        self.current_fileinfo: Union[FileInfo, None] = None
         self.selected_rules: List[str] = []
 
     @property
