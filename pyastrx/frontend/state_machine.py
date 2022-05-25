@@ -289,6 +289,10 @@ class InterfaceSelectRules(StateInterface):
     def run(self) -> None:
         options, opt2xpath, default_values = self.get_options()
         style = Style.from_dict(_prompt_dialog_style)
+        if len(options) == 0:
+            self.context.set_state(InterfaceMain)
+            rprint("\n[bold yellow]These rules will not match any pattern in the provide files[/]\n")
+            return
 
         dialog = checkboxlist_dialog(
             title="Rules selection",
