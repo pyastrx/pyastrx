@@ -20,14 +20,23 @@ _prompt_dialog_style = {
 __available_yaml = {
     "after_context": 3,
     "before_context": 3,
-    "linter": False,
     "parallel": True,
     "quiet": False,
     "interactive_files": False,
     "normalize_ast": True,
     "vscode_output": False,
     "pagination": True,
-    "rules": {}
+    "folder": ".",
+    "exclude": [".venv", ".tox", ".pyastrx"],
+    "rules": {
+        "//defaults/*[self::Dict or self::List or self::Set or self::Call]": {
+            "name": "mutable-defaults",
+            "description": "Can create bugs that are hard to find",
+            "severity": "error",
+            "why": "bad practice",
+            "use_in_liner": True,
+        }
+    }
 }
 
 __available_yaml_folder = {

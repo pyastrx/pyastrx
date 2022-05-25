@@ -158,6 +158,8 @@ def invoke_pyastrx(args) -> None:
 
     if args.no_interface:
         config["interactive"] = False
+    if args.vscode_output:
+        config["vscode_output"] = True
 
     if len(rules) == 0 and config["interactive"] == False:
         raise ValueError(
