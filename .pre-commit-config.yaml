@@ -15,14 +15,14 @@ repos:
         language: script
         args: ["-q"]
         types: ["python"]
-        description: Check for any violations using the .pyastrx.yaml config
+        description: Check for any violations using the pyastrx.yaml config
       # - id: pyastrix
       #   name: PyASTrX linter
       #   entry: pyastrix
       #   language_version: python3.10.4
       #   args: ["-l"]
       #   language: python
-      #   description: Check for any violations using the .pyastrx.yaml config
+      #   description: Check for any violations using the pyastrx.yaml config
 
         #always_run: true
     # - id: check-merge-conflict

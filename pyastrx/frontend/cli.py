@@ -113,12 +113,12 @@ def pyastrx() -> None:
 
 
 def get_config_from_yaml() -> dict:
-    """Will check if .pyastrx.yaml exists in the current directory.
+    """Will check if pyastrx.yaml exists in the current directory.
     If it does, it will load the config from it. If not, it will
     create a new one with the default values.
 
     """
-    yml_file = Path(".").resolve() / ".pyastrx.yaml"
+    yml_file = Path(".").resolve() / "pyastrx.yaml"
     if not yml_file.exists():
         config = __available_yaml
         with open(yml_file, "w") as f:

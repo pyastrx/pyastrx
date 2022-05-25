@@ -45,7 +45,7 @@ An easy customizable code quality analysis tool.
 
 Type :code:`pyastrx -h` to see all the options.
 
-You can also use a :code:`.pyastrx.yaml` file to configure the tool.
+You can also use a :code:`pyastrx.yaml` file to configure the tool.
 See the following page for more details :doc:`the_yaml`.
 
 
@@ -94,7 +94,7 @@ in your folder and add the following entry in your `.pre-commit-config.yaml`.
             language: script
             args: ["-q"]
             types: ["python"]
-            description: Check for any violations using the .pyastrx.yaml config
+            description: Check for any violations using the pyastrx.yaml config
 
 
 Later on, I will ship this to be used in the pre-commit channels.
@@ -110,7 +110,7 @@ Explore the AST and XML
 =======================
 
 Using the :code: `-i` arg or adding a :code: `interactive: true` in your
-`.pyastrx.yaml` you can explore the AST and XML parsed AST of your code.
+`pyastrx.yaml` you can explore the AST and XML parsed AST of your code.
 This can be useful to understand your code base and helps you to write
 you custom XPATH queries to be used in your project.
 

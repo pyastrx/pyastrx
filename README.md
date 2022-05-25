@@ -40,7 +40,7 @@ PyASTrX provides the following features:
 
 Type `pyastrx -h` to see all the options.
 
-You can also use a `.pyastrx.yaml` file to configure the tool.
+You can also use a `pyastrx.yaml` file to configure the tool.
 
 ### Human-friendly
 
@@ -79,7 +79,7 @@ in your folder and add the following entry in your
             language: script
             args: ["-q"]
             types: ["python"]
-            description: Check for any violations using the .pyastrx.yaml config
+            description: Check for any violations using the pyastrx.yaml config
 ```
 Later on, I will ship this to be used in the pre-commit channels.
 

@@ -91,7 +91,7 @@ class Manager:
             )
 
     def reload_yaml(self) -> None:
-        with open(Path(".pyastrx.yaml").resolve(), "r") as f:
+        with open(Path("pyastrx.yaml").resolve(), "r") as f:
             _config = yaml.safe_load(f)
         for k in ("rules", "interactive_files", "pagination"):
             if k not in _config.keys():

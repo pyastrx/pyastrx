@@ -1,0 +1,29 @@
+after_context: 3
+before_context: 3
+exclude:
+- .venv
+- .tox
+- .pyastrx
+folder: .
+interactive_files: true
+normalize_ast: true
+pagination: true
+parallel: true
+quiet: false
+rules:
+  //defaults/*[self::Dict or self::List or self::Set or self::Call]:
+    description: Can create bugs that are hard to find
+    name: mutable-defaults
+    severity: error
+    why: bad practice
+  //FunctionDef[@name=body/Assign/targets/Name/@id]:
+        name: "redefinition-of-function-var"
+        description: "You should not define a new variable with the same name as the current function"
+        severity: "warning"
+        why: "bad practice"
+  //FunctionDef[@name=body//Call/func/Name/@id and not(parent::node()/parent::ClassDef)]:
+        name: "recursion"
+        description: "Recursion pattern detected in this file"
+        severity: "info"
+        why: "should be refactored"
+vscode_output: false
