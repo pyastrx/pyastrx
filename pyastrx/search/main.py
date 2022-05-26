@@ -8,7 +8,8 @@ from typing import Callable, List, Tuple, Union
 from lxml import etree
 
 from pyastrx.ast.ast2xml import file2axml
-from pyastrx.data_typing import Files2Matches, Lines2Matches, RulesDict
+from pyastrx.data_typing import (
+    Files2Matches, Lines2Matches, RulesDict, MatchParams)
 from pyastrx.search.cache import Cache
 from pyastrx.search.xml_search import search_in_file_info
 
@@ -37,9 +38,12 @@ copyreg.pickle(etree._ElementTree, lxml_el_pickle, lxml_el_unpickle)
 
 
 class Repo:
-    def __init__(self) -> None:
+    def __init__(self, match_params: MatchParams) -> None:
         self.cache = Cache()
         self._files: List[str] = []
+        if match_params is None:
+            match_params = {}
+        self.match_params = match_params
 
     def load_file(
             self, filename: str, normalize_ast: bool) -> None:
@@ -55,7 +59,7 @@ class Repo:
             after_context: int = 0) -> Lines2Matches:
         info = self.cache.get(filename)
         matching_by_line = search_in_file_info(
-            info, rules, before_context, after_context)
+            info, rules, before_context, after_context, self.match_params)
 
         return matching_by_line
 
@@ -133,7 +137,8 @@ class Repo:
                             search_in_file_info,
                             rules=rules,
                             before_context=before_context,
-                            after_context=after_context
+                            after_context=after_context,
+                            match_params=self.match_params
                         ),
                         map(self.cache.get, self._files)
                 )

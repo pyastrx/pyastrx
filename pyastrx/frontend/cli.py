@@ -9,7 +9,7 @@ from pathlib import Path
 import yaml
 
 from pyastrx.config import __available_yaml, __available_yaml_folder
-from pyastrx.data_typing import Config, RuleInfo, RulesDict
+from pyastrx.data_typing import Config, RuleInfo, RulesDict, MatchParams
 from pyastrx.frontend.manager import Manager
 from pyastrx.frontend.state_machine import Context, StartState
 from pyastrx.search.main import Repo
@@ -174,8 +174,10 @@ def invoke_pyastrx(args) -> None:
         config["vscode_output"] = True
 
     config_pyastrx = Config(**config)
-
-    repo = Repo()
+    match_params = MatchParams(
+        **yaml_config.get("match_params", {})
+    )
+    repo = Repo(match_params)
     if not config_pyastrx.interactive:
         manager = Manager(config_pyastrx, repo)
         manager.load_files()

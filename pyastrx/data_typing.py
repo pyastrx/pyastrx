@@ -3,7 +3,7 @@ stuff to deal with data typing.
 
 """
 from dataclasses import dataclass
-from typing import Dict, List, NewType, Tuple
+from typing import Dict, List, NewType, Tuple, Union
 
 from lxml import etree
 
@@ -51,6 +51,12 @@ Lines2Matches = NewType('Lines2Matches', Dict[int, MatchesByLine])
 
 
 Files2Matches = NewType('Files2Matches', Dict[str, Lines2Matches])
+
+
+@dataclass
+class MatchParams:
+    deny_dict: Union[Dict[str, List[str]], None] = None
+    allow_dict: Union[Dict[str, List[str]], None] = None
 
 
 @dataclass
