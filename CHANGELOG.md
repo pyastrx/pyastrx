@@ -6,7 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [0.1.0] - 2022-05-25
+## [0.2.0] - 2022-05-26
+### Added
+
+- Support for allow and deny lists
+- Perf improvements using Xpath Evaluators
+- Examples about how to use allow and deny lists
+### Fixed
+
+-
+### Changed
+
+- lxml extensions for xpath now can accept `match_params`
+
+## [0.1.2] - 2022-05-25
 ### Added
 
 
@@ -16,6 +29,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 
-
-[Unreleased]: https://github.com/devmessias/pyastrx/compare/0.1.0...master
-[0.1.0]: https://github.com/devmessias/edgeseraser/compare/0.1.0...0.1.0
+[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.2.0...master
+[0.2.0]: https://github.com/pyastrx/pyastrx/compare/0.2.0...0.1.2
+[0.1.2]: https://github.com/pyastrx/pyastrx/compare/0.1.2...0.1.2

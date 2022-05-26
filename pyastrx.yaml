@@ -26,14 +26,19 @@ rules:
       description: "Recursion pattern detected in this file"
       severity: "info"
       why: "should be refactored"
+  //FunctionDef/args/arguments/args/Name[pyastrx:deny-list('built-in', @id)]:
+        name: "built-in-function-as-argument"
+        description: "This function uses a built-in function as argument"
+        severity: "error"
+        why: "bad practice"
+vscode_output: true
 match_params:
   deny_dict:
-    var_names:
-    - problematic_var_name
-    - problematic_var_name_2
+    built-in:
+    - dict
+    - list
     secrets:
     - secret_1
-    - secret_2
   allow_dict:
     class_names:
     - allowed_var_name1
