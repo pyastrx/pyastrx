@@ -50,7 +50,7 @@ sync-env: pip-compile
 ## @category Dev-dist
 ## Create the distribution
 pypi-dist:
-	python3 -m build
+	python3 setup.py bdist_wheel
 	twine check dist/*
 
 
