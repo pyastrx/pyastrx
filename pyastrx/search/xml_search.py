@@ -6,11 +6,8 @@ from pyastrx.data_typing import (Expression2Match, FileInfo, Lines2Matches,
                                  Match, MatchesByLine, RulesDict)
 from pyastrx.search.txt_tools import apply_context
 from pyastrx.xml.xpath_expressions import XpathExpressions
-from pyastrx.xml.xpath_extensions import lxml_ext_pyastrx, lxml_ext_regex
-
-# initialize the extension functions
-lxml_ext_regex.prefix = "re"
-lxml_ext_pyastrx.prefix = "pyastrx"
+from pyastrx.xml.xpath_extensions import (
+    LXMLExtensions, __all_lxml_ext__, __lxml_namespaces__)
 
 
 def get_xml_el_value(
@@ -62,15 +59,49 @@ def search_in_axml(
     return matching_by_expression
 
 
+def search_evaluator(
+        rules: RulesDict, evaluator: etree.XPathEvaluator) -> Expression2Match:
+    matching_by_expression = Expression2Match({})
+    for expression, rule_info in rules.items():
+        try:
+            matching_elements = evaluator(expression)
+            cols_by_line = linenos_from_xml(
+                matching_elements)
+            matching_by_expression[expression] = Match(
+                cols_by_line,
+                rule_info,
+                len(cols_by_line)
+            )
+        except etree.XPathEvalError:
+            print(f"XPath error: {expression}")
+
+    return matching_by_expression
+
+
 def search_in_file_info(
         file_info: FileInfo, rules: RulesDict,
-        before_context: int = 0, after_context: int = 0) -> Lines2Matches:
+        before_context: int = 0, after_context: int = 0,
+        match_params: Dict[str, str] = None,
+        use_evaluator: bool = True) -> Lines2Matches:
     if file_info is None:
         return {}
-
-    matching_by_expression = search_in_axml(
+    if use_evaluator:
+        if match_params is None:
+            match_params = {}
+        extension_module = LXMLExtensions(**match_params)
+        extensions = etree.Extension(
+            extension_module, __all_lxml_ext__, ns='local-ns')
+        evaluator = etree.XPathEvaluator(
+            file_info.axml,
+            namespaces=__lxml_namespaces__, extensions=extensions
+        )
+        matching_by_expression = search_evaluator(
             rules,
-            axml=file_info.axml)
+            evaluator)
+    else:
+        matching_by_expression = search_in_axml(
+                rules,
+                axml=file_info.axml)
     match_expr_by_line = {}
     for expression, match in matching_by_expression.items():
         for line_num, cols in match.cols_by_line.items():
