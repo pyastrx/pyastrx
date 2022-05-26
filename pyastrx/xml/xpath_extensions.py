@@ -2,6 +2,8 @@
 import re
 from typing import List, Dict
 
+from pyastrx.exceptions import MissingYAMLConfig
+
 
 class LXMLExtensions:
     def __init__(
@@ -44,7 +46,17 @@ class LXMLExtensions:
             bool: True if one of the values is inside of the deny_list
 
         """
-        deny_list = self.deny_dict[list_name]
+        if self.deny_dict is None:
+            raise MissingYAMLConfig(
+                "march_params: deny_list",
+                "Create first a deny_list inside of the yaml config")
+        try:
+            deny_list = self.deny_dict[list_name]
+        except KeyError:
+            raise MissingYAMLConfig(
+                f"deny_list: {list_name}",
+                f"Create first a attribute named {list_name} "
+                + "inside of match_params:deny_list")
         for value in values:
             if value in deny_list:
                 return True
@@ -64,7 +76,18 @@ class LXMLExtensions:
             bool: True if the values can not be found in the allow_list
 
         """
-        allow_list = self.allow_dict[list_name]
+        if self.allow_dict is None:
+            raise MissingYAMLConfig(
+                "march_params: allow_list",
+                "Create first a allow_list inside of the yaml config")
+        try:
+            allow_list = self.allow_dict[list_name]
+        except KeyError:
+            raise MissingYAMLConfig(
+                f"allow_list: {list_name}",
+                f"Create first a attribute named {list_name} "
+                + "inside of match_params:allow_list")
+
         for value in values:
             if value not in allow_list:
                 return True
