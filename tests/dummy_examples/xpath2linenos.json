@@ -1,6 +1,6 @@
 {
     "mix_examples.py":[
-        ["//ClassDef[re:match('.*Var', @name)]", [4, 23]],
+        ["//ClassDef[pyastrx:match('.*Var', @name)]", [4, 23]],
         ["//ClassDef", [4, 17, 23]],
         [".//ExceptHandler", [31]],
         [
@@ -39,6 +39,20 @@
         [
             "//FunctionDef[@name=body//Call/func/Name/@id and not(parent::node()/parent::ClassDef)]",
             [1, 11, 21, 46]
+        ]
+    ],
+    "deny_list.py":[
+        [
+            "//Assign/targets/Name[pyastrx:deny-list('list_1', @id)]",
+            [1, 7],
+            {"deny_dict": {"list_1":["problematic_var_name", "problematic_var_name2"]}}
+        ]
+    ],
+    "allow_list.py":[
+        [
+            "//Assign/targets/Name[pyastrx:allow-list('list_1', @id)]",
+            [3],
+            {"allow_dict": {"list_1":["ok_var_name", "ok_var_name2"]}}
         ]
     ]
 }
