@@ -3,7 +3,7 @@ from typing import Dict, List, Tuple
 from lxml import etree
 
 from pyastrx.data_typing import (Expression2Match, FileInfo, Lines2Matches,
-                                 Match, MatchesByLine, RulesDict)
+                                 Match, MatchesByLine, RulesDict, MatchParams)
 from pyastrx.search.txt_tools import apply_context
 from pyastrx.xml.xpath_expressions import XpathExpressions
 from pyastrx.xml.xpath_extensions import (
@@ -81,14 +81,14 @@ def search_evaluator(
 def search_in_file_info(
         file_info: FileInfo, rules: RulesDict,
         before_context: int = 0, after_context: int = 0,
-        match_params: Dict[str, str] = None,
+        match_params: MatchParams = None,
         use_evaluator: bool = True) -> Lines2Matches:
     if file_info is None:
         return {}
     if use_evaluator:
         if match_params is None:
-            match_params = {}
-        extension_module = LXMLExtensions(**match_params)
+            match_params = MatchParams({})
+        extension_module = LXMLExtensions(**match_params.__dict__)
         extensions = etree.Extension(
             extension_module, __all_lxml_ext__, ns='local-ns')
         evaluator = etree.XPathEvaluator(

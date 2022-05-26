@@ -90,6 +90,7 @@ class LXMLExtensions:
 __all_lxml_ext__ = {
     "lxml_any_in": "any-in",
     "lxml_deny_list": "deny-list",
+    "lxml_allow_list": "allow-list",
     "lxml_match": "match",
     "lxml_search": "search",
 }

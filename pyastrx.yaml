@@ -26,4 +26,15 @@ rules:
       description: "Recursion pattern detected in this file"
       severity: "info"
       why: "should be refactored"
-vscode_output: false
+match_params:
+  deny_dict:
+    var_names:
+    - problematic_var_name
+    - problematic_var_name_2
+    secrets:
+    - secret_1
+    - secret_2
+  allow_dict:
+    class_names:
+    - allowed_var_name1
+    - allowed_var_name2
