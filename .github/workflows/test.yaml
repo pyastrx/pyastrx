@@ -22,7 +22,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install lxml
         run: |
-          sudo apt-get install build-dep libxml2-dev libxslt-dev
+          sudo apt-get install libxml2-dev libxslt-dev
           sudo apt-get install python3-lxml
       - name: Install dependencies
         run: |
