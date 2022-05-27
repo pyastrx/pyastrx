@@ -152,4 +152,3 @@ class Repo:
                     before_context, after_context)
                 file2matches[filename] = match_by_lines
         return Files2Matches(file2matches)
-

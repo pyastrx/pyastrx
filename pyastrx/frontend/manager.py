@@ -183,4 +183,3 @@ class Manager:
                 rprint(output_str)
 
         return num_matches, str_by_file, filter_rules
-
