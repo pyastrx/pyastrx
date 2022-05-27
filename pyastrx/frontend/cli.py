@@ -9,7 +9,7 @@ from pathlib import Path
 import yaml
 
 from pyastrx.config import __available_yaml, __available_yaml_folder
-from pyastrx.data_typing import Config, RuleInfo, RulesDict, MatchParams
+from pyastrx.data_typing import Config, MatchParams, RuleInfo, RulesDict
 from pyastrx.frontend.manager import Manager
 from pyastrx.frontend.state_machine import Context, StartState
 from pyastrx.search.main import Repo

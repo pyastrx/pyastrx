@@ -3,8 +3,8 @@
 
 """
 
-import sys
 import subprocess
+import sys
 
 if __name__ == "__main__":
     files = [
@@ -24,4 +24,3 @@ if __name__ == "__main__":
     exit_code = process.wait()
 
     sys.exit(exit_code)
-

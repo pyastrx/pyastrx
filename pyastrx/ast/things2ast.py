@@ -1,6 +1,6 @@
-from sys import version_info
 import ast
 from pathlib import Path
+from sys import version_info
 from typing import Tuple
 
 import gast
