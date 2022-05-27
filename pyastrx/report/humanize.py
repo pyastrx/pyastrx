@@ -56,7 +56,7 @@ def matches_by_filename(
     filename: str,
 ) -> Tuple[str, int]:
     output_str = ""
-    output_list = [f"[bold white on green]File:{filename}[/bold white on green]\n"]
+    output_list = [f"[bold white on green]File:{filename}[/bold white on green]\n"] # noqa
     num_matches = 0
     for line_match, matches_by_line in line2matches.items():
         context = matches_by_line.code_context

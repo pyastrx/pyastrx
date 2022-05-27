@@ -6,7 +6,7 @@ import yaml
 from rich import print as rprint
 
 from pyastrx.config import __available_yaml as available_yaml
-from pyastrx.data_typing import Config, RuleInfo, RulesDict, FileInfo
+from pyastrx.data_typing import Config, FileInfo, RuleInfo, RulesDict
 from pyastrx.report import data_friendly as data_friendly_report
 from pyastrx.report import humanize as humanized_report
 from pyastrx.report.stdout import rich_paging
@@ -183,4 +183,3 @@ class Manager:
                 rprint(output_str)
 
         return num_matches, str_by_file, filter_rules
-

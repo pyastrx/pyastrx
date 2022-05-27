@@ -40,4 +40,3 @@ __available_yaml_folder = {
     "recursive": True,
     "exclude": [".venv", "docs", ".git", ".tox", ".pyastrx"],
 }
-

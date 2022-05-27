@@ -9,7 +9,7 @@ def extract_lines(
     for line, matches_by_line in lines2matches.items():
         code_context = matches_by_line.code_context
         context_str = "\n".join(code for line, code in code_context)
-        match_str = [code for l, code in code_context if line == line]
+        match_str = [code for _, code in code_context if line == line]
         for expression, match in matches_by_line.match_by_expr.items():
             data = {
                     "line": line,

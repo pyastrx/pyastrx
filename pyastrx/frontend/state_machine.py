@@ -291,7 +291,9 @@ class InterfaceSelectRules(StateInterface):
         style = Style.from_dict(_prompt_dialog_style)
         if len(options) == 0:
             self.context.set_state(InterfaceMain)
-            rprint("\n[bold yellow]These rules will not match any pattern in the provide files[/]\n")
+            rprint(
+                "\n[bold yellow]These rules will not match any pattern "
+                + " in the provide files[/]\n")
             return
 
         dialog = checkboxlist_dialog(
@@ -533,7 +535,7 @@ class SearchState(State):
 
         if not self.context._search_interface == InterfaceNewRule:
             self.context.filter_rules(filter_rules)
-        interactive_files = self.context.config.interactive_files and num_files > 1
+        interactive_files = self.context.config.interactive_files and num_files > 1 # noqa
         if not interactive_files:
             self.context.set_state(self.context._search_interface)
             return
@@ -545,8 +547,8 @@ class SearchState(State):
                 for i, (filename, _) in str_by_file.items()
             ]
             dialog = checkboxlist_dialog(
-                title=f"Files selection: ({num_files} files matched the rules)",
-                text="To disable this dialog, set interactive_files to False in pyastrx.yaml",
+                title=f"Files selection: ({num_files} files matched the rules)",  # noqa
+                text="To disable this dialog, set interactive_files to False in pyastrx.yaml",  # noqa
                 values=options,
                 default_values=selected_files,
                 style=style
@@ -564,5 +566,3 @@ class SearchState(State):
             else:
                 rprint(output_str)
         self.context.set_state(self.context.search_interface)
-
-

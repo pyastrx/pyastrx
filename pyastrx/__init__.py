@@ -22,7 +22,7 @@ def __info__() -> None:
     hs = 60
     c = "!"
     rprint(f"{'-'*hs}")
-    rprint(f"{c}{' '*(hs//2-1-len(__pkg_name__))}{__pkg_name__}{' '*(hs//2-1)}{c}")
+    rprint(f"{c}{' '*(hs//2-1-len(__pkg_name__))}{__pkg_name__}{' '*(hs//2-1)}{c}") # noqa
     rprint(f"{'-'*hs}")
     rprint(*(
         f"[bold yellow] Version:[/] {__version__}\n",

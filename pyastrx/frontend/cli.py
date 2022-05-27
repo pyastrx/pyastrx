@@ -9,7 +9,7 @@ from pathlib import Path
 import yaml
 
 from pyastrx.config import __available_yaml, __available_yaml_folder
-from pyastrx.data_typing import Config, RuleInfo, RulesDict, MatchParams
+from pyastrx.data_typing import Config, MatchParams, RuleInfo, RulesDict
 from pyastrx.frontend.manager import Manager
 from pyastrx.frontend.state_machine import Context, StartState
 from pyastrx.search.main import Repo
@@ -46,7 +46,7 @@ def construct_base_argparse() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--vscode-output",
-        help="This saves the output in a format that can be read by VSCode PyASTrX extension",
+        help="This saves the output in a format that can be read by VSCode PyASTrX extension", # noqa
         action="store_true",
     )
     parser.add_argument(
@@ -161,7 +161,7 @@ def invoke_pyastrx(args) -> None:
     if args.vscode_output:
         config["vscode_output"] = True
 
-    if len(rules) == 0 and config["interactive"] == False:
+    if len(rules) == 0 and config["interactive"] is False:
         raise ValueError(
                 "No rules found in the yaml file and no expression provided")
 
@@ -195,5 +195,3 @@ def invoke_pyastrx(args) -> None:
 
 if __name__ == "__main__":
     pyastrx()
-
-

@@ -14,4 +14,3 @@ def apply_context(
     ])
 
     return context_list
-

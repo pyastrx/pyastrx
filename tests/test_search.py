@@ -1,7 +1,7 @@
 import json
 
+from pyastrx.data_typing import MatchParams, RuleInfo, RulesDict
 from pyastrx.search import Repo
-from pyastrx.data_typing import RuleInfo, RulesDict, MatchParams
 
 
 def test_xpath_example_tags():
@@ -28,15 +28,3 @@ def test_xpath_example_tags():
                     print(linenos)
                     print(xpath)
                     assert False
-
-
-# def test_evaluator_example_tags():
-#     """This test using all the keywords in the code_repo/xpath2lineos.json"""
-
-#     xpath2linenos = json.load(open("tests/dummy_examples/xpath2linenos.json"))
-#     repo = Repo()
-#     for filename, items in xpath2linenos.items():
-#         file = f"tests/dummy_examples/{filename}"
-#         rules = RulesDict({xpath: RuleInfo() for xpath, _ in items})
-#         repo.load_file(file, normalize_ast=True)
-#         lines2matches = repo.search_file(file, rules)

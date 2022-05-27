@@ -8,8 +8,8 @@ from typing import Callable, List, Tuple, Union
 from lxml import etree
 
 from pyastrx.ast.ast2xml import file2axml
-from pyastrx.data_typing import (
-    Files2Matches, Lines2Matches, RulesDict, MatchParams)
+from pyastrx.data_typing import (Files2Matches, Lines2Matches, MatchParams,
+                                 RulesDict)
 from pyastrx.search.cache import Cache
 from pyastrx.search.xml_search import search_in_file_info
 
@@ -152,4 +152,3 @@ class Repo:
                     before_context, after_context)
                 file2matches[filename] = match_by_lines
         return Files2Matches(file2matches)
-

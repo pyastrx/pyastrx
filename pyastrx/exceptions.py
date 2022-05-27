@@ -12,5 +12,5 @@ class MissingYAMLConfig(Exception):
         super().__init__(self.message)
 
     def __str__(self):
-        return f'\nMissing the following attributes {self.key_name} in the pyastrx.yaml' \
-            + f'\n\t>> {self.message}'
+        return f'\nMissing the following attributes {self.key_name}' \
+         + f" in the pyastrx.yaml '\n\t>> {self.message}"

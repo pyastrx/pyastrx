@@ -3,11 +3,11 @@ from typing import Dict, List, Tuple
 from lxml import etree
 
 from pyastrx.data_typing import (Expression2Match, FileInfo, Lines2Matches,
-                                 Match, MatchesByLine, RulesDict, MatchParams)
+                                 Match, MatchesByLine, MatchParams, RulesDict)
 from pyastrx.search.txt_tools import apply_context
 from pyastrx.xml.xpath_expressions import XpathExpressions
-from pyastrx.xml.xpath_extensions import (
-    LXMLExtensions, __all_lxml_ext__, __lxml_namespaces__)
+from pyastrx.xml.xpath_extensions import (LXMLExtensions, __all_lxml_ext__,
+                                          __lxml_namespaces__)
 
 
 def get_xml_el_value(

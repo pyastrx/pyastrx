@@ -1,6 +1,6 @@
 """All the xpath extensions should be defined here."""
 import re
-from typing import List, Dict
+from typing import Dict, List
 
 from pyastrx.exceptions import MissingYAMLConfig
 
