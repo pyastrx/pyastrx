@@ -2,10 +2,19 @@
 stuff to deal with data typing.
 
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, is_dataclass
+import json
 from typing import Dict, List, NewType, Tuple, Union
 
 from lxml import etree
+
+
+class DataClassJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if is_dataclass(obj):
+            return obj.__dict__
+        return super().default(obj)
+
 
 
 @dataclass
@@ -31,7 +40,6 @@ RulesDict = NewType('RulesDict', Dict[str, RuleInfo])
 @dataclass
 class Match:
     cols_by_line: Dict[int, List[int]]
-    rule_info: RuleInfo = RuleInfo()
     num_matches: int = 0
 
 
@@ -47,7 +55,10 @@ class MatchesByLine:
     match_by_expr: Expression2Match
 
 
-Lines2Matches = NewType('Lines2Matches', Dict[int, MatchesByLine])
+@dataclass
+class Lines2Matches:
+    matches: Dict[int, MatchesByLine]
+    num_matches_by_expr: Dict[str, int]
 
 
 Files2Matches = NewType('Files2Matches', Dict[str, Lines2Matches])
