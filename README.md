@@ -1,7 +1,7 @@
 # What is PyASTrX?
 
 
-![](docs/source/_static/imgs/cover_2_w_description.png#gh-light-mode-only | width=50)
+![](docs/source/_static/imgs/cover_2_w_description.png#gh-light-mode-only)
 ![](docs/source/_static/imgs/cover_2_w_description_dark.png#gh-dark-mode-only)
 
 
