@@ -1,11 +1,17 @@
 
+
 ================
 What is PyASTrX?
 ================
 
+.. image:: _static/imgs/cover_2_w_description.png
+    :alt: PyASTrX logo
+    :width: 50%
+    :align: center
 
-Philosophy
-==========
+
+
+
 
 .. raw:: html
 
@@ -102,7 +108,7 @@ in your folder and add the following entry in your `.pre-commit-config.yaml`.
 Later on, I will ship this to be used in the pre-commit channels.
 
 VsCode extension
-===============
+================
 
 
 Soon, I will ship a VS Code extension.
@@ -118,7 +124,7 @@ you custom XPATH queries to be used in your project.
 
 
 Folder exploration
-~~~~~~~~~~~~~~~~~~
+------------------
 
 **Start the interactive interface**
 
@@ -153,7 +159,8 @@ Folder exploration
     :width: 45%
 
 File exploration (one key-press distance)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
+
 
 **Open the interactive with the python file**
 
