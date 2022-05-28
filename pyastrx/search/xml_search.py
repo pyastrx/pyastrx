@@ -50,7 +50,6 @@ def search_in_axml(
                 matching_elements)
             matching_by_expression[expression] = Match(
                 cols_by_line,
-                rule_info,
                 len(cols_by_line)
             )
         except etree.XPathEvalError:
@@ -62,14 +61,13 @@ def search_in_axml(
 def search_evaluator(
         rules: RulesDict, evaluator: etree.XPathEvaluator) -> Expression2Match:
     matching_by_expression = Expression2Match({})
-    for expression, rule_info in rules.items():
+    for expression, _ in rules.items():
         try:
             matching_elements = evaluator(expression)
             cols_by_line = linenos_from_xml(
                 matching_elements)
             matching_by_expression[expression] = Match(
                 cols_by_line,
-                rule_info,
                 len(cols_by_line)
             )
         except etree.XPathEvalError:
@@ -84,7 +82,7 @@ def search_in_file_info(
         match_params: MatchParams = None,
         use_evaluator: bool = True) -> Lines2Matches:
     if file_info is None:
-        return {}
+        return {}, {}
     if use_evaluator:
         if match_params is None:
             match_params = MatchParams({})
@@ -95,22 +93,26 @@ def search_in_file_info(
             file_info.axml,
             namespaces=__lxml_namespaces__, extensions=extensions
         )
-        matching_by_expression = search_evaluator(
+        matching_by_expr = search_evaluator(
             rules,
             evaluator)
     else:
-        matching_by_expression = search_in_axml(
+        matching_by_expr = search_in_axml(
                 rules,
                 axml=file_info.axml)
     match_expr_by_line = {}
-    for expression, match in matching_by_expression.items():
+    expr2num = {}
+    for expr, match in matching_by_expr.items():
         for line_num, cols in match.cols_by_line.items():
             if line_num not in match_expr_by_line:
                 code_context = apply_context(
                     file_info.txt.splitlines(), line_num - 1,
                     before_context, after_context)
                 match_expr_by_line[line_num] = MatchesByLine(code_context, {})
-            match_expr_by_line[line_num].match_by_expr[expression] = Match(
-                {line_num: cols}, match.rule_info, match.num_matches
+            match_expr_by_line[line_num].match_by_expr[expr] = Match(
+                {line_num: cols}, match.num_matches
             )
-    return Lines2Matches(match_expr_by_line)
+            expr2num[expr] = match.num_matches
+            expr2num[expr] = expr2num.get(expr, 0) + match.num_matches
+
+    return Lines2Matches(match_expr_by_line, expr2num)

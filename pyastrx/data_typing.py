@@ -4,17 +4,16 @@ stuff to deal with data typing.
 """
 from dataclasses import dataclass, is_dataclass
 import json
-from typing import Dict, List, NewType, Tuple, Union
+from typing import Dict, List, NewType, Tuple, Union, Any
 
 from lxml import etree
 
 
 class DataClassJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
+    def default(self, obj: Any) -> Any:
         if is_dataclass(obj):
             return obj.__dict__
         return super().default(obj)
-
 
 
 @dataclass

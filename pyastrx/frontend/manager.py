@@ -6,8 +6,9 @@ import yaml
 from rich import print as rprint
 
 from pyastrx.config import __available_yaml as available_yaml
-from pyastrx.data_typing import Config, FileInfo, Files2Matches, RuleInfo, RulesDict
-from pyastrx.report import data_friendly as data_friendly_report
+from pyastrx.data_typing import (
+    Config, FileInfo, Files2Matches, RuleInfo, RulesDict,
+    DataClassJSONEncoder)
 from pyastrx.report import humanize as humanized_report
 from pyastrx.report.stdout import rich_paging
 from pyastrx.search.main import Repo
@@ -58,11 +59,12 @@ class Manager:
                 if v.use_in_linter})
         return rules
 
-    def filter_rules(self, num_matches_by_rule: Dict[str, int]) -> None:
-        for expression, num_matches in num_matches_by_rule.items():
-            if num_matches == 0:
-                self.selected_rules = []
-                del self.config.rules[expression]
+    def filter_rules(self, num_matches_by_expr: Dict[str, int]) -> None:
+        for expression, num_matches in num_matches_by_expr.items():
+            if num_matches > 0:
+                continue
+            self.selected_rules = []
+            del self.config.rules[expression]
 
     def set_current_file(self, file: str) -> None:
         info = self.repo.cache.get(file)
@@ -110,7 +112,7 @@ class Manager:
         return len(self.repo.get_files()) > 1
 
     def search(self) -> Tuple[
-        int, Dict[int, Tuple[str, str]], Dict[str, int]]:
+            int, Dict[int, Tuple[str, str]], Dict[str, int]]:
         rules = self.get_current_rules()
         is_unique_file = self.is_unique_file()
         config = self.config
@@ -118,6 +120,7 @@ class Manager:
         str_by_file = {}
         parent_folder = Path(".").resolve()
         filter_rules = {k: 0 for k in rules.keys()}
+        file2matches: Files2Matches
         if is_unique_file:
             file = self.repo.get_file()
             line2matches = self.repo.search_file(
@@ -125,19 +128,7 @@ class Manager:
                     before_context=config.before_context,
                     after_context=config.after_context,
                 )
-            if isinstance(rules, dict):
-                for (line, matches_by_line) in line2matches.items():
-                    for expr, match in matches_by_line.match_by_expr.items():
-                        filter_rules[expr] += match.num_matches
-            output_str, num_matches = humanized_report.matches_by_filename(
-                line2matches, file)
-            str_by_file[0] = (
-                    str(Path(file).relative_to(parent_folder)),
-                    output_str
-            )
-            if config.vscode_output:
-                json_data = data_friendly_report.vscode_dict(
-                    Files2Matches({file: line2matches}))
+            file2matches = Files2Matches({file: line2matches})
         else:
             file2matches = self.repo.search_files(
                     rules,
@@ -145,30 +136,40 @@ class Manager:
                     after_context=config.after_context,
                     parallel=config.parallel,
                 )
-            output_str = ""
-            if config.vscode_output:
-                json_data = data_friendly_report.vscode_dict(file2matches)
-            for i, (file, line2matches) in enumerate(
-                    file2matches.items()):
-                if len(line2matches) == 0:
-                    continue
-                for (line, matches_by_line) in line2matches.items():
-                    for expr, match in matches_by_line.match_by_expr.items():
-                        filter_rules[expr] += match.num_matches
-                output_str_file, num_matches_file = \
-                    humanized_report.matches_by_filename(
-                            line2matches, file)
-                if num_matches_file > 0:
-                    str_by_file[i] = (
-                        str(Path(file).relative_to(parent_folder)),
-                        output_str_file
-                    )
-                    num_matches += num_matches_file
-                    output_str += output_str_file
+        output_str = ""
+        for i, (file, line2matches) in enumerate(
+                file2matches.items()):
+            if len(line2matches.matches) == 0:
+                continue
+            for expr in line2matches.num_matches_by_expr.keys():
+                filter_rules[expr] += line2matches.num_matches_by_expr[expr]
+            output_str_file, num_matches_file = \
+                humanized_report.matches_by_filename(
+                        line2matches, file, rules)
+            if num_matches_file > 0:
+                str_by_file[i] = (
+                    str(Path(file).relative_to(parent_folder)),
+                    output_str_file
+                )
+                num_matches += num_matches_file
+                output_str += output_str_file
         # save json_data to
         if config.vscode_output:
+            rule_infos = {
+                k: v.__dict__ for k, v in rules.items()
+                if filter_rules[k] > 0
+            }
+
+            json_data = {
+                "files": {
+                    file: v.matches
+                    for file, v in file2matches.items()
+                    if len(v.num_matches_by_expr) > 0
+                },
+                "rules": rule_infos,
+            }
             with open(Path(".pyastrx/results.json").resolve(), "w") as f:
-                json.dump(json_data, f)
+                json.dump(json_data, f, cls=DataClassJSONEncoder)
 
         num_files = len(str_by_file)
         if not config.interactive:
