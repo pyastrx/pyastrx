@@ -15,15 +15,16 @@
 </h2>
 
 The PyASTrX philosophy is to provide a simple, easy-to-use, and
-extensible framework for code quality analysis, refactoring and codebase analysis.
+extensible framework for code quality analysis, refactoring, and codebase analysis.
 
 
 The main point that I've developed is that sometimes a necessary practice in one project can be a bad practice in another
-project. In other words, we should **walk a **mile in **someone's** shoes** before judging the code quality of someone else code.
-
+project. In other words, we should walk a mile in someone's shoes before judging the code
+quality of someone else's code.
 
 PyASTrX allows you to define new code analysis patterns using just XPATH
-expressions.
+expressions. No need to write an extension to use in
+flake8 or pylint!
 
 ## Install
 
@@ -92,9 +93,10 @@ Soon, I will ship a VS Code extension.
 
 Using the **-i** arg or adding a `interactive:
 true` in your `pyastrx.yaml` you can explore
-the AST and XML parsed AST of your code. This can be useful to
-understand your codebase and helps you to write your custom XPATH
-queries to be used in your project.
+the AST and XML parsed AST of your code.
+This can be useful to understand your code base and help you to write
+you custom XPATH queries to be used in your project.
+
 
 ### Folder and file explorer
 
@@ -159,7 +161,7 @@ Stevens](http://www.chasestevens.com/).
 
 [GAST](https://github.com/serge-sans-paille/gast) is a remarkable
 tool developed by [Serge Sans
-Paille](http://serge.liyun.free.fr/serge/). GAST allows you to use the
+Paille](http://serge.liyun.free.fr/serge/). GAST allows PyASTrX use the
 same XPATH expressions to analyze different code bases written in
 different python versions.
 
@@ -168,7 +170,7 @@ different python versions.
 
 
 A project created by [Jonathan Slenders](https://github.com/jonathanslenders) that
-Provides a powerful and reliable way to construct command-line interfaces.
+provides a powerful and reliable way to construct command-line interfaces.
 
-This project has a lot of features, good documentation and the
+This project has a lot of features, and good documentation and the
 maintainers keep it well updated.

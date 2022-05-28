@@ -23,13 +23,15 @@ Philosophy
 
 
 The PyASTrX philosophy is to provide a simple, easy-to-use, and
-extensible framework for code quality analysis, refactoring and codebase analysis.
+extensible framework for code quality analysis, refactoring, and codebase analysis.
 
 The main point that I've developed is that sometimes a necessary practice in one project can be a bad practice in another
-project. In other words, we should **walk a **mile in **someone's** shoes** before judging the code quality of someone else code.
+project. In other words, we should walk a mile in someone's shoes before judging the code
+quality of someone else's code.
 
 PyASTrX allows you to define new code analysis patterns using just XPATH
-expressions. No need to write a parser, create a python file and ship to use in flake8 or pylint!
+expressions. No need to write an extension to use in
+flake8 or pylint!
 
 
 .. include:: install.rst
@@ -111,7 +113,7 @@ Explore the AST and XML
 
 Using the :code: `-i` arg or adding a :code: `interactive: true` in your
 `pyastrx.yaml` you can explore the AST and XML parsed AST of your code.
-This can be useful to understand your code base and helps you to write
+This can be useful to understand your code base and help you to write
 you custom XPATH queries to be used in your project.
 
 
@@ -193,8 +195,8 @@ developed by `H. Chase Stevens`_.
 GAST
 ====
 
-`GAST`_ it's a remarkable tool developed by `Serge Sans Paille`_.
-GAST allows you to use the same XPATH expressions to analyze different
+`GAST`_ is a remarkable tool developed by `Serge Sans Paille`_.
+GAST allows PyASTrX use the same XPATH expressions to analyze different
 code bases written in different python versions.
 
 
@@ -206,8 +208,8 @@ code bases written in different python versions.
 prompt_toolkit
 ===============
 
-A project created by `Jonathan Slenders`_ that
- provides a powerful and reliable way to construct command-line interfaces.
+A project created by `Jonathan Slenders`_ that provides a powerful and
+reliable way to construct command-line interfaces.
 
 This project has a lot of features, good documentation and the maintainers keep
 it well updated.
