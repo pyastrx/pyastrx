@@ -75,6 +75,8 @@ def search_in_file_info(
     axml: Union[etree._Element, etree._ElementTree]
     if isinstance(file_info.axml, bytes):
         axml = etree.parse(BytesIO(file_info.axml))
+    else:
+        axml = file_info.axml
     evaluator = etree.XPathEvaluator(
         axml,
         namespaces=__lxml_namespaces__, extensions=extensions

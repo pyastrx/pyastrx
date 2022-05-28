@@ -20,7 +20,6 @@ class Manager:
         self.repo = repo
         self._expression = ""
         self._current_rule: RulesDict = RulesDict({})
-        self.current_fileinfo: Union[FileInfo, None] = None
         self.selected_rules: List[str] = []
 
     @property
