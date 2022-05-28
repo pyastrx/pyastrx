@@ -2,10 +2,14 @@
 stuff to deal with data typing.
 
 """
+import sys
 from dataclasses import dataclass, is_dataclass
 import json
-from typing import Dict, List, NewType, Tuple, Union, Any, TypeAlias
-
+from typing import Dict, List, NewType, Tuple, Union, Any
+if sys.version_info[1] < 10:
+    from typing_extensions import TypeAlias
+else:
+    from typing import TypeAlias
 from lxml import etree
 
 
