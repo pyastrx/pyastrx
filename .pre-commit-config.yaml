@@ -2,11 +2,6 @@
 # See https://pre-commit.com/hooks.html for more hooks
 exclude: ".md$"
 repos:
-  - repo: https://github.com/pycqa/isort
-    rev: 5.10.1
-    hooks:
-      - id: isort
-        name: isort (python)
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.7.9
     hooks:

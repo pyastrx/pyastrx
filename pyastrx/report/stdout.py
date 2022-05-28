@@ -2,10 +2,13 @@
     readable report on stdout.
 """
 import pydoc
+from typing import Union
+from io import BytesIO
 
 from lxml import etree
 from rich.console import Console
 
+from pyastrx.data_typing import AXML
 from pyastrx.xml.misc import el_lxml2str
 
 
@@ -20,7 +23,12 @@ def rich_paging(text: str) -> None:
     pydoc.pipepager(str_output, cmd='less -R')
 
 
-def paging_lxml(el_lxml: etree._Element) -> None:
+def paging_lxml(el_lxml: AXML) -> None:
     "Use rich to page the lxml element through less and pydoc."
-    text = el_lxml2str(el_lxml)
+    axml: Union[etree._Element, etree._ElementTree]
+    if isinstance(el_lxml, bytes):
+        axml = etree.parse(BytesIO(el_lxml))
+    else:
+        axml = el_lxml
+    text = el_lxml2str(axml)
     rich_paging(text)

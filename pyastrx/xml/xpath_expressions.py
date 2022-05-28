@@ -1,10 +1,13 @@
 
-from collections import namedtuple
+from typing import NamedTuple
 
-XpathExpressions = namedtuple(
-    "XpathExpression",
-    ["linenos", "cols_offset"]
-)(
+
+class _XpathExpressions(NamedTuple):
+    linenos: str
+    cols_offset: str
+
+
+XpathExpressions = _XpathExpressions(
     # extract the lineno from the xml element
     "./ancestor-or-self::*[@lineno][1]/@lineno",
     # extract the col_offset from the xml element

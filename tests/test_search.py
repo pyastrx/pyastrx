@@ -22,7 +22,7 @@ def test_xpath_example_tags():
             repo.load_file(file, normalize_ast=True)
             lines2matches = repo.search_file(
                 file, RulesDict({xpath: RuleInfo()}))
-            for lineno, _ in lines2matches.items():
+            for lineno, _ in lines2matches.matches.items():
                 if lineno not in linenos:
                     print(f"{file}:{lineno}")
                     print(linenos)

@@ -17,6 +17,7 @@ from prompt_toolkit.completion import FuzzyWordCompleter
 from prompt_toolkit.filters import completion_is_selected, has_completions
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.key_binding.key_processor import KeyPressEvent
 from prompt_toolkit.shortcuts import checkboxlist_dialog
 from prompt_toolkit.styles import Style
 from rich import print as rprint
@@ -34,10 +35,10 @@ from pyastrx.xml.misc import el_lxml2str
 #  prompt dialog auto suggest history
 if not Path(".pyastrx").exists():
     Path(".pyastrx").mkdir()
-_PromptSessionExpr: PromptSession = PromptSession(
-    history=FileHistory('.pyastrx/history_new_expr.txt'))
-_PromptSessionRules: PromptSession = PromptSession(
-    history=FileHistory('.pyastrx/history_rules.txt'))
+_PromptSessionExpr = PromptSession(
+    history=FileHistory('.pyastrx/history_new_expr.txt'))  # type: ignore
+_PromptSessionRules = PromptSession(
+    history=FileHistory('.pyastrx/history_rules.txt'))  # type: ignore
 
 
 char2color = {
@@ -168,7 +169,7 @@ class Context(Manager):
         self._search_interface = state
 
     def set_state(self, state: Type[State], **kwargs) -> None:
-        state.context = self
+        state.context = self  # type: ignore
         self._state = state(**kwargs)
 
 
@@ -340,7 +341,7 @@ class InterfaceRules(StateInterface):
         filter = has_completions & ~completion_is_selected
 
         @key_bindings.add("enter", filter=filter)
-        def _(event) -> None:
+        def _(event: KeyPressEvent) -> None:
             event.current_buffer.go_to_completion(0)
             event.current_buffer.validate_and_handle()
 
@@ -425,7 +426,7 @@ class InterfaceFiles(StateInterface):
         filter = has_completions & ~completion_is_selected
 
         @key_bindings.add("enter", filter=filter)
-        def _(event) -> None:
+        def _(event: KeyPressEvent) -> None:
             event.current_buffer.go_to_completion(0)
             event.current_buffer.validate_and_handle()
         commands = ["q"] + self.context.repo.get_files()

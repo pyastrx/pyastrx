@@ -1,4 +1,4 @@
-name: Python test workflow
+name: CQ Workflow(pre-commit->test->mypy)
 
 on:
   push:
@@ -39,3 +39,6 @@ jobs:
       - name: Test with pytest
         run: |
           pytest -svv tests
+      - name: mypy check
+        run: |
+          mypy pyastrx/

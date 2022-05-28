@@ -1,3 +1,4 @@
+from typing import Callable, Union, Any
 import ast
 import codecs
 from functools import partial
@@ -7,10 +8,12 @@ from pathlib import Path
 from lxml import etree
 
 from pyastrx.ast.things2ast import txt2ast
-from pyastrx.data_typing import FileInfo
+from pyastrx.data_typing import FileInfo, AXML
 
 
-def _set_encoded_literal(set_fn, literal) -> None:
+def set_encoded_literal(
+        set_fn: Callable[[Union[str, bytes]], None],
+        literal: Union[Number, str]) -> None:
     if isinstance(literal, Number):
         literal = str(literal)
     try:
@@ -19,7 +22,8 @@ def _set_encoded_literal(set_fn, literal) -> None:
         set_fn("")  # Null byte - failover to empty string
 
 
-def transformer_ast_node_field(field_value, field_name, xml_node):
+def transformer_ast_node_field(
+        field_value: Any, field_name: str, xml_node: etree._Element) -> None:
     if isinstance(field_value, ast.AST):
         field = etree.SubElement(xml_node, field_name)
         field.append(
@@ -38,18 +42,18 @@ def transformer_ast_node_field(field_value, field_name, xml_node):
                     )
                 )
             else:
-                subfield = etree.SubElement(field, "item")
-                _set_encoded_literal(partial(setattr, subfield, "text"), item)
+                subfield: etree._Element = etree.SubElement(field, "item")
+                set_encoded_literal(partial(setattr, subfield, "text"), item)
 
     elif field_value is not None:
-        _set_encoded_literal(
+        set_encoded_literal(
             partial(xml_node.set, "type"), type(field_value).__name__
         )
-        _set_encoded_literal(
+        set_encoded_literal(
             partial(xml_node.set, field_name), field_value)
 
 
-def encode_location(node: ast.AST, xml_node: etree.Element) -> None:
+def encode_location(node: ast.AST, xml_node: etree._Element) -> None:
     """This encode the code location available in the AST node
     into the XML node.
 
@@ -59,10 +63,10 @@ def encode_location(node: ast.AST, xml_node: etree.Element) -> None:
         value = getattr(node, attr, None)
         if value is None:
             continue
-        _set_encoded_literal(partial(xml_node.set, attr), value)
+        set_encoded_literal(partial(xml_node.set, attr), value)
 
 
-def ast2xml(node: ast.AST) -> etree.Element:
+def ast2xml(node: ast.AST) -> etree._Element:
     """Convert supplied AST node to XML."""
 
     xml_node = etree.Element(node.__class__.__name__)
@@ -70,7 +74,6 @@ def ast2xml(node: ast.AST) -> etree.Element:
 
     node_fields = zip(
         node._fields, (getattr(node, attr) for attr in node._fields))
-
     for field_name, field_value in node_fields:
         transformer_ast_node_field(field_value, field_name, xml_node)
 
@@ -78,7 +81,10 @@ def ast2xml(node: ast.AST) -> etree.Element:
 
 
 def file2axml(
-        filename: str, normalize_ast: bool) -> FileInfo:
+        filename: str,
+        normalize_ast: bool,
+        baxml: bool = False
+) -> FileInfo:
     """Construct the FileInfo obj from a python file.
 
     """
@@ -87,9 +93,13 @@ def file2axml(
     with open(filename, "r") as f:
         txt = f.read()
     parsed_ast = txt2ast(txt, filename, normalize_ast)
+    xml_ast: AXML
     xml_ast = ast2xml(
         parsed_ast,
     )
+    if baxml:
+        xml_ast = etree.tostring(xml_ast, encoding="utf-8")
+
     info = FileInfo(
         filename=filename,
         axml=xml_ast,

@@ -1,40 +1,14 @@
-import copyreg
 from functools import partial
-from io import BytesIO
 from multiprocessing import Pool
 from pathlib import Path
-from typing import Callable, List, Tuple, Union
+from typing import List, Union
 
-from lxml import etree
 
 from pyastrx.ast.ast2xml import file2axml
 from pyastrx.data_typing import (Files2Matches, Lines2Matches, MatchParams,
                                  RulesDict)
 from pyastrx.search.cache import Cache
 from pyastrx.search.xml_search import search_in_file_info
-
-
-def lxml_el_unpickle(el_lxml: bytes) -> etree._ElementTree:
-    """Unpickle an lxml element.
-    """
-    el_lxml = etree.parse(BytesIO(el_lxml))
-    return el_lxml
-
-
-def lxml_el_pickle(el_lxml: etree._Element) -> Tuple[Callable, Tuple[bytes]]:
-    """Pickle an lxml element.
-
-    This is a custom pickle function that allows us to use lxml
-    with multiprocessing.
-
-    """
-    data = etree.tostring(el_lxml)
-    return lxml_el_unpickle, (data,)
-
-
-# This registers the unpickling function for lxml elements.
-copyreg.pickle(etree._Element, lxml_el_pickle, lxml_el_unpickle)
-copyreg.pickle(etree._ElementTree, lxml_el_pickle, lxml_el_unpickle)
 
 
 class Repo:
@@ -75,11 +49,11 @@ class Repo:
         if exclude is None:
             exclude = [".venv", ".tox"]
         if recursive:
-            files = Path(folder).rglob(f"*.{extension}")
+            files_path = Path(folder).rglob(f"*.{extension}")
         else:
-            files = Path(folder).glob(f"*.{extension}")
+            files_path = Path(folder).glob(f"*.{extension}")
         files = [
-            str(f.resolve()) for f in files
+            str(f.resolve()) for f in files_path
             if not any(d in f.parts for d in exclude)
         ]
         self.load_files(files, parallel, normalize_ast)
@@ -104,7 +78,10 @@ class Repo:
             with Pool() as pool:
                 infos = pool.map(
                         partial(
-                            file2axml, normalize_ast=normalize_ast),
+                            file2axml,
+                            normalize_ast=normalize_ast,
+                            baxml=True
+                        ),
                         files2load)
             for info, filename in zip(infos, files2load):
                 if info is None:
