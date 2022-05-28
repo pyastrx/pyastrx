@@ -50,7 +50,7 @@ def txt2ASTtxt(
     ast_obj = txt2ast(txt, filename, normalize_ast)
     if version_info.minor < 9:
         return f"{ast.dump(ast_obj)}"
-    return f"{ast.dump(ast_obj, indent=indent)}"
+    return f"{ast.dump(ast_obj, indent=indent)}"  # type: ignore
 
 
 def file2ast(
