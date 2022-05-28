@@ -1,13 +1,13 @@
 import json
 from pathlib import Path
-from typing import Dict, List, Union, Tuple
+from typing import Dict, List, Tuple
 
 import yaml
 from rich import print as rprint
 
 from pyastrx.config import __available_yaml as available_yaml
 from pyastrx.data_typing import (
-    Config, FileInfo, Files2Matches, RuleInfo, RulesDict,
+    Config, Files2Matches, RuleInfo, RulesDict,
     DataClassJSONEncoder)
 from pyastrx.report import humanize as humanized_report
 from pyastrx.report.stdout import rich_paging
