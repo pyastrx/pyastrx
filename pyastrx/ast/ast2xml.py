@@ -84,7 +84,7 @@ def file2axml(
         filename: str,
         normalize_ast: bool,
         baxml: bool = False
-    ) -> FileInfo:
+) -> FileInfo:
     """Construct the FileInfo obj from a python file.
 
     """

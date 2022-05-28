@@ -10,7 +10,7 @@ if sys.version_info[1] < 10:
     from typing_extensions import TypeAlias
 else:
     from typing import TypeAlias
-from lxml import etree
+from lxml import etree # noqa
 
 
 class DataClassJSONEncoder(json.JSONEncoder):

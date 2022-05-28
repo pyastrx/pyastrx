@@ -21,7 +21,8 @@ def get_xml_el_value(
             if (
                 isinstance(r, float)
                 or isinstance(r, str)
-                or isinstance(r, int)):
+                or isinstance(r, int)
+            ):
                 result.append(int(r))
         return result, True
     else:
