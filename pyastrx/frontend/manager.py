@@ -1,12 +1,12 @@
 import json
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple
 
 import yaml
 from rich import print as rprint
 
 from pyastrx.config import __available_yaml as available_yaml
-from pyastrx.data_typing import Config, FileInfo, RuleInfo, RulesDict
+from pyastrx.data_typing import Config, FileInfo, Files2Matches, RuleInfo, RulesDict
 from pyastrx.report import data_friendly as data_friendly_report
 from pyastrx.report import humanize as humanized_report
 from pyastrx.report.stdout import rich_paging
@@ -109,7 +109,8 @@ class Manager:
     def is_folder(self) -> bool:
         return len(self.repo.get_files()) > 1
 
-    def search(self) -> None:
+    def search(self) -> Tuple[
+        int, Dict[int, Tuple[str, str]], Dict[str, int]]:
         rules = self.get_current_rules()
         is_unique_file = self.is_unique_file()
         config = self.config
@@ -136,7 +137,7 @@ class Manager:
             )
             if config.vscode_output:
                 json_data = data_friendly_report.vscode_dict(
-                    {file: line2matches})
+                    Files2Matches({file: line2matches}))
         else:
             file2matches = self.repo.search_files(
                     rules,

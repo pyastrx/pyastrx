@@ -1,14 +1,14 @@
 import ast
 from pathlib import Path
 from sys import version_info
-from typing import Tuple
+from typing import Tuple, Any
 
 import gast
 
 
 def txt2ast(
         txt: str, filename: str = "<unknown>",
-        normalize_ast: bool = True) -> ast.Module:
+        normalize_ast: bool = True) -> Any:
     """Convert Python file contents (as a string) to an AST.
 
     Args:
@@ -18,7 +18,9 @@ def txt2ast(
             gast allows different python version to have the same AST.
             Which allows us to use the same kind of xpath queries.
     Returns:
-        ast.Module: AST of the supplied contents.
+        parsed_ast: AST of the supplied contents.
+            Any if from gast.
+            Module if from ast.
 
     """
     if normalize_ast:

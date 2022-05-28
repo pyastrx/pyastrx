@@ -131,7 +131,7 @@ def get_config_from_yaml() -> dict:
     return config
 
 
-def invoke_pyastrx(args) -> None:
+def invoke_pyastrx(args: argparse.Namespace) -> None:
     rules: RulesDict
     config = {}
     yaml_config = get_config_from_yaml()
