@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple, SupportsInt, Optional, Union
+from typing import Dict, List, Tuple, Optional, Union
 from io import BytesIO
 from lxml import etree
 
@@ -18,7 +18,10 @@ def get_xml_el_value(
     if isinstance(xml_result, list):
         result: List[int] = []
         for r in xml_result:
-            if isinstance(r, SupportsInt) or isinstance(r, str):
+            if (
+                isinstance(r, float)
+                or isinstance(r, str)
+                or isinstance(r, int)):
                 result.append(int(r))
         return result, True
     else:
