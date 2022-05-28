@@ -8,7 +8,7 @@ from pathlib import Path
 from lxml import etree
 
 from pyastrx.ast.things2ast import txt2ast
-from pyastrx.data_typing import FileInfo
+from pyastrx.data_typing import FileInfo, AXML
 
 
 def set_encoded_literal(
@@ -81,7 +81,10 @@ def ast2xml(node: ast.AST) -> etree._Element:
 
 
 def file2axml(
-        filename: str, normalize_ast: bool) -> FileInfo:
+        filename: str,
+        normalize_ast: bool,
+        baxml: bool = False
+    ) -> FileInfo:
     """Construct the FileInfo obj from a python file.
 
     """
@@ -90,9 +93,13 @@ def file2axml(
     with open(filename, "r") as f:
         txt = f.read()
     parsed_ast = txt2ast(txt, filename, normalize_ast)
+    xml_ast: AXML
     xml_ast = ast2xml(
         parsed_ast,
     )
+    if baxml:
+        xml_ast = etree.tostring(xml_ast, encoding="utf-8")
+
     info = FileInfo(
         filename=filename,
         axml=xml_ast,

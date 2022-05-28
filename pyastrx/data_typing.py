@@ -4,7 +4,7 @@ stuff to deal with data typing.
 """
 from dataclasses import dataclass, is_dataclass
 import json
-from typing import Dict, List, NewType, Tuple, Union, Any
+from typing import Dict, List, NewType, Tuple, Union, Any, TypeAlias
 
 from lxml import etree
 
@@ -16,10 +16,13 @@ class DataClassJSONEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
+AXML: TypeAlias = Union[etree._Element, etree._ElementTree, bytes]
+
+
 @dataclass
 class FileInfo:
     filename: str
-    axml: etree._Element
+    axml: AXML
     txt: str
     last_modified: float
 

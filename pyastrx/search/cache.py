@@ -33,7 +33,9 @@ class Cache:
         """
         return self._cache[filename]
 
-    def set(self, filename: str, file_info: FileInfo) -> None:
+    def set(
+            self, filename: str,
+            file_info: FileInfo) -> None:
         """
         Set a value in the cache.
         """

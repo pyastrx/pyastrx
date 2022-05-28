@@ -1,5 +1,5 @@
-from typing import Dict, List, Tuple
-
+from typing import Dict, List, Tuple, SupportsInt, Optional, Union
+from io import BytesIO
 from lxml import etree
 
 from pyastrx.data_typing import (Expression2Match, FileInfo, Lines2Matches,
@@ -14,92 +14,75 @@ def get_xml_el_value(
         element: etree._Element,
         xpath_name: str) -> Tuple[List[int], bool]:
     xpath_expr = getattr(XpathExpressions, xpath_name)
-    try:
-        result = [int(r) for r in element.xpath(xpath_expr)]
+    xml_result = element.xpath(xpath_expr)
+    if isinstance(xml_result, list):
+        result: List[int] = []
+        for r in xml_result:
+            if isinstance(r, SupportsInt) or isinstance(r, str):
+                result.append(int(r))
         return result, True
-    except AttributeError:
+    else:
         return [0], False
 
 
 def linenos_from_xml(
-        elements: List[etree._Element]) -> Dict[int, List[int]]:
-    """Given a list of elements, return a list of line numbers."""
-    lines: Dict[int, List[int]] = {}
-    for element in elements:
-        linenos, success_line = get_xml_el_value(element, "linenos")
-        cols_offset, _ = get_xml_el_value(element, "cols_offset")
-
-        if success_line:
-            col = cols_offset[0]
-            line_num = linenos[0]
-
-            if line_num not in lines:
-                lines[line_num] = []
-            lines[line_num].append(col)
-
-    return lines
-
-
-def search_in_axml(
-        rules: RulesDict, axml: etree._Element) -> Expression2Match:
-    matching_by_expression = Expression2Match({})
-    for expression, rule_info in rules.items():
-        try:
-            matching_elements = axml.xpath(expression)
-            cols_by_line = linenos_from_xml(
-                matching_elements)
-            matching_by_expression[expression] = Match(
-                cols_by_line,
-                len(cols_by_line)
-            )
-        except etree.XPathEvalError:
-            print(f"XPath error: {expression}")
-
-    return matching_by_expression
+        element: etree._Element) -> Tuple[List[int], List[int], bool]:
+    linenos, success_line = get_xml_el_value(element, "linenos")
+    cols_offset, success_col = get_xml_el_value(element, "cols_offset")
+    success = success_line and success_col
+    return linenos, cols_offset, success
 
 
 def search_evaluator(
-        rules: RulesDict, evaluator: etree.XPathEvaluator) -> Expression2Match:
+        rules: RulesDict,
+        evaluator: etree.XPathElementEvaluator) -> Expression2Match:
     matching_by_expression = Expression2Match({})
     for expression, _ in rules.items():
-        try:
-            matching_elements = evaluator(expression)
-            cols_by_line = linenos_from_xml(
-                matching_elements)
-            matching_by_expression[expression] = Match(
-                cols_by_line,
-                len(cols_by_line)
-            )
-        except etree.XPathEvalError:
-            print(f"XPath error: {expression}")
+
+        matching_elements = evaluator(expression)
+        if not isinstance(matching_elements, list):
+            continue
+        line2cols: Dict[int, List[int]] = {}
+        for element in matching_elements:
+            if not isinstance(element, etree._Element):
+                continue
+            linenos, cols, success = linenos_from_xml(
+                element)
+            if not success or len(linenos) == 0:
+                continue
+            col = cols[0]
+            line_num = linenos[0]
+            if line_num not in line2cols:
+                line2cols[line_num] = []
+            line2cols[line_num].append(col)
+
+        matching_by_expression[expression] = Match(
+            line2cols,
+            len(line2cols)
+        )
 
     return matching_by_expression
 
 
 def search_in_file_info(
         file_info: FileInfo, rules: RulesDict,
-        before_context: int = 0, after_context: int = 0,
-        match_params: MatchParams = None,
-        use_evaluator: bool = True) -> Lines2Matches:
-    if file_info is None:
-        return {}, {}
-    if use_evaluator:
-        if match_params is None:
-            match_params = MatchParams({})
-        extension_module = LXMLExtensions(**match_params.__dict__)
-        extensions = etree.Extension(
-            extension_module, __all_lxml_ext__, ns='local-ns')
-        evaluator = etree.XPathEvaluator(
-            file_info.axml,
-            namespaces=__lxml_namespaces__, extensions=extensions
-        )
-        matching_by_expr = search_evaluator(
-            rules,
-            evaluator)
-    else:
-        matching_by_expr = search_in_axml(
-                rules,
-                axml=file_info.axml)
+        before_context: int, after_context: int,
+        match_params: Optional[MatchParams]) -> Lines2Matches:
+
+    extension_module = LXMLExtensions(**match_params.__dict__)
+    extensions = etree.Extension(
+        extension_module, __all_lxml_ext__, ns='local-ns')
+    axml: Union[etree._Element, etree._ElementTree]
+    if isinstance(file_info.axml, bytes):
+        axml = etree.parse(BytesIO(file_info.axml))
+    evaluator = etree.XPathEvaluator(
+        axml,
+        namespaces=__lxml_namespaces__, extensions=extensions
+    )
+    matching_by_expr = search_evaluator(
+        rules,
+        evaluator)
+
     match_expr_by_line = {}
     expr2num = {}
     for expr, match in matching_by_expr.items():
@@ -108,7 +91,8 @@ def search_in_file_info(
                 code_context = apply_context(
                     file_info.txt.splitlines(), line_num - 1,
                     before_context, after_context)
-                match_expr_by_line[line_num] = MatchesByLine(code_context, {})
+                match_expr_by_line[line_num] = MatchesByLine(
+                    code_context, Expression2Match({}))
             match_expr_by_line[line_num].match_by_expr[expr] = Match(
                 {line_num: cols}, match.num_matches
             )
