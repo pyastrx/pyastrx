@@ -34,10 +34,10 @@ from pyastrx.xml.misc import el_lxml2str
 #  prompt dialog auto suggest history
 if not Path(".pyastrx").exists():
     Path(".pyastrx").mkdir()
-_PromptSessionExpr = PromptSession(
-    history=FileHistory('.pyastrx/history_new_expr.txt'))  # type: ignore
-_PromptSessionRules = PromptSession(
-    history=FileHistory('.pyastrx/history_rules.txt'))  # type: ignore
+_PromptSessionExpr: PromptSession = PromptSession(
+    history=FileHistory('.pyastrx/history_new_expr.txt'))
+_PromptSessionRules: PromptSession = PromptSession(
+    history=FileHistory('.pyastrx/history_rules.txt'))
 
 
 char2color = {
