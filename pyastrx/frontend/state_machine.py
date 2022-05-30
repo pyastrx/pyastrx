@@ -34,9 +34,9 @@ from pyastrx.xml.misc import el_lxml2str
 #  prompt dialog auto suggest history
 if not Path(".pyastrx").exists():
     Path(".pyastrx").mkdir()
-_PromptSessionExpr: PromptSession = PromptSession(
+_PromptSessionExpr: PromptSession[str] = PromptSession(
     history=FileHistory('.pyastrx/history_new_expr.txt'))
-_PromptSessionRules: PromptSession = PromptSession(
+_PromptSessionRules: PromptSession[str] = PromptSession(
     history=FileHistory('.pyastrx/history_rules.txt'))
 
 
