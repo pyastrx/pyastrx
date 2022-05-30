@@ -10,7 +10,6 @@ A image diagram of the state machine can be found in the
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, List, Tuple, Type, Union
-
 from prompt_toolkit import PromptSession, prompt
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import FuzzyWordCompleter
@@ -35,10 +34,10 @@ from pyastrx.xml.misc import el_lxml2str
 #  prompt dialog auto suggest history
 if not Path(".pyastrx").exists():
     Path(".pyastrx").mkdir()
-_PromptSessionExpr = PromptSession(
-    history=FileHistory('.pyastrx/history_new_expr.txt'))  # type: ignore
-_PromptSessionRules = PromptSession(
-    history=FileHistory('.pyastrx/history_rules.txt'))  # type: ignore
+_PromptSessionExpr: PromptSession = PromptSession(
+    history=FileHistory('.pyastrx/history_new_expr.txt'))
+_PromptSessionRules: PromptSession = PromptSession(
+    history=FileHistory('.pyastrx/history_rules.txt'))
 
 
 char2color = {
@@ -98,18 +97,7 @@ class StateInterface(State):
     def __init__(self, title: str = "", help_text: str = "") -> None:
         self.title = title
         self.help_text = help_text
-        self.start()
         self.pheader()
-
-    @abstractmethod
-    def start(self) -> None:
-        """This method is called right after the object is created.
-
-        self.title,  and self.help_text should be
-        set in this method.
-
-        """
-        pass
 
     @staticmethod
     def poptions(items: List[Tuple[str, str]]) -> None:
@@ -168,7 +156,10 @@ class Context(Manager):
     def search_interface(self, state: Type[StateInterface]) -> None:
         self._search_interface = state
 
-    def set_state(self, state: Type[State], **kwargs) -> None:
+    def set_state(
+            self,
+            state: Union[Type[State], Type[StateInterface]],
+            **kwargs: str) -> None:
         state.context = self  # type: ignore
         self._state = state(**kwargs)
 
@@ -182,7 +173,8 @@ class StartState(State):
 class LoadFiles(State):
     def run(self) -> None:
         self.context.load_files()
-        self.context.set_state(InterfaceMain)
+        self.context.set_state(
+            InterfaceMain)
 
 
 class Exit(State):
@@ -205,8 +197,10 @@ class Exit(State):
 
 
 class InterfaceMain(StateInterface):
-    def start(self) -> None:
-        self.title = "Main Menu"
+    def __init__(
+            self, title: str = "Main interface",
+            help_text: str = "") -> None:
+        super().__init__(title=title, help_text=help_text)
 
     def run(self) -> None:
         self.context.resset_custom_expression()
@@ -244,12 +238,14 @@ class InterfaceMain(StateInterface):
 class ReloadYAML(State):
     def run(self) -> None:
         self.context.reload_yaml()
-        self.context.set_state(InterfaceMain)
+        self.context.set_state(
+            InterfaceMain)
 
 
 class InterfaceExport(StateInterface):
-    def start(self) -> None:
+    def __init__(self) -> None:
         self.title = "Export current files"
+        super().__init__(title=self.title)
 
     def run(self) -> None:
         options: PromptOpt = [
@@ -261,11 +257,6 @@ class InterfaceExport(StateInterface):
 
 
 class InterfaceSelectRules(StateInterface):
-    def start(self) -> None:
-        self.title = "Select a rule"
-        self.help_text = "Type anything related to the rule"\
-            + "or [bold red]q[/] to cancel"
-
     def get_options(self) -> Tuple[
             List[Tuple[int, str]],
             Dict[int, str],
@@ -319,10 +310,11 @@ class InterfaceSelectRules(StateInterface):
 
 
 class InterfaceRules(StateInterface):
-    def start(self) -> None:
-        self.title = "Select a rule"
-        self.help_text = "Type anything related to the rule"\
+    def __init__(self) -> None:
+        title = "Select a rule"
+        help_text = "Type anything related to the rule"\
             + "or [bold red]q[/] to cancel"
+        super().__init__(title=title, help_text=help_text)
 
     def get_humanized_rules(self) -> Tuple[List[str], Dict[str, str]]:
         self.context.search_interface = InterfaceRules
@@ -368,11 +360,12 @@ class InterfaceRules(StateInterface):
 
 
 class InterfaceNewRule(StateInterface):
-    def start(self) -> None:
-        self.title = "Search using a New expression"
-        self.help_text = "Type a xpath expression"\
+    def __init__(self) -> None:
+        title = "Search using a New expression"
+        help_text = "Type a xpath expression"\
             + " and press enter to search"\
             + " or type [bold red]q[/] to cancel\n"
+        super().__init__(title=title, help_text=help_text)
 
     def run(self) -> None:
         self.context.search_interface = InterfaceNewRule
@@ -404,8 +397,9 @@ class AvailableRules(State):
 
 
 class InterfaceHelp(StateInterface):
-    def start(self) -> None:
-        self.title = "Help"
+    def __init__(self) -> None:
+        title = "Help"
+        super().__init__(title=title)
 
     def run(self) -> None:
         options: PromptOpt = [
@@ -416,10 +410,11 @@ class InterfaceHelp(StateInterface):
 
 
 class InterfaceFiles(StateInterface):
-    def start(self) -> None:
-        self.title = "Available Files"
-        self.help_text = "Select a file to open"\
+    def __init__(self) -> None:
+        title = "Available Files"
+        help_text = "Select a file to open"\
             + " or [bold red]q[/] to cancel"
+        super().__init__(title=title, help_text=help_text)
 
     def run(self) -> None:
         key_bindings = KeyBindings()
@@ -444,14 +439,18 @@ class InterfaceFiles(StateInterface):
         try:
             self.context.set_current_file(file)
             help_text = f"{file}"
-            self.context.set_state(InterfaceFile, help_text=help_text)
+            self.context.set_state(InterfaceFile, file=help_text)
         except KeyError:
             self.context.set_state(InterfaceMain)
 
 
 class InterfaceFile(StateInterface):
-    def start(self) -> None:
-        self.title = "File Options"
+    def __init__(
+            self, title: str = "File Options", file: str = "") -> None:
+        super().__init__(
+            title=title,
+            help_text=f"[bold red]File[/]: {file}"
+        )
 
     def run(self) -> None:
 

@@ -1,6 +1,6 @@
 import ast
 from pathlib import Path
-from sys import version_info
+import sys
 from typing import Tuple, Any
 
 import gast
@@ -48,9 +48,10 @@ def txt2ASTtxt(
 
     """
     ast_obj = txt2ast(txt, filename, normalize_ast)
-    if version_info.minor < 9:
+    if sys.version_info >= (3, 9):
+        return f"{ast.dump(ast_obj, indent=indent)}"
+    else:
         return f"{ast.dump(ast_obj)}"
-    return f"{ast.dump(ast_obj, indent=indent)}"  # type: ignore
 
 
 def file2ast(
