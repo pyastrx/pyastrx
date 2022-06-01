@@ -1,7 +1,3 @@
-========
-Examples
-========
-
 
 Default arguments
 =================
@@ -150,4 +146,3 @@ Now, you can use the following rule to detect this behavior:
 
 To use allow lists is the same, but you must call the `pyastrx:allow-list`:
 `[pyastrx:allow-list('list_name', @ATTR_TO_BE_CHECKED)]`.
-

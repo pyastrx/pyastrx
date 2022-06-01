@@ -131,7 +131,7 @@ $ pyastrx -i -f path_to_file (or just save that in yaml)
 
 **Choose the ast (t), xml (x) or code exploration (o)*
 
-## On the shoulders of giants
+## Acknowledgments
 
 
 This project is possible only because of the work of several

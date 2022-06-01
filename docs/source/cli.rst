@@ -1,14 +1,10 @@
-==================
-How to use PyASTrX
-==================
-
 
 CLI: Interactive mode
 ---------------------
 
 
 Start the interactive mode in src folder
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: console
 
@@ -56,5 +52,3 @@ More options
 .. code-block:: console
 
     $ pyastrx --help
-
-
