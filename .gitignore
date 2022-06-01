@@ -1,3 +1,8 @@
+.pyre
+_cacache
+.pyre_configuration
+.watchmanconfig
+_update-notifier-last-checked
 dummy_tests
 .tox
 .mypy_cache
