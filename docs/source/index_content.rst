@@ -171,9 +171,9 @@ File exploration (one key-press distance)
 
 **Choose the ast (t), xml (x) or code exploration (o)**
 
-==========================
-On the shoulders of giants
-==========================
+===============
+Acknowledgments
+===============
 
 
 This project is possible only because of the work of several

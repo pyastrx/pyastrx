@@ -79,10 +79,6 @@ class Manager:
             )
             if len(files) == 1:
                 self.set_current_file(self.repo.get_files()[0])
-        elif len(files) > 0:
-            self.repo.load_files(
-                files,
-                parallel=parallel, normalize_ast=self.config.normalize_ast)
         else:
             self.repo.load_folder(
                 self.config.folder,

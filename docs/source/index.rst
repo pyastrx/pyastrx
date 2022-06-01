@@ -2,16 +2,21 @@
 .. include:: index_content.rst
 
 
+
 .. toctree::
+   :caption: First steps:
    :maxdepth: 2
-   :caption: Contents:
 
+   cli
 
 .. toctree::
-    :caption: First steps:
-    :maxdepth: 1
+   :caption: Examples
+   :maxdepth: 2
 
-    cli
-    the_yaml
-    examples
+   examples
 
+.. toctree::
+   :caption: Configure:
+   :maxdepth: 2
+
+   the_yaml

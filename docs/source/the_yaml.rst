@@ -1,6 +1,4 @@
-=======================
-Configure the YAML file
-=======================
+
 
 YAML demonstration file
 -----------------------
