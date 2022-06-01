@@ -5,11 +5,17 @@ stuff to deal with data typing.
 import sys
 from dataclasses import dataclass, is_dataclass
 import json
-from typing import Dict, List, NewType, Tuple, Union, Any
+from typing import Dict, List, NewType, Tuple, TypedDict, Union, Any
 if sys.version_info[1] < 10:
     from typing_extensions import TypeAlias
 else:
     from typing import TypeAlias
+
+if sys.version_info[1] < 8:
+    from typing_extensions import Literal
+else:
+    from typing import Literal
+
 from lxml import etree # noqa
 
 
@@ -77,6 +83,12 @@ class MatchParams:
 
 
 @dataclass
+class InferenceConfig:
+    what: Literal["pyre", "mypy"] = "pyre"
+    run: bool = False
+
+
+@dataclass
 class Config:
     rules: RulesDict
     files: List[str]
@@ -93,3 +105,28 @@ class Config:
     vscode_output: bool = False
     quiet: bool = False
     folder: str = "."
+
+
+class PyreLoc(TypedDict):
+    line: int
+    column: int
+
+
+class PyreTokenLoc(TypedDict):
+    start: PyreLoc
+    stop: PyreLoc
+
+
+class PyreType(TypedDict):
+    location: PyreTokenLoc
+    annotation: str
+
+
+class PyreFile(TypedDict):
+    path: str
+    types: List[PyreType]
+
+
+class ASTrXType(TypedDict):
+    location: PyreTokenLoc
+    annotation: str

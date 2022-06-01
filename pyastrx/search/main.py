@@ -1,30 +1,43 @@
 from functools import partial
 from multiprocessing import Pool
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Optional
 
 
+from pyastrx.inference.pyre import infer_types as infer_types_pyre
+from pyastrx.inference.normalization import pyre2astrx
 from pyastrx.ast.ast2xml import file2axml
 from pyastrx.data_typing import (Files2Matches, Lines2Matches, MatchParams,
-                                 RulesDict)
+                                 RulesDict, ASTrXType, InferenceConfig)
 from pyastrx.search.cache import Cache
 from pyastrx.search.xml_search import search_in_file_info
 
 
 class Repo:
-    def __init__(self, match_params: MatchParams) -> None:
+    def __init__(
+            self, match_params: MatchParams,
+            inference: Optional[InferenceConfig] = None,
+    ) -> None:
         self.cache = Cache()
         self._files: List[str] = []
         if match_params is None:
             match_params = {}
         self.match_params = match_params
+        self.inference = inference
 
     def load_file(
-            self, filename: str, normalize_ast: bool) -> None:
+            self, filename: str, normalize_ast: bool,
+            infered_types: Optional[List[ASTrXType]] = None) -> None:
+        """
+        Args:
+
+        """
         should_update, _ = self.cache.update(filename)
         self._files = [filename]
         if should_update:
-            info = file2axml(filename, normalize_ast)
+            info = file2axml(
+                filename=filename, normalize_ast=normalize_ast,
+                infered_types=infered_types)
             self.cache.set(filename, info)
 
     def search_file(
@@ -56,7 +69,8 @@ class Repo:
             str(f.resolve()) for f in files_path
             if not any(d in f.parts for d in exclude)
         ]
-        self.load_files(files, parallel, normalize_ast)
+        self.load_files(
+            files, parallel, normalize_ast)
 
     def load_files(
         self,
@@ -74,23 +88,43 @@ class Repo:
         if len(files2load) == 0:
             return
 
+        use_infered_types = False
+        inference_result: List[List[ASTrXType]]
+        if self.inference and self.inference.run:
+            pyre_inference, use_infered_types = infer_types_pyre(files2load)
+            if use_infered_types:
+                inference_result = [
+                    pyre2astrx(infered_types["types"])
+                    for infered_types in pyre_inference
+                ]
+        files_and_types = [
+            (filename, inference_result[i])
+            if use_infered_types else (filename, None)
+            for i, filename in enumerate(files2load)
+        ]
+
         if parallel:
             with Pool() as pool:
-                infos = pool.map(
-                        partial(
-                            file2axml,
-                            normalize_ast=normalize_ast,
-                            baxml=True
-                        ),
-                        files2load)
+                infos = pool.starmap(
+                    partial(
+                        file2axml,
+                        normalize_ast=normalize_ast,
+                        baxml=True
+                    ),
+                    files_and_types
+                )
             for info, filename in zip(infos, files2load):
                 if info is None:
                     raise Exception(f"Failed to convert {filename}")
                 self.cache.set(filename, info)
-        else:
-            for filename in files2load:
-                self.load_file(filename, normalize_ast=normalize_ast)
 
+            self._files = files
+            return
+
+        for filename, infered_types in files_and_types:
+            self.load_file(
+                filename, normalize_ast=normalize_ast,
+                infered_types=infered_types)
         self._files = files
 
     def get_files(self) -> List[str]:

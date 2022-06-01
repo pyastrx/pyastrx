@@ -5,7 +5,7 @@ exclude:
 - .tox
 - .pyastrx
 folder: .
-interactive_files: true
+interactive_files: false
 normalize_ast: true
 pagination: true
 parallel: true
@@ -43,3 +43,6 @@ match_params:
     class_names:
     - allowed_var_name1
     - allowed_var_name2
+inference:
+  what: 'pyre'
+  run: false
