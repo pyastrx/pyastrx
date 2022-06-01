@@ -45,4 +45,4 @@ match_params:
     - allowed_var_name2
 inference:
   what: 'pyre'
-  run: false
+  run: true
