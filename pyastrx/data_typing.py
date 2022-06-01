@@ -5,16 +5,17 @@ stuff to deal with data typing.
 import sys
 from dataclasses import dataclass, is_dataclass
 import json
-from typing import Dict, List, NewType, Tuple, TypedDict, Union, Any
+from typing import Dict, List, NewType, Tuple, Union, Any
 if sys.version_info[1] < 10:
     from typing_extensions import TypeAlias
 else:
     from typing import TypeAlias
 
-if sys.version_info[1] < 8:
-    from typing_extensions import Literal
+if sys.version_info[1] <= 7:
+    from typing_extensions import Literal, TypedDict
 else:
-    from typing import Literal
+    from typing import Literal, TypedDict
+
 
 from lxml import etree # noqa
 
