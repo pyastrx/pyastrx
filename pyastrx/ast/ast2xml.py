@@ -28,41 +28,38 @@ def encode_type(
     xml_node: etree._Element,
     field_name: str,
     field_value: Any,
-    infered_types: Optional[List[ASTrXType]] = None,
-    el_loc: Optional[List[int]] = None,
+    infered_types: List[ASTrXType],
+    el_loc: List[int]
 ) -> None:
-    if field_name not in ("name", "id", "arg", "alias"):
-        return
-    if infered_types is None or el_loc is None:
+    num_types = len(infered_types)
+    i = 0
+    encoded = False
+
+    while True and i < num_types:
+        pyre_type = infered_types[i]
+        annotation = pyre_type["annotation"]
+        loc = pyre_type["location"]
+        pyre_loc = [
+            loc["start"]["line"],
+            loc["start"]["column"],
+            loc["stop"]["line"],
+            loc["stop"]["column"]
+        ]
+        if all(a == b for a, b in zip(pyre_loc, el_loc)):
+            set_encoded_literal(
+                partial(xml_node.set, "type"), annotation
+            )
+            encoded = True
+            break
+        i += 1
+    if not encoded:
+        # no reason to try to encode type using this method
+        # if is not a Constant node
+        if xml_node.tag != "Constant":
+            return
         set_encoded_literal(
             partial(xml_node.set, "type"), type(field_value).__name__
         )
-    else:
-        num_types = len(infered_types)
-        i = 0
-        encoded = False
-
-        while True and i < num_types:
-            pyre_type = infered_types[i]
-            annotation = pyre_type["annotation"]
-            loc = pyre_type["location"]
-            pyre_loc = [
-                loc["start"]["line"],
-                loc["start"]["column"],
-                loc["stop"]["line"],
-                loc["stop"]["column"]
-            ]
-            if all(a == b for a, b in zip(pyre_loc, el_loc)):
-                set_encoded_literal(
-                    partial(xml_node.set, "type"), annotation
-                )
-                encoded = True
-                break
-            i += 1
-        if not encoded:
-            set_encoded_literal(
-                partial(xml_node.set, "type"), type(field_value).__name__
-            )
 
 
 def transformer_ast_node_field(
@@ -100,13 +97,23 @@ def transformer_ast_node_field(
                 subfield: etree._Element = etree.SubElement(field, "item")
                 set_encoded_literal(partial(setattr, subfield, "text"), item)
     elif field_value is not None:
-        encode_type(
-            xml_node,
-            field_value=field_value,
-            field_name=field_name,
-            infered_types=infered_types,
-            el_loc=el_loc,
-        )
+
+        if infered_types is None or el_loc is None:
+            # this encondes int, str, float that in python 3 grammar
+            # are Const nodes with the type information
+            if xml_node.tag != "Constant":
+                return
+            set_encoded_literal(
+                partial(xml_node.set, "type"), type(field_value).__name__
+            )
+        else:
+            encode_type(
+                xml_node,
+                field_value=field_value,
+                field_name=field_name,
+                infered_types=infered_types,
+                el_loc=el_loc,
+            )
         set_encoded_literal(
             partial(xml_node.set, field_name), field_value)
 
