@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Callable, Union, Any, Optional, List
 import ast
 import codecs
@@ -27,45 +28,38 @@ def encode_type(
     xml_node: etree._Element,
     field_name: str,
     field_value: Any,
-    infered_types: Optional[List[ASTrXType]] = None,
-    el_loc: Optional[List[int]] = None,
+    infered_types: List[ASTrXType],
+    el_loc: List[int]
 ) -> None:
-    if field_name not in ("name", "id", "arg", "alias"):
-        return
-    if infered_types is None or el_loc is None:
+    num_types = len(infered_types)
+    i = 0
+    encoded = False
+
+    while True and i < num_types:
+        pyre_type = infered_types[i]
+        annotation = pyre_type["annotation"]
+        loc = pyre_type["location"]
+        pyre_loc = [
+            loc["start"]["line"],
+            loc["start"]["column"],
+            loc["stop"]["line"],
+            loc["stop"]["column"]
+        ]
+        if all(a == b for a, b in zip(pyre_loc, el_loc)):
+            set_encoded_literal(
+                partial(xml_node.set, "type"), annotation
+            )
+            encoded = True
+            break
+        i += 1
+    if not encoded:
+        # no reason to try to encode type using this method
+        # if is not a Constant node
+        if xml_node.tag != "Constant":
+            return
         set_encoded_literal(
             partial(xml_node.set, "type"), type(field_value).__name__
         )
-    else:
-        num_types = len(infered_types)
-        i = 0
-        encoded = False
-
-        while True and i < num_types:
-            pyre_type = infered_types[i]
-            annotation = pyre_type["annotation"].replace(
-                "[", "("
-            ).replace(
-                "]", ")"
-            )
-            loc = pyre_type["location"]
-            pyre_loc = [
-                loc["start"]["line"],
-                loc["start"]["column"],
-                loc["stop"]["line"],
-                loc["stop"]["column"]
-            ]
-            if all(a == b for a, b in zip(pyre_loc, el_loc)):
-                set_encoded_literal(
-                    partial(xml_node.set, "type"), annotation
-                )
-                encoded = True
-                break
-            i += 1
-        if not encoded:
-            set_encoded_literal(
-                partial(xml_node.set, "type"), type(field_value).__name__
-            )
 
 
 def transformer_ast_node_field(
@@ -103,6 +97,18 @@ def transformer_ast_node_field(
                 subfield: etree._Element = etree.SubElement(field, "item")
                 set_encoded_literal(partial(setattr, subfield, "text"), item)
     elif field_value is not None:
+        set_encoded_literal(
+            partial(xml_node.set, field_name), field_value)
+
+        if infered_types is None or el_loc is None:
+            # this encondes int, str, float that in python 3 grammar
+            # are Const nodes with the type information
+            if xml_node.tag != "Constant":
+                return
+            set_encoded_literal(
+                partial(xml_node.set, "type"), type(field_value).__name__
+            )
+            return
         encode_type(
             xml_node,
             field_value=field_value,
@@ -110,8 +116,6 @@ def transformer_ast_node_field(
             infered_types=infered_types,
             el_loc=el_loc,
         )
-        set_encoded_literal(
-            partial(xml_node.set, field_name), field_value)
 
 
 def encode_location(
@@ -121,26 +125,27 @@ def encode_location(
     into the XML node.
 
     """
-    # this normalizes to be the same locations as pyre
-    node_name = node.__class__.__name__
-    if node_name in ("FunctionDef", "ClassDef", "arg"):
+
+    # the below code is used because the location obtained from the
+    # pyre is based on the tokens position for some types of nodes like
+    # ClassDef, FunctionDef, etc.
+    if node.__class__.__name__ in (
+            "FunctionDef", "ClassDef", "arg") and txt_lines:
         value = getattr(node, "name", None)
         if value is None:
             value = getattr(node, "arg", None)
         lineno = node.lineno
-        # print(lineno, node.end_lineno, value)
-        if txt_lines:
-            txt_line = txt_lines[lineno-1]
-            rc = re.compile(f"{value}(?!([0-9]|\_|^a-zA-Z))") # noqa
-            r_result = rc.search(txt_line)
-            if r_result is None:
-                return
+        txt_line = txt_lines[lineno-1]
+        rc = re.compile(f"{value}(?!([0-9]|\\_|^a-zA-Z))") # noqa
+        r_result = rc.search(txt_line)
+        if r_result is None:
+            return
 
-            end_col_offset = r_result.end()
-            col_offset = r_result.start()
-            setattr(node, "end_lineno", lineno)
-            setattr(node, "end_col_offset", end_col_offset)
-            setattr(node, "col_offset", col_offset)
+        end_col_offset = r_result.end()
+        col_offset = r_result.start()
+        setattr(node, "end_lineno", lineno)
+        setattr(node, "end_col_offset", end_col_offset)
+        setattr(node, "col_offset", col_offset)
 
     for attr in ("lineno", "col_offset", "end_lineno", "end_col_offset"):
         value = getattr(node, attr, None)

@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.3.0] - 2022-06-02
+
+### Added
+
+- Pyre-query support (now is possible to create rules with type inference information)
+- Export ast works with python 3.7
+- Annotations
+
+### Fixed
+
+- The source code now is fully verified with mypy
+- pep8
+- removed redundant information (reduces mem consumption)
+
+### Changed
+
+- performance improvements (mem and cpu consumption)
+- remove copyreg for multiprocessing.
+
+
 ## [0.2.0] - 2022-05-26
 ### Added
 
@@ -29,6 +49,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 
-[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.2.0...master
+[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.3.0...master
+[0.3.0]: https://github.com/pyastrx/pyastrx/compare/0.3.0...0.2.0
 [0.2.0]: https://github.com/pyastrx/pyastrx/compare/0.2.0...0.1.2
 [0.1.2]: https://github.com/pyastrx/pyastrx/compare/0.1.2...0.1.2
