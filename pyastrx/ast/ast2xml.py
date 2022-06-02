@@ -118,26 +118,27 @@ def encode_location(
     into the XML node.
 
     """
-    # this normalizes to be the same locations as pyre
-    node_name = node.__class__.__name__
-    if node_name in ("FunctionDef", "ClassDef", "arg"):
+
+    # the below code is used because the location obtained from the
+    # pyre is based on the tokens position for some types of nodes like
+    # ClassDef, FunctionDef, etc.
+    if node.__class__.__name__ in (
+            "FunctionDef", "ClassDef", "arg") and txt_lines:
         value = getattr(node, "name", None)
         if value is None:
             value = getattr(node, "arg", None)
         lineno = node.lineno
-        # print(lineno, node.end_lineno, value)
-        if txt_lines:
-            txt_line = txt_lines[lineno-1]
-            rc = re.compile(f"{value}(?!([0-9]|\\_|^a-zA-Z))") # noqa
-            r_result = rc.search(txt_line)
-            if r_result is None:
-                return
+        txt_line = txt_lines[lineno-1]
+        rc = re.compile(f"{value}(?!([0-9]|\\_|^a-zA-Z))") # noqa
+        r_result = rc.search(txt_line)
+        if r_result is None:
+            return
 
-            end_col_offset = r_result.end()
-            col_offset = r_result.start()
-            setattr(node, "end_lineno", lineno)
-            setattr(node, "end_col_offset", end_col_offset)
-            setattr(node, "col_offset", col_offset)
+        end_col_offset = r_result.end()
+        col_offset = r_result.start()
+        setattr(node, "end_lineno", lineno)
+        setattr(node, "end_col_offset", end_col_offset)
+        setattr(node, "col_offset", col_offset)
 
     for attr in ("lineno", "col_offset", "end_lineno", "end_col_offset"):
         value = getattr(node, attr, None)
