@@ -97,6 +97,8 @@ def transformer_ast_node_field(
                 subfield: etree._Element = etree.SubElement(field, "item")
                 set_encoded_literal(partial(setattr, subfield, "text"), item)
     elif field_value is not None:
+        set_encoded_literal(
+            partial(xml_node.set, field_name), field_value)
 
         if infered_types is None or el_loc is None:
             # this encondes int, str, float that in python 3 grammar
@@ -106,16 +108,14 @@ def transformer_ast_node_field(
             set_encoded_literal(
                 partial(xml_node.set, "type"), type(field_value).__name__
             )
-        else:
-            encode_type(
-                xml_node,
-                field_value=field_value,
-                field_name=field_name,
-                infered_types=infered_types,
-                el_loc=el_loc,
-            )
-        set_encoded_literal(
-            partial(xml_node.set, field_name), field_value)
+            return
+        encode_type(
+            xml_node,
+            field_value=field_value,
+            field_name=field_name,
+            infered_types=infered_types,
+            el_loc=el_loc,
+        )
 
 
 def encode_location(
