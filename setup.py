@@ -7,7 +7,7 @@ with open("README.rst", "r") as f:
 
 setup(
     name='pyastrx',
-    version='0.2.0',
+    version='0.3.0',
     long_description=README_TEXT,
     long_description_content_type="text/x-rst",
     description="'Simple projects are all alike; each complex"\
@@ -34,7 +34,7 @@ setup(
     },
     keywords=[
         "ast", "xpath", "yaml", "linter", "parser",
-        "refactoring tool", "vscode"],
+        "refactoring tool", "vscode", "pyre", "pyre-linter"],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python',
