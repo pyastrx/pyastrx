@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Callable, Union, Any, Optional, List
 import ast
 import codecs
@@ -43,11 +44,7 @@ def encode_type(
 
         while True and i < num_types:
             pyre_type = infered_types[i]
-            annotation = pyre_type["annotation"].replace(
-                "[", "("
-            ).replace(
-                "]", ")"
-            )
+            annotation = pyre_type["annotation"]
             loc = pyre_type["location"]
             pyre_loc = [
                 loc["start"]["line"],
@@ -131,7 +128,7 @@ def encode_location(
         # print(lineno, node.end_lineno, value)
         if txt_lines:
             txt_line = txt_lines[lineno-1]
-            rc = re.compile(f"{value}(?!([0-9]|\_|^a-zA-Z))") # noqa
+            rc = re.compile(f"{value}(?!([0-9]|\\_|^a-zA-Z))") # noqa
             r_result = rc.search(txt_line)
             if r_result is None:
                 return
