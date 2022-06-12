@@ -3,7 +3,7 @@ for different type inference engines.
 
 """
 from typing import List, cast
-from pyastrx.data_typing import PyreType, ASTrXType
+from pyastrx.data_typing import PyreType, ASTrXType, MypyType
 
 
 def pyre2astrx(pyre_types: List[PyreType]) -> List[ASTrXType]:
@@ -20,4 +20,12 @@ def pyre2astrx(pyre_types: List[PyreType]) -> List[ASTrXType]:
 
     """
     astrx_types = [cast(ASTrXType, pyre_type) for pyre_type in pyre_types]
+    return astrx_types
+
+
+def mypy2astrx(mypy_types: List[MypyType]) -> List[ASTrXType]:
+    """Convert mypy query to astrx types.
+
+    """
+    astrx_types = [cast(ASTrXType, mypy_type) for mypy_type in mypy_types]
     return astrx_types

@@ -5,7 +5,7 @@ stuff to deal with data typing.
 import sys
 from dataclasses import dataclass, is_dataclass
 import json
-from typing import Dict, List, NewType, Tuple, Union, Any
+from typing import Dict, List, NewType, Tuple, Union, Any, Optional
 if sys.version_info[1] < 10:
     from typing_extensions import TypeAlias
 else:
@@ -113,14 +113,23 @@ class PyreLoc(TypedDict):
     column: int
 
 
-class PyreTokenLoc(TypedDict):
+class TokenLoc(TypedDict):
     start: PyreLoc
     stop: PyreLoc
 
 
 class PyreType(TypedDict):
-    location: PyreTokenLoc
+    location: TokenLoc
     annotation: str
+
+
+class MypyType(TypedDict):
+    location: TokenLoc
+    annotation: str
+    name: str
+    node_name: str
+    fullname: Optional[str]
+    attrs: List[str]
 
 
 class PyreFile(TypedDict):
@@ -128,6 +137,15 @@ class PyreFile(TypedDict):
     types: List[PyreType]
 
 
+class MypyInferFileResult(TypedDict):
+    path: str
+    types: List[MypyType]
+
+
 class ASTrXType(TypedDict):
-    location: PyreTokenLoc
+    location: TokenLoc
     annotation: str
+    name: Optional[str]
+    node_name: Optional[str]
+    fullname: Optional[str]
+    attrs: Optional[List[str]]
