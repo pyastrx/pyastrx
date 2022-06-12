@@ -3,12 +3,12 @@ from typing_extensions import TYPE_CHECKING
 
 import mypy.nodes
 
-if TYPE_CHECKING:
-    import mypy.patterns
-
 from mypy.traverser import TraverserVisitor
 
 from pyastrx.data_typing import MypyType, TokenLoc
+
+if TYPE_CHECKING: # noqa:
+    import mypy.patterns # noqa:
 
 
 class TypeExtractor(TraverserVisitor):
