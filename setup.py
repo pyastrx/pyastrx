@@ -29,7 +29,7 @@ setup(
     entry_points={
         'console_scripts': [
             'pyastrx = pyastrx.frontend.cli:pyastrx',
-
+            'mypyq = pyastrx.frontend.mypyq:mypy_query',
         ]
     },
     keywords=[

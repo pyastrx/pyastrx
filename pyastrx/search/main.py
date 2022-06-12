@@ -5,7 +5,8 @@ from typing import List, Union, Optional
 
 
 from pyastrx.inference.pyre import infer_types as infer_types_pyre
-from pyastrx.inference.normalization import pyre2astrx
+from pyastrx.inference.mypy import infer_types as infer_types_mypy
+from pyastrx.inference.normalization import pyre2astrx, mypy2astrx
 from pyastrx.ast.ast2xml import file2axml
 from pyastrx.data_typing import (Files2Matches, Lines2Matches, MatchParams,
                                  RulesDict, ASTrXType, InferenceConfig)
@@ -91,12 +92,22 @@ class Repo:
         use_infered_types = False
         inference_result: List[List[ASTrXType]]
         if self.inference and self.inference.run:
-            pyre_inference, use_infered_types = infer_types_pyre(files2load)
-            if use_infered_types:
-                inference_result = [
-                    pyre2astrx(infered_types["types"])
-                    for infered_types in pyre_inference
-                ]
+            if self.inference.what == "pyre":
+                inference_result_pyre, use_infered_types = infer_types_pyre(
+                    files2load)
+                if use_infered_types:
+                    inference_result = [
+                        pyre2astrx(infered_types["types"])
+                        for infered_types in inference_result_pyre
+                    ]
+            elif self.inference.what == "mypy":
+                inference_result_mypy, use_infered_types = infer_types_mypy(
+                    files2load)
+                if use_infered_types:
+                    inference_result = [
+                        mypy2astrx(infered_types["types"])
+                        for infered_types in inference_result_mypy
+                    ]
         files_and_types = [
             (filename, inference_result[i])
             if use_infered_types else (filename, None)
