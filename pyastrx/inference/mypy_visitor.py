@@ -236,7 +236,9 @@ class TypeExtractor(TraverserVisitor):
         line = o.line
         column = o.column
         end_line = o.end_line if o.end_line is not None else line
-        end_column = o.end_column if o.end_column is not None else column
+        end_column = getattr(o, "end_column", None)
+        if end_column is None:
+            end_column = column
         position: TokenLoc = {
             "start": {"line": line, "column": column},
             "stop": {
