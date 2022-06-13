@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing import Callable, Union, Any, Optional, List
 import ast
 import codecs
@@ -35,20 +34,30 @@ def encode_type(
     i = 0
     encoded = False
 
-    while True and i < num_types:
-        pyre_type = infered_types[i]
-        annotation = pyre_type["annotation"]
-        loc = pyre_type["location"]
-        pyre_loc = [
+    while i < num_types:
+        infered_type = infered_types[i]
+        annotation = infered_type["annotation"]
+        loc = infered_type["location"]
+        location = [
             loc["start"]["line"],
             loc["start"]["column"],
             loc["stop"]["line"],
             loc["stop"]["column"]
         ]
-        if all(a == b for a, b in zip(pyre_loc, el_loc)):
+        if all(a == b for a, b in zip(location, el_loc)):
             set_encoded_literal(
                 partial(xml_node.set, "type"), annotation
             )
+            for attr_name in ("name", "node_name", "fullname"):
+                value = getattr(field_value, attr_name, None)
+                if value is None:
+                    continue
+                xml_node.set(attr_name, value)
+            attrs = infered_type["attrs"]
+            if attrs is None:
+                continue
+            for attr in attrs:
+                xml_node.set(attr, "1")
             encoded = True
             break
         i += 1
@@ -169,8 +178,6 @@ def ast2xml(
         node._fields, (getattr(node, attr) for attr in node._fields))
     encode_location(
         node, xml_node, txt_lines)
-    if infered_types is None:
-        pass
 
     try:
         el_loc = [
