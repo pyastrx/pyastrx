@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.4.0] - 2022-06-13
+
+### Added
+
+- Mypy query command
+
+```
+$ mypyq filename.py
+```
+
+- Mypy type xml annotations
+- Cache system
+
+### Fixed
+
+- Performance issues due the absence of caching
+
 ## [0.3.0] - 2022-06-02
 
 ### Added
@@ -49,7 +66,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 
-[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.3.0...master
+[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.4.0...master
+[0.4.0]: https://github.com/pyastrx/pyastrx/compare/0.3.0...0.2.0
 [0.3.0]: https://github.com/pyastrx/pyastrx/compare/0.3.0...0.2.0
 [0.2.0]: https://github.com/pyastrx/pyastrx/compare/0.2.0...0.1.2
 [0.1.2]: https://github.com/pyastrx/pyastrx/compare/0.1.2...0.1.2
