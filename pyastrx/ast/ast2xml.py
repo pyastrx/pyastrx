@@ -53,7 +53,10 @@ def encode_type(
                 if value is None:
                     continue
                 xml_node.set(attr_name, value)
-            for attr in infered_type["attrs"]:
+            attrs = infered_type["attrs"]
+            if attrs is None:
+                continue
+            for attr in attrs:
                 xml_node.set(attr, "1")
             encoded = True
             break
