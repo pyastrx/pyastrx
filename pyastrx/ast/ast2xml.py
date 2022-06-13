@@ -204,11 +204,10 @@ def file2axml(
     """Construct the FileInfo obj from a python file.
 
     """
-    file_path = Path(filename)
-    last_modified = file_path.stat().st_mtime
-    with open(filename, "r") as f:
+    file_path = str(Path(filename).resolve())
+    with open(file_path, "r") as f:
         txt = f.read()
-    parsed_ast = txt2ast(txt, filename, normalize_ast)
+    parsed_ast = txt2ast(txt, file_path, normalize_ast)
     xml_ast: AXML
     txt_lines = None
     if infered_types:
@@ -222,10 +221,9 @@ def file2axml(
         xml_ast = etree.tostring(xml_ast, encoding="utf-8")
 
     info = FileInfo(
-        filename=filename,
+        filename=file_path,
         axml=xml_ast,
         txt=txt,
-        last_modified=last_modified,
     )
 
     return info
