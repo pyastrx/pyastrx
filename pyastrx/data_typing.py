@@ -35,7 +35,6 @@ class FileInfo:
     filename: str
     axml: AXML
     txt: str
-    last_modified: float
 
 
 @dataclass

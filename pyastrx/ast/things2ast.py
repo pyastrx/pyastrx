@@ -1,7 +1,6 @@
 import ast
-from pathlib import Path
 import sys
-from typing import Tuple, Any
+from typing import Any
 
 import gast
 
@@ -55,7 +54,7 @@ def txt2ASTtxt(
 
 
 def file2ast(
-        filename: str, normalize_ast: bool) -> Tuple[ast.AST, float]:
+        filename: str, normalize_ast: bool) -> ast.AST:
     """Construct the ast from a python file.
 
     Args:
@@ -64,13 +63,10 @@ def file2ast(
             gast allows different python version to have the same AST.
             Which allows us to use the same kind of xpath queries.
     Returns:
-        (ast.AST, float): AST of the supplied contents.
+        ast.AST
 
     """
-    file_path = Path(filename)
-    # get last modified time
-    last_modified = file_path.stat().st_mtime
     with open(filename, "r") as f:
         txt = f.read()
     parsed_ast = txt2ast(txt, filename, normalize_ast=normalize_ast)
-    return parsed_ast, last_modified
+    return parsed_ast

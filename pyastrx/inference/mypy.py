@@ -27,6 +27,10 @@ def infer_types(
     for file in files:
         mod = file.replace(base_folder, "").replace("/", ".")
         mod = mod.replace(".py", "")
+        mypy_query.append({
+            "path": file,
+            "types": []
+        })
         types_info = []
         if mod not in result.graph:
             continue
@@ -36,8 +40,6 @@ def infer_types(
         visitor = TypeExtractor(tree)
         visitor.visit_mypy_file(tree)
         types_info = visitor.types_info
-        mypy_query.append({
-            "path": file,
-            "types": types_info
-        })
+        mypy_query[-1]["types"] = types_info
+
     return mypy_query, True

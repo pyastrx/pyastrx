@@ -18,8 +18,9 @@ class Repo:
     def __init__(
             self, match_params: MatchParams,
             inference: Optional[InferenceConfig] = None,
+            file_cache: bool = True,
     ) -> None:
-        self.cache = Cache()
+        self.cache = Cache(file_cache)
         self._files: List[str] = []
         if match_params is None:
             match_params = {}
@@ -33,12 +34,12 @@ class Repo:
         Args:
 
         """
-        should_update, _ = self.cache.update(filename)
+        should_update = self.cache.update(filename)
         self._files = [filename]
         if should_update:
             info = file2axml(
                 filename=filename, normalize_ast=normalize_ast,
-                infered_types=infered_types)
+                infered_types=infered_types, baxml=True)
             self.cache.set(filename, info)
 
     def search_file(
@@ -84,9 +85,10 @@ class Repo:
             str(Path(file).resolve()) for file in files]
         files2load = [
             filename for filename in files
-            if self.cache.update(filename)[0] is True
+            if self.cache.update(filename)
         ]
         if len(files2load) == 0:
+            self._files = files
             return
 
         use_infered_types = False

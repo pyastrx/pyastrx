@@ -173,14 +173,15 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
         config["folder"] = args.folder
     if args.vscode_output:
         config["vscode_output"] = True
-
     config_pyastrx = Config(**config)
 
     match_params = MatchParams(
         **yaml_config.get("match_params", {})
     )
     inference = InferenceConfig(**yaml_config.get("inference", {}))
-    repo = Repo(match_params, inference)
+
+    file_cache: bool = yaml_config.get("file_cache", True)
+    repo = Repo(match_params, inference, file_cache=file_cache)
     if not config_pyastrx.interactive:
         manager = Manager(config_pyastrx, repo)
         manager.load_files()
