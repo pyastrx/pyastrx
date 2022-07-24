@@ -42,8 +42,10 @@ def search_evaluator(
         evaluator: etree.XPathElementEvaluator) -> Expression2Match:
     matching_by_expression = Expression2Match({})
     for expression, _ in rules.items():
-
-        matching_elements = evaluator(expression)
+        try:
+            matching_elements = evaluator(expression)
+        except etree.XPathEvalError:
+            continue
         if not isinstance(matching_elements, list):
             continue
         line2cols: Dict[int, List[int]] = {}
