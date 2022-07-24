@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - xpath expressions now is a key value pair in the configuration file
 
+### Fixed
+
+- (CVE-2022-2309) Upgrade lxml to 4.9.1 for security reasons 
+
 
 ## [0.2.0] - 2022-05-26
 ### Added
