@@ -20,7 +20,7 @@ setup(
         +"and codebase analysis.",
     license='MIT',
     install_requires=[
-        'colorama==0.4.4', 'commonmark==0.9.1', 'gast==0.5.3', 'lxml==4.8.0',
+        'colorama==0.4.4', 'commonmark==0.9.1', 'gast==0.5.3', 'lxml==4.9.1',
         'prompt-toolkit==3.0.29', 'pyaml==21.10.1', 'pygments==2.12.0',
         'pyyaml==6.0', 'rich==12.4.1', 'wcwidth==0.2.5'],
     author='Bruno Messias',
