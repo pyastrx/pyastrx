@@ -19,7 +19,7 @@ from pyastrx.search.main import Repo
 def multiLine2line(multi_line_xpath: str) -> str:
     """Formatter for a xpath str from a yaml.
 
-    This allows to use indentation and multiple lines to 
+    This allows to use indentation and multiple lines to
     define complex xpath expressions
 
     """
