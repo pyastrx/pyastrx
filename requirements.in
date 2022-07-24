@@ -1,6 +1,6 @@
 rich
 pyaml
 colorama
-lxml
+lxml>=4.9.1
 gast
 prompt_toolkit

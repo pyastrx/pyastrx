@@ -11,23 +11,49 @@ pagination: true
 parallel: true
 quiet: false
 rules:
-  //defaults/*[self::Dict or self::List or self::Set or self::Call]:
+  recursion-class-method:
+    xpath:
+      |
+      //ClassDef
+        /body
+          /FunctionDef[
+            @name=body
+            //Call
+              /func
+                /Attribute[
+                  value/Name[@id='self']
+                ]
+                /@attr
+      ]
+    description: "Recursion pattern detected in this file"
+    severity: "info"
+    why: "should be refactored"
+  mutable-defaults:
+    xpath:
+      |
+      //defaults
+      /*[
+        self::Dict or self::List or self::Set or self::Call
+        ]
     description: Can create bugs that are hard to find
-    name: mutable-defaults
     severity: error
     why: bad practice
-  //FunctionDef[@name=body/Assign/targets/Name/@id]:
-      name: "redefinition-of-function-var"
+  redefinition-of-function-var:
+      xpath: "//FunctionDef[@name=body/Assign/targets/Name/@id]"
       description: "You should not define a new variable with the same name as the current function"
       severity: "warning"
       why: "bad practice"
-  //FunctionDef[@name=body//Call/func/Name/@id and not(parent::node()/parent::ClassDef)]:
-      name: "recursion"
-      description: "Recursion pattern detected in this file"
-      severity: "info"
-      why: "should be refactored"
-  //FunctionDef/args/arguments/args/Name[pyastrx:deny-list('built-in', @id)]:
-        name: "built-in-function-as-argument"
+
+  built-in-function-as-argument:
+        xpath:
+          |
+          //FunctionDef
+          /args
+          /arguments
+          /args
+          /Name[
+            pyastrx:deny-list('built-in', @id)
+          ]
         description: "This function uses a built-in function as argument"
         severity: "error"
         why: "bad practice"
