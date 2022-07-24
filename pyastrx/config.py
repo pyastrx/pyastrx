@@ -24,8 +24,8 @@ __available_yaml = {
     "folder": ".",
     "exclude": [".venv", ".tox", ".pyastrx"],
     "rules": {
-        "//defaults/*[self::Dict or self::List or self::Set or self::Call]": {
-            "name": "mutable-defaults",
+        "mutable-defaults": {
+            "xpath": "//defaults/*[self::Dict or self::List or self::Set or self::Call]",
             "description": "Can create bugs that are hard to find",
             "severity": "error",
             "why": "bad practice",

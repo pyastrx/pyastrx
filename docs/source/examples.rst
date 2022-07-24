@@ -7,8 +7,8 @@ Mutable default arguments
 
 .. code:: yaml
 
-    //defaults/*[self::Dict or self::List or self::Set or self::Call]:
-        name: "mutable-defaults"
+    mutable-defaults:
+        xpath: "//defaults/*[self::Dict or self::List or self::Set or self::Call]"
         description: "Can create bugs that are hard to find"
         severity: "error"
         why: "bad practice"
@@ -23,8 +23,8 @@ Global definition
 
 .. code:: yaml
 
-    //FunctionDef/body/Global:
-        name: "Global keyword being used"
+    global-keyword:
+        xpath: "//FunctionDef/body/Global"
         description: "This can create annoying side effects"
         severity: "info"
         use_in_linter: false
@@ -36,8 +36,8 @@ Unnecessary global keyword in function
 
 .. code:: yaml
 
-    //FunctionDef/body/Global/names[not(item=../../Assign/targets/Name/@id)]:
-        name: "mutable-defaults"
+    mutable-defaults:
+        xpath: "//FunctionDef/body/Global/names[not(item=../../Assign/targets/Name/@id)]"
         description: "An unnecessary global keyword is being used"
         severity: "info"
         why: "bad practice"
@@ -51,8 +51,8 @@ Recursion
 
 .. code:: yaml
 
-    //FunctionDef[@name=body//Call/func/Name/@id and not(parent::node()/parent::ClassDef)]:
-        name: "recursion"
+    recursion:
+        xpath: "//FunctionDef[@name=body//Call/func/Name/@id and not(parent::node()/parent::ClassDef)]"
         description: "Recursion pattern detected in this file"
         severity: "info"
         why: "should be refactored"
@@ -61,12 +61,28 @@ Recursion
 Recursion in a class method
 ---------------------------
 
+This example also shows that we can use multiple lines to define 
+a complex xpath expression.
+
 .. code:: yaml
 
-    //ClassDef/body/FunctionDef[@name=body//Call/func/Attribute[value/Name[@id='self']]/@attr]:
-        name: "recursion-class-method"
+    recursion-class-method:
+        xpath:
+            |
+            //ClassDef
+              /body
+                /FunctionDef[
+                  @name=body
+                  //Call
+                    /func
+                      /Attribute[
+                        value/Name[@id='self']
+                     ]
+                     /@attr
+                ]
         description: ""
         severity: "ino"
+
 
 
 New variable with the same name as the current function
@@ -74,8 +90,8 @@ New variable with the same name as the current function
 
 .. code:: yaml
 
-    //FunctionDef[@name=body/Assign/targets/Name/@id]:
-        name: "redefinition-of-function-var"
+    redefinition-of-function-var:
+        xpath: "//FunctionDef[@name=body/Assign/targets/Name/@id]"
         description: "Please, avoid defining a new variable with the same name as the current function"
         severity: "error"
         why: "bad practice"
@@ -133,8 +149,14 @@ Now, you can use the following rule to detect this behavior:
 
 .. code:: yaml
 
-    //FunctionDef/args/arguments/args/Name[pyastrx:deny-list('built-in', @id)]:
-        name: "built-in-function-as-argument"
+    built-in-function-as-argument:
+        xpath:
+            |
+            //FunctionDef
+              /args
+                /arguments
+                  /args
+                    /Name[pyastrx:deny-list('built-in', @id)]:
         description: "This function uses a built-in function as argument"
         severity: "error"
         why: "bad practice"
@@ -144,5 +166,8 @@ Now, you can use the following rule to detect this behavior:
     :align: center
 
 
-To use allow lists is the same, but you must call the `pyastrx:allow-list`:
-`[pyastrx:allow-list('list_name', @ATTR_TO_BE_CHECKED)]`.
+For allow list, use the `pyastrx:allow-list`
+
+.. code::
+
+    pyastrx:allow-list:[pyastrx:allow-list('list_name', @ATTR_TO_BE_CHECKED)]

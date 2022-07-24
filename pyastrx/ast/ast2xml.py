@@ -131,7 +131,7 @@ def encode_location(
         # print(lineno, node.end_lineno, value)
         if txt_lines:
             txt_line = txt_lines[lineno-1]
-            rc = re.compile(f"{value}(?!([0-9]|\_|^a-zA-Z))") # noqa
+            rc = re.compile(f"{value}(?!([0-9]|\\_|^a-zA-Z))") # noqa
             r_result = rc.search(txt_line)
             if r_result is None:
                 return
