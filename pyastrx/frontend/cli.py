@@ -16,6 +16,19 @@ from pyastrx.frontend.state_machine import Context, StartState
 from pyastrx.search.main import Repo
 
 
+def multiLine2line(multi_line_xpath: str) -> str:
+    """Formatter for a xpath str from a yaml.
+
+    This allows to use indentation and multiple lines to 
+    define complex xpath expressions
+
+    """
+    # Remove spaces in the beginning of each line
+    lines = [v.lstrip() for v in multi_line_xpath.split("\n")]
+    xpath = "".join(lines)
+    return xpath
+
+
 def construct_base_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -141,9 +154,13 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
 
     else:
         rules_yaml = yaml_config.get("rules", {})
-        rules = RulesDict({
-            k: RuleInfo(**v) for k, v in rules_yaml.items()
-        })
+        rules_dict = {}
+        for name, v in rules_yaml.items():
+            xpath = multiLine2line(v["xpath"])
+            del v["xpath"]
+            v["name"] = name
+            rules_dict[xpath] = RuleInfo(**v)
+        rules = RulesDict(rules_dict)
 
     config["interactive"] = args.interactive
     config["rules"] = rules

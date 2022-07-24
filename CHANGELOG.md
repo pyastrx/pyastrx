@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.4.1] - 2022-07-23
+
+
+### Changed
+
+- xpath expressions now is a key value pair in the configuration file
+
+### Fixed
+
+- (CVE-2022-2309) Upgrade lxml to 4.9.1 for security reasons
+
+
 ## [0.4.0] - 2022-06-13
 
 ### Added
@@ -66,7 +78,8 @@ $ mypyq filename.py
 ### Changed
 
 
-[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.4.0...master
+[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.4.1...master
+[0.4.1]: https://github.com/pyastrx/pyastrx/compare/0.4.1...0.3.0
 [0.4.0]: https://github.com/pyastrx/pyastrx/compare/0.3.0...0.2.0
 [0.3.0]: https://github.com/pyastrx/pyastrx/compare/0.3.0...0.2.0
 [0.2.0]: https://github.com/pyastrx/pyastrx/compare/0.2.0...0.1.2
