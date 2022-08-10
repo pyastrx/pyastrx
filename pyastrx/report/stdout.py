@@ -4,6 +4,7 @@
 import pydoc
 from typing import Union
 from io import BytesIO
+import shutil
 
 from lxml import etree
 from rich.console import Console
@@ -20,6 +21,10 @@ def rich_paging(text: str) -> None:
     with console.capture() as capture:
         console.print(text)
     str_output = capture.get()
+
+    if shutil.which("less") is None:
+        print(str_output)
+        return
     pydoc.pipepager(str_output, cmd='less -R')
 
 
