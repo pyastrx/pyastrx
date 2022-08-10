@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.4.3] - 2022-9-10
+
+### Fixed
+
+- MyPy optional
+- less command is now optional
+
 ## [0.4.2] - 2022-07-23
 
 
@@ -86,7 +93,8 @@ $ mypyq filename.py
 ### Changed
 
 
-[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.4.2...master
+[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.4.3...master
+[0.4.3]: https://github.com/pyastrx/pyastrx/compare/0.4.3...0.4.3
 [0.4.2]: https://github.com/pyastrx/pyastrx/compare/0.4.2...0.4.1
 [0.4.1]: https://github.com/pyastrx/pyastrx/compare/0.4.1...0.3.0
 [0.4.0]: https://github.com/pyastrx/pyastrx/compare/0.3.0...0.2.0

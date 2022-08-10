@@ -7,7 +7,7 @@ with open("README.rst", "r") as f:
 
 setup(
     name='pyastrx',
-    version='0.4.2',
+    version='0.4.3',
     long_description=README_TEXT,
     long_description_content_type="text/x-rst",
     description="'Simple projects are all alike; each complex"\
