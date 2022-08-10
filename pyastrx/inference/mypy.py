@@ -1,9 +1,13 @@
 from pathlib import Path
 from typing import List, Tuple
 
-import mypy.main as MAIN
-import mypy.build as BUILD
-from mypy.nodes import MypyFile as MypyFileType
+try:
+    import mypy.main as MAIN
+    import mypy.build as BUILD
+    from mypy.nodes import MypyFile as MypyFileType
+    MYPY_AVAILABLE = True
+except ImportError:
+    MYPY_AVAILABLE = False
 
 from pyastrx.data_typing import MypyInferFileResult
 from pyastrx.inference.mypy_visitor import TypeExtractor
@@ -11,7 +15,8 @@ from pyastrx.inference.mypy_visitor import TypeExtractor
 
 def infer_types(
         files: List[str], ) -> Tuple[List[MypyInferFileResult], bool]:
-
+    if not MYPY_AVAILABLE:
+        raise ImportError("mypy is not available")
     mfiles, opt = MAIN.process_options(
         files,
     )
