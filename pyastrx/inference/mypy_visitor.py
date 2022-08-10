@@ -1,14 +1,18 @@
 from typing import Any, List, Tuple, Union
 from typing_extensions import TYPE_CHECKING
-
-import mypy.nodes
-
-from mypy.traverser import TraverserVisitor
+try:
+    import mypy.nodes
+    from mypy.traverser import TraverserVisitor
+except ImportError:
+    TraverserVisitor = object
 
 from pyastrx.data_typing import MypyType, TokenLoc
 
 if TYPE_CHECKING: # noqa:
-    import mypy.patterns # noqa:
+    try:
+        import mypy.patterns # noqa:
+    except ImportError:
+        pass
 
 
 class TypeExtractor(TraverserVisitor):
