@@ -36,15 +36,15 @@ command line interface and the code analysis.
                 rules:
                    quoting-database:
                         xpath:
-                        |
-                        //KeyNode[@name="quoting"]
-                        /MappingNode
-                        /KeyNode[@name="database"]
-                        /*[
-                            self::IntNode or self::StrNode or self::KeyNode
-                        ]
-                        severity: error
-                        description: "Database quoting should be a boolean"
+                            |
+                            //KeyNode[@name="quoting"]
+                            /MappingNode
+                            /KeyNode[@name="database"]
+                            /*[
+                                self::IntNode or self::StrNode or self::KeyNode
+                            ]
+                            severity: error
+                            description: "Database quoting should be a boolean"
 
 Options
 -------
