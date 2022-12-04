@@ -69,26 +69,19 @@ class Manager:
         info = self.repo.cache.get(file)
         self.current_fileinfo = info
 
-    def load_files(self) -> None:
-        parallel = self.config.parallel
-        files = self.config.files
-        if len(files) > 0:
-            self.repo.load_files(
-                files, normalize_ast=self.config.normalize_ast,
-                parallel=parallel
-            )
-            if len(files) == 1:
-                self.set_current_file(self.repo.get_files()[0])
-        else:
-            self.repo.load_folder(
-                self.config.folder,
-                normalize_ast=self.config.normalize_ast,
-                parallel=parallel,
-                exclude=self.config.exclude,
-                recursive=self.config.recursive
-            )
+    def load_specitications(self) -> None:
+        self.repo.load_specifications(
+            self.config.specifications,
+        )
+        files = self.repo.get_files()
+        if len(files) > 1:
+            return
+
+        self.set_current_file(self.repo.get_file())
 
     def reload_yaml(self) -> None:
+        # TODO: REFACTOR TO USE SPECIFICATIONS
+        raise NotImplementedError
         with open(Path("pyastrx.yaml").resolve(), "r") as f:
             _config = yaml.safe_load(f)
         for k in ("rules", "interactive_files", "pagination"):
@@ -119,18 +112,18 @@ class Manager:
         if is_unique_file:
             file = self.repo.get_file()
             line2matches = self.repo.search_file(
-                    file, rules,
-                    before_context=config.before_context,
-                    after_context=config.after_context,
-                )
+                file, rules,
+                before_context=config.before_context,
+                after_context=config.after_context,
+            )
             file2matches = Files2Matches({file: line2matches})
         else:
             file2matches = self.repo.search_files(
-                    rules,
-                    before_context=config.before_context,
-                    after_context=config.after_context,
-                    parallel=config.parallel,
-                )
+                rules,
+                before_context=config.before_context,
+                after_context=config.after_context,
+                parallel=config.parallel,
+            )
         output_str = ""
         for i, (file, line2matches) in enumerate(
                 file2matches.items()):
@@ -140,7 +133,7 @@ class Manager:
                 filter_rules[expr] += line2matches.num_matches_by_expr[expr]
             output_str_file, num_matches_file = \
                 humanized_report.matches_by_filename(
-                        line2matches, file, rules)
+                    line2matches, file, rules)
             if num_matches_file > 0:
                 str_by_file[i] = (
                     str(Path(file).relative_to(parent_folder)),

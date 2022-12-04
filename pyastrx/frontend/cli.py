@@ -4,13 +4,16 @@ The Command Line Interface for PyASTrix.
 
 """
 import argparse
+from typing import List, Tuple
 from pathlib import Path
 
 import yaml
 
 from pyastrx.config import __available_yaml, __available_yaml_folder
 from pyastrx.data_typing import (
-    Config, MatchParams, RuleInfo, RulesDict, InferenceConfig)
+    Config, MatchParams, RuleInfo, RulesDict, InferenceConfig,
+    Specifications, Specification
+)
 from pyastrx.frontend.manager import Manager
 from pyastrx.frontend.state_machine import Context, StartState
 from pyastrx.search.main import Repo
@@ -92,6 +95,13 @@ def construct_base_argparse() -> argparse.ArgumentParser:
         default=[],
     )
     parser.add_argument(
+        "-s",
+        "--specification",
+        help="language specification (python, yaml)",
+        type=str,
+        default="python",
+    )
+    parser.add_argument(
         "-a",
         "--after-context",
         help="lines of context to display after matching line",
@@ -145,28 +155,71 @@ def get_config_from_yaml() -> dict:
     return config
 
 
+def get_extensions_from_spec(lang_spec: str) -> List[str]:
+    if lang_spec == "python":
+        return ["py"]
+    elif lang_spec == "yaml":
+        return ["yaml", "yml"]
+    else:
+        raise ValueError(f"Invalid language {lang_spec}. Should be python or yaml") # noqa
+
+
 def invoke_pyastrx(args: argparse.Namespace) -> None:
     rules: RulesDict
     config = {}
     yaml_config = get_config_from_yaml()
+    config["rules"] = {}
+    specs_dict = {}
+    rules_dict = {}
     if len(args.expr) > 0:
-        rules = RulesDict({str(e): RuleInfo() for e in args.expr})
-
+        lang_spec = args.specification
+        extensions = get_extensions_from_spec(lang_spec)
+        spec_name = "inline"
+        rules_dict = {
+            f"[{spec_name}]{str(e)}":
+                RuleInfo(
+                    specification_name=spec_name,
+                )
+                for e in args.expr
+        }
+        specs_dict[spec_name] = {
+            "language": lang_spec,
+            "extensions": extensions,
+            **__available_yaml_folder
+        }
     else:
-        rules_yaml = yaml_config.get("rules", {})
-        rules_dict = {}
-        for name, v in rules_yaml.items():
-            xpath = multiLine2line(v["xpath"])
-            del v["xpath"]
-            v["name"] = name
-            rules_dict[xpath] = RuleInfo(**v)
-        rules = RulesDict(rules_dict)
+        yaml_specs = yaml_config["specifications"]
+        for spec_name, spec_config in yaml_specs.items():
+            language = spec_config["language"]
+            if args.file:
+                if language != args.specification:
+                    continue
+
+            rules_yaml = spec_config.get("rules", {})
+            for name, v in rules_yaml.items():
+                xpath = multiLine2line(v["xpath"])
+                del v["xpath"]
+                v["name"] = name
+                v["specification_name"] = spec_name
+                rules_dict[f"[{spec_name}]{xpath}"] = RuleInfo(**v)
+            del spec_config["rules"]
+            for key, val in __available_yaml_folder.items():
+                spec_config[key] = spec_config.get(key, val)
+            spec_config["files"] = args.file
+            spec_config["extensions"] = get_extensions_from_spec(language)
+            specs_dict[spec_name] = spec_config
 
     config["interactive"] = args.interactive
-    config["rules"] = rules
+    for spec_name, spec_config in specs_dict.items():
+        for key, val in __available_yaml_folder.items():
+            if key in spec_config:
+                continue
+        spec_config[key] = val
+
     for key, val in __available_yaml.items():
-        if key not in config:
-            config[key] = yaml_config.get(key, val)
+        if key in spec_config or key == "specifications":
+            continue
+        config[key] = val
     if args.linter:
         config["linter"] = True
         config["interactive"] = False
@@ -179,29 +232,41 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
     if args.vscode_output:
         config["vscode_output"] = True
 
+    rules = RulesDict(rules_dict)
+   
+    config["rules"] = rules
     if len(rules) == 0 and config["interactive"] is False:
         raise ValueError(
-                "No rules found in the yaml file and no expression provided")
+            "No rules found in the yaml file and no expression provided")
 
-    config["files"] = args.file
-    for key, val in __available_yaml_folder.items():
-        config[key] = yaml_config.get(key, val)
-    if args.folder:
-        config["folder"] = args.folder
     if args.vscode_output:
         config["vscode_output"] = True
-    config_pyastrx = Config(**config)
+    
+    for spec_name, spec in specs_dict.items():
+        spec["files"] = args.file
+        for key, val in __available_yaml_folder.items():
+            if key not in spec:
+                spec[key] = val
+        if args.folder:
+            spec["folder"] = args.folder
 
+    specfications = Specifications({
+        spec_name: Specification(**spec_config)
+        for spec_name, spec_config in specs_dict.items()
+    })
+    config["specifications"] = specfications
+    config_pyastrx = Config(**config)
     match_params = MatchParams(
         **yaml_config.get("match_params", {})
     )
+
     inference = InferenceConfig(**yaml_config.get("inference", {}))
 
     file_cache: bool = yaml_config.get("file_cache", True)
     repo = Repo(match_params, inference, file_cache=file_cache)
     if not config_pyastrx.interactive:
         manager = Manager(config_pyastrx, repo)
-        manager.load_files()
+        manager.load_specitications()
         num_matches = manager.search()[0]
         if config_pyastrx.linter:
             exit_code = 1 if num_matches > 0 else 0

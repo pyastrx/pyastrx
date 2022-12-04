@@ -10,22 +10,41 @@ command line interface and the code analysis.
 
         after_context: 3
         before_context: 3
-        exclude:
-        - .venv
-        - .tox
-        - .pyastrx
-        folder: .
-        interactive_files: false
-        normalize_ast: true
+        interactive_files: true
         pagination: true
-        parallel: true
         quiet: false
-        rules:
-            //defaults/*[self::Dict or self::List or self::Set or self::Call]:
-                description: Can create bugs that are hard to find
-                name: mutable-defaults
-                severity: error
-                why: bad practice
+        specifications:
+            default:
+                language: python
+                folder: "."
+                recursive: true
+                exclude:
+                - .venv
+                - .tox
+                - .pyastrx
+                rules:
+                    //defaults/*[self::Dict or self::List or self::Set or self::Call]:
+                        description: Can create bugs that are hard to find
+                        name: mutable-defaults
+                        severity: error
+                        why: bad practice
+            dbt-yaml:
+                language: yaml
+                folder: "models"
+                recursive: true
+                parallel: true
+                rules:
+                   quoting-database:
+                        xpath:
+                        |
+                        //KeyNode[@name="quoting"]
+                        /MappingNode
+                        /KeyNode[@name="database"]
+                        /*[
+                            self::IntNode or self::StrNode or self::KeyNode
+                        ]
+                        severity: error
+                        description: "Database quoting should be a boolean"
 
 Options
 -------

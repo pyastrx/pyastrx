@@ -38,12 +38,15 @@ def linenos_from_xml(
 
 
 def search_evaluator(
+        mark_specification: str,
         rules: RulesDict,
         evaluator: etree.XPathElementEvaluator) -> Expression2Match:
     matching_by_expression = Expression2Match({})
     for expression, _ in rules.items():
+        # replace the same length of the specification name in the expression
+        xpath = expression[len(mark_specification):]
         try:
-            matching_elements = evaluator(expression)
+            matching_elements = evaluator(xpath)
         except etree.XPathEvalError:
             continue
         if not isinstance(matching_elements, list):
@@ -83,12 +86,22 @@ def search_in_file_info(
         axml = etree.parse(BytesIO(file_info.axml))
     else:
         axml = file_info.axml
+
     evaluator = etree.XPathEvaluator(
         axml,
         namespaces=__lxml_namespaces__, extensions=extensions
     )
+    specification_name = file_info.specification_name
+    mark_spec = f"[{specification_name}]"
+
+    filtred_rules = RulesDict({
+        k: v
+        for k, v in rules.items()
+        if k.startswith(mark_spec)}
+    )
     matching_by_expr = search_evaluator(
-        rules,
+        mark_spec,
+        filtred_rules,
         evaluator)
 
     match_expr_by_line = {}

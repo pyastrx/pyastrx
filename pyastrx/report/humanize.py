@@ -15,13 +15,12 @@ def match_description(rule: RuleInfo) -> str:
     except KeyError:
         color = __severity2color["default"]
 
-    why = rule.why
+    why = f"-{rule.why}" if rule.why else ""
     name = rule.name
     description = rule.description
-    match_header_str = f"[bold {color}] - {name}|"\
-        + f"{why} |"\
-        + f"{description}"\
-        + f"[/bold {color}]\n"
+    match_header_str = f"[bold {color}] -\[{name}]"\
+        + f"({severity}{why}):[/bold {color}]"\
+        + f"\n\t{description}\n\n"
     return match_header_str
 
 
@@ -35,6 +34,8 @@ def str_context(
         if line_is_match:
             line_mark_list = [" "] * len(line_str)
             for col_number in cols:
+                if len(line_mark_list) - 1 < col_number:
+                    continue
                 line_mark_list[col_number] = "^"
             line_mark = ''.join(line_mark_list)
             line_mark = f"{'':<5}{line_mark}"
@@ -47,7 +48,7 @@ def str_context(
         if line_is_match:
             output_str += f"{line_mark}\n"
 
-    output_str += "-" * 20+"\n"
+    output_str += f"\n{'-' * 20}\n\n"
     return output_str
 
 

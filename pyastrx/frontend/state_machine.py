@@ -136,7 +136,7 @@ class StateInterface(State):
         rprint(f"\n{'='*s}\n{self.title}\n{'-'*s}")
         if self.help_text:
             rprint(self.help_text)
-        print("-"*20)
+        print("-" * 20)
 
 
 class Context(Manager):
@@ -172,7 +172,7 @@ class StartState(State):
 
 class LoadFiles(State):
     def run(self) -> None:
-        self.context.load_files()
+        self.context.load_specitications()
         self.context.set_state(
             InterfaceMain)
 
@@ -266,11 +266,18 @@ class InterfaceSelectRules(StateInterface):
         opt2xpath = {}
         default_values = []
         for i, (expression, info) in enumerate(rules.items()):
+            spec_name = info.specification_name
             name = info.name
             description = info.description
             why = info.why
             severity = info.severity
-            str_info = f"({severity})-{name}-({why}):\n\t{description}"
+
+            str_info = f"[ {spec_name} ]" \
+                + f"| {severity} |" \
+                + f" {name}"
+            if why:
+                str_info += f"( {why} )"
+            str_info += f"\n{description}"
             options.append((i, str_info))
             opt2xpath[i] = expression
             check = expression in self.context.selected_rules
@@ -287,10 +294,11 @@ class InterfaceSelectRules(StateInterface):
                 "\n[bold yellow]These rules will not match any pattern "
                 + " in the provide files[/]\n")
             return
-
+        dialog_text = "Choose which rules to use for the search. The pattern is:\n" \
+            + "\n [specification]|severity| name(?why)\nDescription"
         dialog = checkboxlist_dialog(
             title="Rules selection",
-            text="Choose which rules to use for the search",
+            text=dialog_text,
             values=options,
             default_values=default_values,
             style=style
@@ -323,7 +331,14 @@ class InterfaceRules(StateInterface):
         rules_str = []
         str2expression = {}
         for expression, info in rules.items():
-            str_info = f"{info.name}({info.why}-){info.description}"
+            spec_name = info.specification_name
+            name = info.name 
+            why = info.why
+            description = info.description
+            str_info = f"[ {spec_name} ]" \
+                + name \
+                + f"( {why} )" \
+                + f": {description}"
             rules_str.append(str_info)
             str2expression[str_info] = expression
         return rules_str, str2expression
@@ -479,10 +494,11 @@ class ShowXML(State):
 
 class ShowAST(State):
     def run(self) -> None:
-        ast_txt = txt2ASTtxt(
-            self.context.current_fileinfo.txt,
-            normalize_ast=self.context.config.normalize_ast)
-        rich_paging(ast_txt)
+        if self.context.current_fileinfo.filename.endswith(".py"):
+            ast_txt = txt2ASTtxt(
+                self.context.current_fileinfo.txt,
+                normalize_ast=True)
+            rich_paging(ast_txt)
         self.context.set_state(FileCond)
 
 
@@ -514,16 +530,17 @@ class ExportAST(State):
         files = self.context.repo.get_files()
         for filename in files:
             file_info = self.context.repo.cache.get(filename)
-            txt = file_info.txt
-            ast_txt = txt2ASTtxt(
-                txt,
-                normalize_ast=self.context.config.normalize_ast
-            )
-            export_location = get_location_and_create(
-                ".pyastrx/export_data/ast/", filename)
+            if file_info.language == "python":
+                txt = file_info.txt
+                ast_txt = txt2ASTtxt(
+                    txt,
+                    normalize_ast=True
+                )
+                export_location = get_location_and_create(
+                    ".pyastrx/export_data/ast/", filename)
 
-            with open(export_location, "w") as f:
-                f.write(ast_txt)
+                with open(export_location, "w") as f:
+                    f.write(ast_txt)
         self.context.set_state(InterfaceMain)
 
 
