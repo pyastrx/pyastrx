@@ -21,12 +21,20 @@ specifications:
           |
           //KeyNode[@name="quoting"]
           /MappingNode
-          /KeyNode[@name="database"]
+          /KeyNode
           /*[
             self::IntNode or self::StrNode or self::KeyNode
           ]
         severity: error
         description: "Database quoting should be a boolean"
+      sources-should-be-svc:
+        xpath: 
+          |
+          //KeyNode[@name="sources"]
+          /MappingNode
+          /KeyNode
+          /SequenceNode
+          /StrNode[pyastrx:match('svc_*',text())]
   python:
     language: python
     exclude:

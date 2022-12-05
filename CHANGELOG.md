@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 
 ## [Unreleased]
+## [0.5.0] - 2022-05-12
+
+### Added
+
+- Now it's possible to use PyASTrX to check and analyze YAML files.
+- Specifications allow using multiple set of rules for different languages, files and folders.
+
+### Changed
+
+- Rules section should be inside a specification section
 
 ## [0.4.3] - 2022-9-10
 
@@ -95,6 +105,8 @@ $ mypyq filename.py
 
 [Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.4.3...master
 [0.4.3]: https://github.com/pyastrx/pyastrx/compare/0.4.3...0.4.3
+[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.5.0...master
+[0.5.0]: https://github.com/pyastrx/pyastrx/compare/0.4.2...0.5.0
 [0.4.2]: https://github.com/pyastrx/pyastrx/compare/0.4.2...0.4.1
 [0.4.1]: https://github.com/pyastrx/pyastrx/compare/0.4.1...0.3.0
 [0.4.0]: https://github.com/pyastrx/pyastrx/compare/0.3.0...0.2.0

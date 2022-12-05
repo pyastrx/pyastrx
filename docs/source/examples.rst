@@ -1,9 +1,22 @@
 
+YAML specification
+===================
+
+DBT examples
+------------
+
+
+
+Python specification
+====================
+
+
 Default arguments
-=================
+-----------------
+
 
 Mutable default arguments
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: yaml
 
@@ -15,11 +28,12 @@ Mutable default arguments
 
 
 Global variables
-================
+----------------
 
 
 Global definition
------------------
+~~~~~~~~~~~~~~~~~
+
 
 .. code:: yaml
 
@@ -32,7 +46,7 @@ Global definition
 
 
 Unnecessary global keyword in function
---------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: yaml
 
@@ -44,10 +58,10 @@ Unnecessary global keyword in function
 
 
 Function definitions
-====================
+--------------------
 
 Recursion
----------
+~~~~~~~~~
 
 .. code:: yaml
 
@@ -59,7 +73,7 @@ Recursion
 
 
 Recursion in a class method
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This example also shows that we can use multiple lines to define 
 a complex xpath expression.
@@ -86,7 +100,7 @@ a complex xpath expression.
 
 
 New variable with the same name as the current function
--------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: yaml
 
@@ -168,6 +182,7 @@ Now, you can use the following rule to detect this behavior:
 
 
 Allow list:
+===========
 
 .. code::
 
