@@ -37,8 +37,8 @@ class Node(object):
         class_name = self.__class__.__name__
         set_key_node = False
         tag = self.tag
-        lineno = self.start_mark.line
-        end_lineno = self.end_mark.line
+        lineno = self.start_mark.line + 1
+        end_lineno = self.end_mark.line + 1
         col_offset = self.start_mark.column
         end_col_offset = self.end_mark.column
         value = self.value
