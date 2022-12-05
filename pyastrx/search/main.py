@@ -1,14 +1,14 @@
 from functools import partial
 from multiprocessing import Pool
 from pathlib import Path
-from typing import List, Union, Optional, Dict, Literal, Tuple
+from typing import List, Optional, Literal
 from dataclasses import asdict
 
 
 from pyastrx.inference.pyre import infer_types as infer_types_pyre
 from pyastrx.inference.mypy import infer_types as infer_types_mypy
 from pyastrx.inference.normalization import pyre2astrx, mypy2astrx
-from pyastrx.ast.ast2xml import file2axml
+from pyastrx.axml.python.ast2xml import file2axml
 from pyastrx.axml.yaml.yaml2xml import file2axml as yaml2axml
 from pyastrx.data_typing import (
     Files2Matches, Lines2Matches, MatchParams,

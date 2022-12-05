@@ -22,7 +22,7 @@ from prompt_toolkit.styles import Style
 from rich import print as rprint
 
 from pyastrx import __info__
-from pyastrx.ast.things2ast import txt2ASTtxt
+from pyastrx.axml.python.things2ast import txt2ASTtxt
 from pyastrx.config import _prompt_dialog_style
 from pyastrx.data_typing import Config
 from pyastrx.folder_utils import get_location_and_create

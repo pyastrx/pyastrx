@@ -8,7 +8,7 @@ import re
 
 from lxml import etree
 
-from pyastrx.ast.things2ast import txt2ast
+from pyastrx.axml.python.things2ast import txt2ast
 from pyastrx.data_typing import ASTrXType, FileInfo, AXML
 
 
