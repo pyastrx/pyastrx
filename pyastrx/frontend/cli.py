@@ -63,7 +63,7 @@ def construct_base_argparse() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--vscode-output",
-        help="This saves the output in a format that can be read by VSCode PyASTrX extension", # noqa
+        help="This saves the output in a format that can be read by VSCode PyASTrX extension",  # noqa
         action="store_true",
     )
     parser.add_argument(
@@ -161,7 +161,7 @@ def get_extensions_from_spec(lang_spec: str) -> List[str]:
     elif lang_spec == "yaml":
         return ["yaml", "yml"]
     else:
-        raise ValueError(f"Invalid language {lang_spec}. Should be python or yaml") # noqa
+        raise ValueError(f"Invalid language {lang_spec}. Should be python or yaml")  # noqa
 
 
 def invoke_pyastrx(args: argparse.Namespace) -> None:
@@ -205,7 +205,7 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
             del spec_config["rules"]
             for key, val in __available_yaml_folder.items():
                 spec_config[key] = spec_config.get(key, val)
-            spec_config["files"] = args.file
+
             spec_config["extensions"] = get_extensions_from_spec(language)
             specs_dict[spec_name] = spec_config
 
@@ -233,7 +233,7 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
         config["vscode_output"] = True
 
     rules = RulesDict(rules_dict)
-   
+
     config["rules"] = rules
     if len(rules) == 0 and config["interactive"] is False:
         raise ValueError(
@@ -241,9 +241,11 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
 
     if args.vscode_output:
         config["vscode_output"] = True
-    
+
     for spec_name, spec in specs_dict.items():
-        spec["files"] = args.file
+        if "files" not in spec:
+            spec["files"] = args.file
+
         for key, val in __available_yaml_folder.items():
             if key not in spec:
                 spec[key] = val
