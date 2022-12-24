@@ -1,10 +1,10 @@
-from yaml.reader import *
-from yaml.scanner import *
-from yaml.parser import *
-from yaml.constructor import *
-from yaml.resolver import *
+from yaml.reader import Reader
+from yaml.scanner import Scanner
+from yaml.parser import Parser
+from yaml.constructor import Constructor
+from yaml.resolver import Resolver
 
-from pyastrx.axml.yaml.composer import *
+from pyastrx.axml.yaml.composer import Composer
 
 
 class Loader(Reader, Scanner, Parser, Composer, Constructor, Resolver):

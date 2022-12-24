@@ -1,6 +1,12 @@
 from yaml.error import MarkedYAMLError
-from yaml.events import *
-from pyastrx.axml.yaml.nodes import *
+from yaml.events import (
+    StreamEndEvent, StreamStartEvent, AliasEvent, ScalarEvent,
+    SequenceEndEvent, MappingEndEvent,
+    SequenceStartEvent, MappingStartEvent)
+
+from pyastrx.axml.yaml.nodes import (
+    ScalarNode, SequenceNode, MappingNode
+)
 
 
 class ComposerError(MarkedYAMLError):
@@ -103,7 +109,8 @@ class Composer:
         tag = start_event.tag
         if tag is None or tag == '!':
             tag = self.resolve(SequenceNode, None, start_event.implicit)
-        node = SequenceNode(tag, [],
+        node = SequenceNode(
+                tag, [],
                 start_event.start_mark, None,
                 flow_style=start_event.flow_style)
         if anchor is not None:
@@ -120,8 +127,10 @@ class Composer:
         start_event = self.get_event()
         tag = start_event.tag
         if tag is None or tag == '!':
-            tag = self.resolve(MappingNode, None, start_event.implicit)
-        node = MappingNode(tag, [],
+            tag = self.resolve(
+                MappingNode, None, start_event.implicit)
+        node = MappingNode(
+                tag, [],
                 start_event.start_mark, None,
                 flow_style=start_event.flow_style)
         if anchor is not None:

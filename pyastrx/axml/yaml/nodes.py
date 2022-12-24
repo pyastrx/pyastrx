@@ -26,7 +26,7 @@ class Node(object):
 
     def xml_node(
         self, key_node=False, module_node=False, file_path=None
-        ) -> etree._Element:
+    ) -> etree._Element:
         """Return the XML node for the YAML node.
 
         Will recursively call itself to build the string representation
