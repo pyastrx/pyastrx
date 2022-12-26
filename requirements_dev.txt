@@ -70,8 +70,6 @@ pyyaml==6.0
     # via pre-commit
 ruamel-yaml==0.17.21
     # via pre-commit-hooks
-ruamel-yaml-clib==0.2.6
-    # via ruamel-yaml
 six==1.16.0
     # via virtualenv
 toml==0.10.2
@@ -80,8 +78,6 @@ toml==0.10.2
     #   pre-commit-hooks
 tomli==2.0.1
     # via
-    #   black
-    #   mypy
     #   pep517
     #   pytest
 types-pyyaml==6.0.7
@@ -92,7 +88,7 @@ untokenize==0.1.1
     # via docformatter
 virtualenv==20.14.1
     # via pre-commit
-wheel==0.37.1
+wheel==0.38.1
     # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
