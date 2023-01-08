@@ -19,7 +19,7 @@ def test_xpath_example_tags():
                 xpath, linenos, match_params = item
             match_params = MatchParams(**match_params)
             repo = Repo(match_params=match_params)
-            repo.load_file(file, normalize_ast=True)
+            repo.load_file(file, "python", normalize_ast=True)
             lines2matches = repo.search_file(
                 file, RulesDict({xpath: RuleInfo()}))
             for lineno, _ in lines2matches.matches.items():

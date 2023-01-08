@@ -15,28 +15,35 @@ _prompt_dialog_style = {
 __available_yaml = {
     "after_context": 3,
     "before_context": 3,
-    "parallel": True,
     "quiet": False,
+    "parallel": True,
     "interactive_files": False,
-    "normalize_ast": True,
     "vscode_output": False,
-    "pagination": True,
-    "folder": ".",
-    "exclude": [".venv", ".tox", ".pyastrx"],
-    "rules": {
-        "mutable-defaults": {
-            "xpath": "//defaults/*[self::Dict or self::List or self::Set or self::Call]", # noqa
-            "description": "Can create bugs that are hard to find",
-            "severity": "error",
-            "why": "bad practice",
-            "use_in_linter": True
+    "specifications":
+    {
+        "python": {
+            "folder": ".",
+            "language": "python",
+            "recursive": True,
+            "exclude": [".venv", "docs", ".git", ".tox", ".pyastrx"],
+            "rules": {
+                "mutable-defaults": {
+                    "xpath": "//defaults/*[self::Dict or self::List or self::Set or self::Call]",  # noqa
+                    "description": "Can create bugs that are hard to find",
+                    "severity": "error",
+                    "why": "bad practice",
+                    "use_in_linter": True,
+                }
+            }
         }
-    }
+    },
+    "pagination": True
+
 }
 
 __available_yaml_folder = {
     "folder": ".",
-    "parallel": True,
     "recursive": True,
+    "parallel": True,
     "exclude": [".venv", "docs", ".git", ".tox", ".pyastrx"],
 }

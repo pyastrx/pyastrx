@@ -1,63 +1,107 @@
 after_context: 3
 before_context: 3
-exclude:
-- .venv
-- .tox
-- .pyastrx
-folder: .
 interactive_files: false
-normalize_ast: true
 pagination: true
-parallel: true
 quiet: false
-rules:
-  recursion-class-method:
-    xpath:
-      |
-      //ClassDef
-        /body
-          /FunctionDef[
-            @name=body
-            //Call
-              /func
-                /Attribute[
-                  value/Name[@id='self']
-                ]
-                /@attr
-      ]
-    description: "Recursion pattern detected in this file"
-    severity: "info"
-    why: "should be refactored"
-  mutable-defaults:
-    xpath:
-      |
-      //defaults
-      /*[
-        self::Dict or self::List or self::Set or self::Call
-        ]
-    description: Can create bugs that are hard to find
-    severity: error
-    why: bad practice
-  redefinition-of-function-var:
-      xpath: "//FunctionDef[@name=body/Assign/targets/Name/@id]"
-      description: "You should not define a new variable with the same name as the current function"
-      severity: "warning"
-      why: "bad practice"
-
-  built-in-function-as-argument:
+vscode_output: true
+parallel: true
+specifications:
+  dbt:
+    language: yaml
+    parallel: true 
+    exclude:
+    - .venv
+    - .tox
+    - .pyastrx
+    - .mypy_cache
+    folder: .
+    rules:
+      persist_docs_should_be_a_dict:
+        xpath:
+            |
+            //KeyNode[@name="persist_docs"]
+            /*[
+              not(self::MappingNode)
+            ]
+        severity: error
+        description: "persist_docs should be a dict"
+      quoting-database:
         xpath:
           |
-          //FunctionDef
-          /args
-          /arguments
-          /args
-          /Name[
-            pyastrx:deny-list('built-in', @id)
+          //KeyNode[@name="quoting"]
+          /MappingNode
+          /KeyNode
+          /*[
+            not(self::BoolNode) 
           ]
-        description: "This function uses a built-in function as argument"
-        severity: "error"
-        why: "bad practice"
-vscode_output: true
+        severity: error
+        description: "Database quoting should be a boolean"
+      sources-should-be-svc:
+        xpath: 
+          |
+          //KeyNode[@name="sources"]
+          /MappingNode
+          /KeyNode
+          /SequenceNode
+          /StrNode[pyastrx:match('svc_*',text())]
+  python:
+    language: python
+    exclude:
+    - .venv
+    - .tox
+    - .pyastrx
+    - .mypy_cache
+    folder: .
+    rules:
+      recursion-class-method:
+        xpath:
+          |
+          //ClassDef
+            /body
+              /FunctionDef[
+                @name=body
+                //Call
+                  /func
+                    /Attribute[
+                      value/Name[@id='self']
+                    ]
+                    /@attr
+          ]
+        description: "Recursion pattern detected in this file"
+        severity: "info"
+        why: "should be refactored"
+      mutable-defaults:
+        xpath:
+          |
+          //defaults
+          /*[
+            self::Dict or self::List or self::Set or self::Call
+            ]
+        description: Can create bugs that are hard to find
+        severity: error
+        why: bad practice
+      redefinition-of-function-var:
+          xpath: "//FunctionDef[@name=body/Assign/targets/Name/@id]"
+          description: "You should not define a new variable with the same name as the current function"
+          severity: "warning"
+          why: "bad practice"
+
+      built-in-function-as-argument:
+            xpath:
+              |
+              //FunctionDef
+              /args
+              /arguments
+              /args
+              /Name[
+                pyastrx:deny-list('built-in', @id)
+              ]
+            description: "This function uses a built-in function as argument"
+            severity: "error"
+            why: "bad practice" 
+inference:
+  what: 'pyre'
+  run: false
 match_params:
   deny_dict:
     built-in:
@@ -69,6 +113,3 @@ match_params:
     class_names:
     - allowed_var_name1
     - allowed_var_name2
-inference:
-  what: 'pyre'
-  run: false

@@ -8,7 +8,7 @@ import re
 
 from lxml import etree
 
-from pyastrx.ast.things2ast import txt2ast
+from pyastrx.axml.python.things2ast import txt2ast
 from pyastrx.data_typing import ASTrXType, FileInfo, AXML
 
 
@@ -204,7 +204,8 @@ def ast2xml(
 
 def file2axml(
         filename: str,
-        infered_types: Optional[List[ASTrXType]] = None,
+        infered_types: Optional[List[ASTrXType]],
+        specification_name: str,
         normalize_ast: bool = True,
         baxml: bool = False,
 ) -> FileInfo:
@@ -231,6 +232,8 @@ def file2axml(
         filename=file_path,
         axml=xml_ast,
         txt=txt,
+        language="python",
+        specification_name=specification_name
     )
 
     return info

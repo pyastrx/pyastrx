@@ -35,6 +35,8 @@ class FileInfo:
     filename: str
     axml: AXML
     txt: str
+    specification_name: str
+    language: str
 
 
 @dataclass
@@ -44,6 +46,7 @@ class RuleInfo:
     why: str = ""
     severity: str = ""
     use_in_linter: bool = True
+    specification_name: str = ""
 
 
 RulesDict = NewType('RulesDict', Dict[str, RuleInfo])
@@ -89,22 +92,33 @@ class InferenceConfig:
 
 
 @dataclass
-class Config:
-    rules: RulesDict
+class Specification:
     files: List[str]
     exclude: List[str]
+    extensions: List[str]
+    normalize_ast: bool = True
+    parallel: bool = True
+    folder: str = "."
+    recursive: bool = True
+    language: Literal["python", "yaml"] = "python"
+
+
+Specifications = NewType('Specifications', Dict[str, Specification])
+
+
+@dataclass
+class Config:
+    rules: RulesDict
+    specifications: Specifications
     after_context: int = 1
     before_context: int = 1
     parallel: bool = True
-    recursive: bool = True
     interactive: bool = False
     linter: bool = False
     interactive_files: bool = False
     pagination: bool = True
-    normalize_ast: bool = True
     vscode_output: bool = False
     quiet: bool = False
-    folder: str = "."
 
 
 class PyreLoc(TypedDict):
