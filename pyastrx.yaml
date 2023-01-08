@@ -16,6 +16,15 @@ specifications:
     - .mypy_cache
     folder: .
     rules:
+      persist_docs_should_be_a_dict:
+        xpath:
+            |
+            //KeyNode[@name="persist_docs"]
+            /*[
+              not(self::MappingNode)
+            ]
+        severity: error
+        description: "persist_docs should be a dict"
       quoting-database:
         xpath:
           |
@@ -23,7 +32,7 @@ specifications:
           /MappingNode
           /KeyNode
           /*[
-            self::IntNode or self::StrNode or self::KeyNode
+            not(self::BoolNode) 
           ]
         severity: error
         description: "Database quoting should be a boolean"
