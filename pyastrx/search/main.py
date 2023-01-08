@@ -247,7 +247,14 @@ class Repo:
         return self._files
 
     def get_file(self) -> str:
-        return self.get_files()[0]
+        files = self.get_files()
+        if len(files) == 0:
+            print(
+                "[\033[91mERROR\033[0m]",
+                "No files to search in. Check your PyASTrX specifications."
+            )
+            exit(1)
+        return files[0]
 
     def search_files(
             self, rules: RulesDict,
