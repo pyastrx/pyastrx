@@ -2,13 +2,13 @@
 YAML specification
 ===================
 
-PyASTrX can also be used to create validations for your YAML files. 
+PyASTrX can also be used to create validations for your YAML files.
 To do so, you need to create a  specification with a type of `yaml` in the `pyastrx.yaml` file.
 
 DBT examples
 ------------
 
-DBT is a tool that helps data engineers and data scientists to create data pipelines. 
+DBT is a tool that helps data engineers and data scientists to create data pipelines.
 It is a great tool, but sometimes it can be hard to find bugs in the YAML files or bad practices made by the developers.
 PyASTrX can help you to find these bugs and bad practices.
 
@@ -24,7 +24,7 @@ The following example shows how to enforce that the `persist_docs` attribute of 
     specifications:
         my_dbt_specification:
             language: yaml
-            parallel: true 
+            parallel: true
             folder: .
             rules:
                 persist_docs_should_be_a_dict:
@@ -44,7 +44,7 @@ Quoting database in dbt is a boolean attribute, so to check if it is a boolean, 
 
     my_dbt_specification:
         language: yaml
-        parallel: true 
+        parallel: true
         folder: .
         rules:
             quoting_database_should_be_a_boolean:
@@ -54,7 +54,7 @@ Quoting database in dbt is a boolean attribute, so to check if it is a boolean, 
                     /MappingNode
                     /KeyNode
                     /*[
-                        not(self::BoolNode) 
+                        not(self::BoolNode)
                     ]
                     severity: error
                     description: "Database quoting should be a boolean"
@@ -70,25 +70,25 @@ Quoting database in dbt is a boolean attribute, so to check if it is a boolean, 
 Enforcing taxonomy and source restrictions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It's common to have a taxonomy in database projects, and it's also common to have a project 
-that should not have acces to some sources. To see how to enforce this, suppose that we 
-want to enforce that each source model should be one that starts with `svc_` pattern, 
+It's common to have a taxonomy in database projects, and it's also common to have a project
+that should not have acces to some sources. To see how to enforce this, suppose that we
+want to enforce that each source model should be one that starts with `svc_` pattern,
 
 .. code:: yaml
 
     my_dbt_specification:
         language: yaml
-        parallel: true 
+        parallel: true
         folder: .
         rules:
             sources-should-be-svc:
-                xpath: 
+                xpath:
                     |
                     //KeyNode[@name="sources"]
                     /MappingNode
                     /KeyNode
                     /SequenceNode
-                    /StrNode[pyastrx:match('svc_*',text())]
+                    /StrNode[not(pyastrx:match('svc_*',text()))]
             quoting_database_should_be_a_boolean:
                 xpath:
                     |
@@ -96,7 +96,7 @@ want to enforce that each source model should be one that starts with `svc_` pat
                     /MappingNode
                     /KeyNode
                     /*[
-                        not(self::BoolNode) 
+                        not(self::BoolNode)
                     ]
                     severity: error
                     description: "Database quoting should be a boolean"
@@ -177,7 +177,7 @@ Recursion
 Recursion in a class method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This example also shows that we can use multiple lines to define 
+This example also shows that we can use multiple lines to define
 a complex xpath expression.
 
 

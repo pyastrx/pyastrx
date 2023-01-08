@@ -8,7 +8,7 @@ parallel: true
 specifications:
   dbt:
     language: yaml
-    parallel: true 
+    parallel: true
     exclude:
     - .venv
     - .tox
@@ -32,18 +32,18 @@ specifications:
           /MappingNode
           /KeyNode
           /*[
-            not(self::BoolNode) 
+            not(self::BoolNode)
           ]
         severity: error
         description: "Database quoting should be a boolean"
       sources-should-be-svc:
-        xpath: 
+        xpath:
           |
           //KeyNode[@name="sources"]
           /MappingNode
           /KeyNode
           /SequenceNode
-          /StrNode[pyastrx:match('svc_*',text())]
+          /StrNode[not(pyastrx:match('svc_*',text()))]
   python:
     language: python
     exclude:
@@ -98,7 +98,7 @@ specifications:
               ]
             description: "This function uses a built-in function as argument"
             severity: "error"
-            why: "bad practice" 
+            why: "bad practice"
 inference:
   what: 'pyre'
   run: false

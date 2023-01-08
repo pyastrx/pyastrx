@@ -1,0 +1,35 @@
+quoting:
+  database: true
+  schema: 2
+models:
+  "dev_something":
+    persist_docs:
+      columns:
+        svc_1: "This is a description"
+        svc_2: "This is a description"
+        svc_3: "This is a description"
+  "wrong":
+    persist_docs: true
+columns:
+  svc_1:
+    description: "This is a description"
+    type: "string"
+    length: 100
+  svc_2:
+    description: "This is a description"
+    type: "string"
+    length: 100
+  svc_3:
+    description: "This is a description"
+    type: "string"
+    length: 100
+sources:
+  dev_something:
+    - svc_1
+    - svc_2
+    - errado
+  dev_something_else:
+    - svc_3
+    - svc_4
+    - svd
+    - anotherVar

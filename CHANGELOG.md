@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 
 ## [Unreleased]
+## [0.5.1] - 2023-08-01
+
+### Fixed
+
+- typing-extension is a requirement
+- Check if there is any file to analyze
+- allows to call pyastrx just for one specification:
+```
+$ pyastrx -s name_of_specification
+```
+
 ## [0.5.0] - 2023-08-01
 
 ### Added
@@ -103,7 +114,8 @@ $ mypyq filename.py
 
 ### Changed
 
-[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.5.0...main
+[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.5.1...main
+[0.5.1]: https://github.com/pyastrx/pyastrx/compare/0.5.1...0.5.0
 [0.5.0]: https://github.com/pyastrx/pyastrx/compare/0.5.0...0.4.3
 [0.4.3]: https://github.com/pyastrx/pyastrx/compare/0.4.3...0.4.2
 [0.4.2]: https://github.com/pyastrx/pyastrx/compare/0.4.2...0.4.1
