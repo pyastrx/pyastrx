@@ -20,7 +20,7 @@ def match_description(rule: RuleInfo) -> str:
     description = rule.description
     match_header_str = f"[bold {color}] -\[{name}]"\
         + f"({severity}{why}):[/bold {color}]"\
-        + f"\n\t{description}\n\n"
+        + f"\n\t{description}\n\n" # noqa
     return match_header_str
 
 

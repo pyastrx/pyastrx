@@ -4,7 +4,7 @@ The Command Line Interface for PyASTrix.
 
 """
 import argparse
-from typing import List, Tuple
+from typing import List
 from pathlib import Path
 
 import yaml

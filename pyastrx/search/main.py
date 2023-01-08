@@ -68,7 +68,7 @@ class Repo:
                 baxml=True, specification_name=specification_name)
             self.cache.set(filename, info)
         return info
-    
+
     def load_python_files(
         self,
         files2load: List[str],
@@ -123,7 +123,7 @@ class Repo:
                     infered_types=infered_types)
                 for filename, infered_types in files_and_types
             ]
-                
+
         for info, filename in zip(infos, files2load):
             if info is None:
                 raise Exception(f"Failed to convert {filename}")
@@ -176,7 +176,7 @@ class Repo:
         if len(files2load) == 0:
             self._files.extend(files)
             return
-        
+
         if language == "python":
             self.load_python_files(
                 files2load,
@@ -189,7 +189,7 @@ class Repo:
                 specification_name=specification_name,
                 **kwargs
             )
- 
+
         self._files.extend(files)
 
     def load_folder(
@@ -199,7 +199,7 @@ class Repo:
     ) -> None:
         files_path: List[Path] = []
         path_obj = Path(specification.folder)
-        for ext in specification.extensions:            
+        for ext in specification.extensions:
             method = "glob"
             if specification.recursive:
                 method = "rglob"
@@ -208,7 +208,7 @@ class Repo:
                 f for f in getattr(path_obj, method)(f"*{ext}")
                 if f.is_file()
             ])
-          
+
         files = [
             str(f.resolve()) for f in files_path
             if not any(d in f.parts for d in specification.exclude)
@@ -232,7 +232,7 @@ class Repo:
                 **asdict(specification)
             )
             return
-    
+
         self.load_folder(
             specification_name=specification_name,
             specification=specification

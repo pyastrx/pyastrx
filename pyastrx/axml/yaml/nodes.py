@@ -91,7 +91,7 @@ class Node(object):
     def __repr__(self):
         value = self.value
         value = repr(value)
-        return '%s(tag=%r, value=%s)' % (self.__class__.__name__, self.tag, value)
+        return f"{self.__class__.__name__}(tag={self.tag}, value={value})"
 
 
 class ScalarNode(Node):

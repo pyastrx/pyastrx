@@ -294,7 +294,8 @@ class InterfaceSelectRules(StateInterface):
                 "\n[bold yellow]These rules will not match any pattern "
                 + " in the provide files[/]\n")
             return
-        dialog_text = "Choose which rules to use for the search. The pattern is:\n" \
+        dialog_text = "Choose which rules to use for the search. "\
+            "The pattern is:\n" \
             + "\n [specification]|severity| name(?why)\nDescription"
         dialog = checkboxlist_dialog(
             title="Rules selection",
@@ -332,7 +333,7 @@ class InterfaceRules(StateInterface):
         str2expression = {}
         for expression, info in rules.items():
             spec_name = info.specification_name
-            name = info.name 
+            name = info.name
             why = info.why
             description = info.description
             str_info = f"[ {spec_name} ]" \

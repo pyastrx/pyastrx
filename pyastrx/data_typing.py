@@ -3,7 +3,7 @@ stuff to deal with data typing.
 
 """
 import sys
-from dataclasses import dataclass, is_dataclass 
+from dataclasses import dataclass, is_dataclass
 import json
 from typing import Dict, List, NewType, Tuple, Union, Any, Optional
 if sys.version_info[1] < 10:
@@ -119,7 +119,6 @@ class Config:
     pagination: bool = True
     vscode_output: bool = False
     quiet: bool = False
-
 
 
 class PyreLoc(TypedDict):
