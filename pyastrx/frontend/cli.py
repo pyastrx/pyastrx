@@ -99,7 +99,7 @@ def construct_base_argparse() -> argparse.ArgumentParser:
         "--specification",
         help="language specification (python, yaml)",
         type=str,
-        default="python",
+        default=None,
     )
     parser.add_argument(
         "-a",
@@ -191,7 +191,7 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
         yaml_specs = yaml_config["specifications"]
         for spec_name, spec_config in yaml_specs.items():
             language = spec_config["language"]
-            if args.file:
+            if args.specification:
                 if language != args.specification:
                     continue
 
