@@ -20,7 +20,8 @@ class Cache:
         root_folder = Path(".").absolute()
         file_cache = Path(
             f".pyastrx/files/{file_path.relative_to(root_folder)}").resolve()
-        file_cache = file_cache.with_suffix(".cache")
+        suffix = file_cache.suffix
+        file_cache = file_cache.with_suffix(f"{suffix}.cache")
         return file_cache
 
     def update(self, filename: str) -> bool:
