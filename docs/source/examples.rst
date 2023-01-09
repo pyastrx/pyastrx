@@ -86,7 +86,7 @@ want to enforce that each source model should be one that starts with `svc_` pat
                     |
                     //KeyNode[@name="sources"]
                     //StrNode[not(pyastrx:match('svc_*',text()))]
-                    description: "Sources should be prefixed with svc_"
+                description: "Sources should be prefixed with svc_"
                 severity: error
             quoting_database_should_be_a_boolean:
                 xpath:
