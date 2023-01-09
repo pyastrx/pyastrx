@@ -40,10 +40,9 @@ specifications:
         xpath:
           |
           //KeyNode[@name="sources"]
-          /MappingNode
-          /KeyNode
-          /SequenceNode
-          /StrNode[not(pyastrx:match('svc_*',text()))]
+          //StrNode[not(pyastrx:match('svc_*',text()))]
+        description: "Sources should be prefixed with svc_"
+        severity: error
   python:
     language: python
     exclude:

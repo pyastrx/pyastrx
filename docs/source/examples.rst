@@ -56,8 +56,8 @@ Quoting database in dbt is a boolean attribute, so to check if it is a boolean, 
                     /*[
                         not(self::BoolNode)
                     ]
-                    severity: error
-                    description: "Database quoting should be a boolean"
+                severity: error
+                description: "Database quoting should be a boolean"
             persist_docs_should_be_a_dict:
                 xpath:
                     |
@@ -85,10 +85,9 @@ want to enforce that each source model should be one that starts with `svc_` pat
                 xpath:
                     |
                     //KeyNode[@name="sources"]
-                    /MappingNode
-                    /KeyNode
-                    /SequenceNode
-                    /StrNode[not(pyastrx:match('svc_*',text()))]
+                    //StrNode[not(pyastrx:match('svc_*',text()))]
+                    description: "Sources should be prefixed with svc_"
+                severity: error
             quoting_database_should_be_a_boolean:
                 xpath:
                     |
@@ -98,8 +97,8 @@ want to enforce that each source model should be one that starts with `svc_` pat
                     /*[
                         not(self::BoolNode)
                     ]
-                    severity: error
-                    description: "Database quoting should be a boolean"
+                severity: error
+                description: "Database quoting should be a boolean"
             persist_docs_should_be_a_dict:
                 xpath:
                     |
@@ -108,7 +107,7 @@ want to enforce that each source model should be one that starts with `svc_` pat
                     not(self::MappingNode)
                     ]
                 description: "persist_docs should be a dict"
-
+                severity: error
 Python specification
 ====================
 
