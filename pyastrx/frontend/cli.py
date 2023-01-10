@@ -244,7 +244,12 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
 
     for spec_name, spec in specs_dict.items():
         if "files" not in spec:
-            spec["files"] = args.file
+            spec_lang = spec["language"]
+            if spec_lang == "python":
+                files = [f for f in args.file if f.endswith(".py")]
+            elif spec_lang == "yaml":
+                files = [f for f in args.file if f.endswith(".yaml") or f.endswith(".yml")]  # noqa
+            spec["files"] = files
 
         for key, val in __available_yaml_folder.items():
             if key not in spec:
