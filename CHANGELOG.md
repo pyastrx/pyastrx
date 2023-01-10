@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 
 ## [Unreleased]
+
+## [0.5.2] - 2023-10-01
+
+
+### Fixed
+
+- cache files are now stored with the original file extension followed by `.cache`. This fixes the issue
+with two files with the same name but different extensions.
+
+- Now it's possible to pass a list of different files mixing python and YAML files withouth any problem.
+
 ## [0.5.1] - 2023-08-01
 
 ### Fixed
@@ -114,7 +125,8 @@ $ mypyq filename.py
 
 ### Changed
 
-[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.5.1...main
+[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.5.2...main
+[0.5.2]: https://github.com/pyastrx/pyastrx/compare/0.5.2...0.5.1
 [0.5.1]: https://github.com/pyastrx/pyastrx/compare/0.5.1...0.5.0
 [0.5.0]: https://github.com/pyastrx/pyastrx/compare/0.5.0...0.4.3
 [0.4.3]: https://github.com/pyastrx/pyastrx/compare/0.4.3...0.4.2

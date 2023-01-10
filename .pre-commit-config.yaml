@@ -2,11 +2,25 @@
 # See https://pre-commit.com/hooks.html for more hooks
 exclude: ".md$"
 repos:
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.7.9
-    hooks:
-    - id: flake8
   - repo: local
+    hooks:
+      - id: pyastrx
+        name: PyASTrX linter
+        entry: ./.pre-commit-hook/main.py
+        language: script
+        args: ["-q"]
+        types: ["python"]
+        description: Check for any violations using the pyastrx.yaml config
+      - id: pyastrx-yaml
+        name: PyASTrX linter
+        entry: ./.pre-commit-hook/main.py
+
+        language: script
+        args: ["-q"]
+        types: ["yaml"]
+        description: Check for any violations using the pyastrx.yaml config
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
     hooks:
       - id: check-merge-conflict
         name: check for merge conflicts
