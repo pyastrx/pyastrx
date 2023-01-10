@@ -1,11 +1,50 @@
 after_context: 3
-before_context: 3
+before_context: true
 interactive_files: false
 pagination: true
 quiet: false
-vscode_output: true
 parallel: true
 specifications:
+  pyastrx:
+    language: yaml
+    files: [pyastrx.yaml]
+    rules:
+      after_context:
+        xpath:
+          |
+          /Module/KeyNode[@name="after_context"]
+          /*[
+            not(self::IntNode)
+          ]
+        description: "after_context should be a int"
+        severity: error
+      before_context:
+        xpath:
+          |
+          /Module/KeyNode[@name="before_context"]
+          /*[
+            not(self::IntNode)
+          ]
+        description: "before_context should be a int"
+        severity: error
+      interactive_files:
+        xpath:
+          |
+          /Module/KeyNode[@name="interactive_files"]
+          /*[
+            not(self::BoolNode)
+          ]
+        description: "interactive_files should be a boolean"
+        severity: error
+      pagination:
+        xpath:
+          |
+          /Module/KeyNode[@name="pagination"]
+          /*[
+            not(self::BoolNode)
+          ]
+        description: "pagination should be a boolean"
+
   dbt:
     language: yaml
     parallel: true
