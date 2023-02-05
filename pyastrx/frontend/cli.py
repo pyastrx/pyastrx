@@ -6,17 +6,49 @@ The Command Line Interface for PyASTrix.
 import argparse
 from typing import List
 from pathlib import Path
+import time
 
 import yaml
 
+from watchdog.observers import Observer
+from watchdog.events import PatternMatchingEventHandler
+from rich import print as rprint
+
 from pyastrx.config import __available_yaml, __available_yaml_folder
 from pyastrx.data_typing import (
-    Config, MatchParams, RuleInfo, RulesDict, InferenceConfig,
-    Specifications, Specification
+    Config,
+    MatchParams,
+    RuleInfo,
+    RulesDict,
+    InferenceConfig,
+    Specifications,
+    Specification,
 )
 from pyastrx.frontend.manager import Manager
 from pyastrx.frontend.state_machine import Context, StartState
 from pyastrx.search.main import Repo
+
+
+class Handler(PatternMatchingEventHandler):
+    def __init__(self, manager: Manager):
+        self.manager = manager
+        patterns = ["*.yaml", "*.py"]
+        super().__init__(patterns=patterns, ignore_directories=True)
+        self.last_event_time = time.time()
+
+    def on_modified(self, event):
+        if time.time() - self.last_event_time < 1:
+            return
+        self.last_event_time = time.time()
+
+        rprint("=======================================")
+        rprint(f"[green]Modified {event.src_path}[/green]")
+        rprint(f"When: {time.ctime(time.time())}")
+        rprint("======================================= \n")
+        self.manager.load_specitications()
+        self.manager.search()
+
+    on_created = on_modified
 
 
 def multiLine2line(multi_line_xpath: str) -> str:
@@ -51,6 +83,13 @@ def construct_base_argparse() -> argparse.ArgumentParser:
         "-i",
         "--interactive",
         help="interactive mode",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "-w",
+        "--watch",
+        help="watch mode",
         action="store_true",
         default=False,
     )
@@ -161,14 +200,17 @@ def get_extensions_from_spec(lang_spec: str) -> List[str]:
     elif lang_spec == "yaml":
         return ["yaml", "yml"]
     else:
-        raise ValueError(f"Invalid language {lang_spec}. Should be python or yaml")  # noqa
+        raise ValueError(
+            f"Invalid language {lang_spec}. Should be python or yaml"
+        )  # noqa
 
 
 def invoke_pyastrx(args: argparse.Namespace) -> None:
     rules: RulesDict
-    config = {}
+    config: dict = {
+        "rules": {},
+    }
     yaml_config = get_config_from_yaml()
-    config["rules"] = {}
     specs_dict = {}
     rules_dict = {}
     if len(args.expr) > 0:
@@ -176,16 +218,15 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
         extensions = get_extensions_from_spec(lang_spec)
         spec_name = "inline"
         rules_dict = {
-            f"[{spec_name}]{str(e)}":
-                RuleInfo(
-                    specification_name=spec_name,
-                )
-                for e in args.expr
+            f"[{spec_name}]{str(e)}": RuleInfo(
+                specification_name=spec_name,
+            )
+            for e in args.expr
         }
         specs_dict[spec_name] = {
             "language": lang_spec,
             "extensions": extensions,
-            **__available_yaml_folder
+            **__available_yaml_folder,
         }
     else:
         yaml_specs = yaml_config["specifications"]
@@ -227,20 +268,21 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
         config["quiet"] = True
         config["interactive"] = False
 
-    if args.no_interface:
+    if args.no_interface or args.watch:
         config["interactive"] = False
+
+    if "vscode_output" in yaml_config:
+        config["vscode_output"] = yaml_config["vscode_output"]
+
     if args.vscode_output:
         config["vscode_output"] = True
 
     rules = RulesDict(rules_dict)
 
     config["rules"] = rules
-    if len(rules) == 0 and config["interactive"] is False:
-        raise ValueError(
-            "No rules found in the yaml file and no expression provided")
 
-    if args.vscode_output:
-        config["vscode_output"] = True
+    if len(rules) == 0 and config["interactive"] is False:
+        raise ValueError("No rules found in the yaml file and no expression provided") # noqa
 
     for spec_name, spec in specs_dict.items():
         if "files" not in spec:
@@ -248,7 +290,10 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
             if spec_lang == "python":
                 files = [f for f in args.file if f.endswith(".py")]
             elif spec_lang == "yaml":
-                files = [f for f in args.file if f.endswith(".yaml") or f.endswith(".yml")]  # noqa
+                files = [
+                    f for f in args.file
+                    if f.endswith(".yaml") or f.endswith(".yml")
+                ]
             spec["files"] = files
 
         for key, val in __available_yaml_folder.items():
@@ -257,31 +302,45 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
         if args.folder:
             spec["folder"] = args.folder
 
-    specfications = Specifications({
-        spec_name: Specification(**spec_config)
-        for spec_name, spec_config in specs_dict.items()
-    })
+    specfications = Specifications(
+        {
+            spec_name: Specification(**spec_config)
+            for spec_name, spec_config in specs_dict.items()
+        }
+    )
     config["specifications"] = specfications
     config_pyastrx = Config(**config)
-    match_params = MatchParams(
-        **yaml_config.get("match_params", {})
-    )
+    match_params = MatchParams(**yaml_config.get("match_params", {}))
 
     inference = InferenceConfig(**yaml_config.get("inference", {}))
 
     file_cache: bool = yaml_config.get("file_cache", True)
     repo = Repo(match_params, inference, file_cache=file_cache)
-    if not config_pyastrx.interactive:
+    if not config_pyastrx.interactive or args.watch:
         manager = Manager(config_pyastrx, repo)
         manager.load_specitications()
         num_matches = manager.search()[0]
-        if config_pyastrx.linter:
+        if args.watch:
+            event_handler = Handler(manager)
+            observer = Observer()
+            observer.schedule(event_handler, path=".", recursive=True)
+            observer.start()
+            try:
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                observer.stop()
+            observer.join()
+        elif config_pyastrx.linter:
             exit_code = 1 if num_matches > 0 else 0
             exit(exit_code)
         return
     else:
         sm = Context(
-            initial_state=StartState, config=config_pyastrx, repo=repo)
+            initial_state=StartState,
+            config=config_pyastrx,
+            repo=repo
+        )
         while True:
             sm._state.run()
 

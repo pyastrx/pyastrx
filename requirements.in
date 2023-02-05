@@ -1,7 +1,8 @@
 rich
-pyaml
+PyYAML
 colorama
 lxml>=4.9.1
 gast
 prompt_toolkit
 typing-extensions
+watchdog

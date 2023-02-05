@@ -3,19 +3,36 @@ CLI: Interactive mode
 ---------------------
 
 
-Start the interactive mode in src folder
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Start the interactive mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: console
+
+    $ pyastrx -i
+
+
+Start the interactive mode with a specific folder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: console
 
     $ pyastrx -i -d src
+
+
+Watch for changes
+~~~~~~~~~~~~~~~~~
+
+.. code-block:: console
+
+    $ pyastrx -i -w
+
 
 For specific files
 ~~~~~~~~~~~~~~~~~~
 
 .. code-block:: console
 
-    $ pyastrx -i -f src/script_1.py
+    $ pyastrx -f pyastrx.yaml  --spec yaml
 
 or
 
@@ -32,7 +49,7 @@ code base, do the following:
 
 .. code-block:: console
 
-    $ pyastrx -i -expr //defaults
+    $ pyastrx  --expr //defaults --spec python
 
 As a linter
 -----------

@@ -89,7 +89,13 @@ in your folder and add the following entry in your `.pre-commit-config.yaml`.
             args: ["-q"]
             types: ["python"]
             description: Check for any violations using the pyastrx.yaml config
-
+        - id: pyastrx-yaml
+            name: PyASTrX linter
+            entry: ./<LOCATION>/main.py
+            language: script
+            args: ["-q"]
+            types: ["yaml"]
+            description: Check for any violations using the pyastrx.yaml config
 
 Later on, I will ship this to be used in the pre-commit channels.
 
@@ -209,5 +215,3 @@ it well updated.
 
 .. _Jonathan Slenders: https://github.com/jonathanslenders
 .. _prompt_toolkit: https://github.com/prompt-toolkit/
-
-
