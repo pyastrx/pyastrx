@@ -1,9 +1,10 @@
 after_context: 3
-before_context: true
+before_context: false
 interactive_files: false
 pagination: true
 quiet: false
-parallel: true
+vscode_output: true
+parallel: false
 specifications:
   pyastrx:
     language: yaml
@@ -12,7 +13,7 @@ specifications:
       after_context:
         xpath:
           |
-          /Module/KeyNode[@name="after_context"]
+          /Module/KeyNode[@name="after2_context"]
           /*[
             not(self::IntNode)
           ]
@@ -81,6 +82,13 @@ specifications:
           //KeyNode[@name="sources"]
           //StrNode[not(pyastrx:match('svc_*',text()))]
         description: "Sources should be prefixed with svc_"
+        severity: error
+      sources-should-be-dbt:
+        xpath:
+          |
+          //KeyNode[@name="sources"]
+          //StrNode[not(pyastrx:match('dbt_*',text()))]
+        description: "Sources should be prefixed with dbt"
         severity: error
   python:
     language: python
