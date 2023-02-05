@@ -1,17 +1,103 @@
 import json
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 import yaml
 from rich import print as rprint
-
 from pyastrx.config import __available_yaml as available_yaml
 from pyastrx.data_typing import (
-    Config, Files2Matches, RuleInfo, RulesDict,
-    DataClassJSONEncoder)
+    Config,
+    Files2Matches,
+    RuleInfo,
+    RulesDict,
+    DataClassJSONEncoder,
+)
 from pyastrx.report import humanize as humanized_report
 from pyastrx.report.stdout import rich_paging
 from pyastrx.search.main import Repo
+
+from dataclasses import dataclass
+
+
+@dataclass
+class MatchNode:
+    match_str: str
+    context: str
+    line: int
+    col: int
+
+
+@dataclass
+class FileNode:
+    file: str
+    match: Union[MatchNode, None] = None
+
+
+def matches2vscode_ext(rules, file2matches, filter_rules):
+    rules_infos = {
+        k: v.__dict__
+        for k, v in rules.items() if filter_rules[k] > 0}
+    rule_map = {k: i for i, k in enumerate(rules_infos.keys())}
+    files2save = {
+        file: v.matches
+        for file, v in file2matches.items()
+        if len(v.num_matches_by_expr) > 0
+    }
+    rule_nodes = [
+        {
+            "expression": expr,
+            "name": rule_info["name"],
+            "severity": rule_info["severity"],
+            "description": rule_info["description"],
+            "why": rule_info["why"],
+            "use_in_linter": rule_info["use_in_linter"],
+            "files": [],
+            "rules": [],
+        }
+        for expr, rule_info in rules_infos.items()
+    ]
+
+    for (file_name, matches_by_file) in files2save.items():
+        for (line_number_str, matches_by_line) in matches_by_file.items():
+            line_number = int(line_number_str)
+            code_context = matches_by_line.code_context
+            match_by_expr = matches_by_line.match_by_expr
+            for (expr, match_pos) in match_by_expr.items():
+                rule_id = rule_map.get(expr)
+                matchNode = MatchNode(
+                    match_str="",
+                    context="",
+                    line=0,
+                    col=0,
+                )
+
+                fileNode = FileNode(
+                    file=file_name,
+                    match=matchNode,
+                )
+                context = ""
+                match_str = ""
+                cols = match_pos.cols_by_line[line_number]
+                # iterate over code_contexy Array and
+                for line_number_ctx, line_code in code_context:
+                    context += line_code + "\n"
+                    if line_number != line_number_ctx:
+                        continue
+                    match_str = line_code
+                    lenLine = len(line_code)
+                    carrets = " " * lenLine
+                    for j in range(len(cols)):
+                        carrets = carrets[: cols[j]] + "^" + carrets[cols[j] + 1 :] # noqa
+                    context += carrets + "\n"
+
+                fileNode.match.match_str = match_str
+                fileNode.match.context = context
+                fileNode.match.line = line_number
+                fileNode.match.col = cols[0]
+                # convert all dataclass to dict
+                if rule_id:
+                    rule_nodes[rule_id]["files"].append(fileNode.__dict__)
+    return rule_nodes
 
 
 class Manager:
@@ -54,8 +140,7 @@ class Manager:
 
         if self.config.linter:
             return RulesDict({
-                k: v for k, v in rules.items()
-                if v.use_in_linter})
+                k: v for k, v in rules.items() if v.use_in_linter})
         return rules
 
     def filter_rules(self, num_matches_by_expr: Dict[str, int]) -> None:
@@ -99,8 +184,7 @@ class Manager:
     def is_folder(self) -> bool:
         return len(self.repo.get_files()) > 1
 
-    def search(self) -> Tuple[
-            int, Dict[int, Tuple[str, str]], Dict[str, int]]:
+    def search(self) -> Tuple[int, Dict[int, Tuple[str, str]], Dict[str, int]]:
         rules = self.get_current_rules()
         is_unique_file = self.is_unique_file()
         config = self.config
@@ -112,11 +196,13 @@ class Manager:
         if is_unique_file:
             file = self.repo.get_file()
             line2matches = self.repo.search_file(
-                file, rules,
+                file,
+                rules,
                 before_context=config.before_context,
                 after_context=config.after_context,
             )
             file2matches = Files2Matches({file: line2matches})
+
         else:
             file2matches = self.repo.search_files(
                 rules,
@@ -124,38 +210,26 @@ class Manager:
                 after_context=config.after_context,
                 parallel=config.parallel,
             )
+
         output_str = ""
-        for i, (file, line2matches) in enumerate(
-                file2matches.items()):
+        for i, (file, line2matches) in enumerate(file2matches.items()):
             if len(line2matches.matches) == 0:
                 continue
             for expr in line2matches.num_matches_by_expr.keys():
                 filter_rules[expr] += line2matches.num_matches_by_expr[expr]
-            output_str_file, num_matches_file = \
-                humanized_report.matches_by_filename(
-                    line2matches, file, rules)
+            output_str_file, num_matches_file = humanized_report.matches_by_filename( # noqa
+                line2matches, file, rules
+            )
             if num_matches_file > 0:
                 str_by_file[i] = (
                     str(Path(file).relative_to(parent_folder)),
-                    output_str_file
+                    output_str_file,
                 )
                 num_matches += num_matches_file
                 output_str += output_str_file
         # save json_data to
         if config.vscode_output:
-            rule_infos = {
-                k: v.__dict__ for k, v in rules.items()
-                if filter_rules[k] > 0
-            }
-
-            json_data = {
-                "files": {
-                    file: v.matches
-                    for file, v in file2matches.items()
-                    if len(v.num_matches_by_expr) > 0
-                },
-                "rules": rule_infos,
-            }
+            json_data = matches2vscode_ext(rules, file2matches, filter_rules)
             with open(Path(".pyastrx/results.json").resolve(), "w") as f:
                 json.dump(json_data, f, cls=DataClassJSONEncoder)
 
