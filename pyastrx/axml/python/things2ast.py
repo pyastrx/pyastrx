@@ -22,10 +22,31 @@ def txt2ast(
             Module if from ast.
 
     """
-    if normalize_ast:
-        parsed_ast = gast.parse(txt, filename)
-    else:
-        parsed_ast = ast.parse(txt, filename)
+
+    # this is a hack to deal with the fact that ast.parse
+    # can't handle with syntax errors, we try to remove the line
+    # with the error until the end of the file to see if we can
+    # parse the file.
+
+    parsed = False
+    num_tries = 0
+    while not parsed:
+        try:
+            if normalize_ast:
+                parsed_ast = gast.parse(txt, filename)
+            else:
+                parsed_ast = ast.parse(txt, filename)
+            parsed = True
+        except SyntaxError as e:
+            lineno = e.lineno
+            if num_tries > 1:
+                # return a empty ast
+                return ast.parse("")
+            lines = txt.split("\n")
+            # remove all the lines after the error
+            lines = lines[:lineno-1]
+            txt = "\n".join(lines)
+            num_tries += 1
 
     return parsed_ast
 

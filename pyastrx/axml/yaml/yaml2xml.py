@@ -3,7 +3,7 @@ from typing import Union
 from lxml import etree
 import yaml
 
-from rich import print as rprint
+from rich import print as print
 from pyastrx.axml.yaml.loader import Loader
 from pyastrx.data_typing import FileInfo
 
@@ -12,22 +12,33 @@ def txt2axml(
     txt: str,
     file_path: str = "",
 ) -> Union[etree._Element, etree._ElementTree]:
-    loader = Loader(txt)
 
     xml_yaml: Union[etree._Element, etree._ElementTree]
 
-    try:
-        xml_yaml = loader.get_single_node().xml_node(
-            module_node=True, file_path=file_path
-        )
-    except yaml.YAMLError:
-        rprint(f"[red]Error in YAML file {file_path}[/red]")
-        # create an empty xml
-        xml_yaml = etree.Element("Module")
-    except AttributeError:
-        rprint(f"[red]Error Scanner in YAML file {file_path}[/red]")
-        # create an empty xml
-        xml_yaml = etree.Element("Module")
+    parsed = False
+    num_tries = 0
+    while not parsed:
+        try:
+            loader = Loader(txt)
+            xml_yaml = loader.get_single_node().xml_node(
+                module_node=True, file_path=file_path
+            )
+            parsed = True
+        except yaml.scanner.ScannerError as err:
+            lineno = err.problem_mark.line
+            if num_tries > 1:
+                # return a empty ast
+                xml_yaml = etree.Element("Module")
+                break
+            lines = txt.split("\n")
+            # remove all the lines after the error
+            lines = lines[:lineno -1]
+            txt = "\n".join(lines)
+            num_tries += 1
+        except AttributeError as err:
+            print(err)
+            xml_yaml = etree.Element("Module")
+            break
 
     return xml_yaml
 

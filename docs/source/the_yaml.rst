@@ -32,7 +32,6 @@ command line interface and the code analysis.
                 language: yaml
                 folder: "models"
                 recursive: true
-                parallel: true
                 rules:
                    quoting-database:
                         xpath:

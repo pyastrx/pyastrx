@@ -12,38 +12,36 @@ _prompt_dialog_style = {
     'dialog.body':        'bg:#4B8BBE',
     'dialog shadow':      'bg:#306998',
 }
-__available_yaml = {
+__default_conf = {
     "after_context": 3,
     "before_context": 3,
     "quiet": False,
-    "parallel": True,
     "interactive_files": False,
     "vscode_output": False,
-    "specifications":
-    {
-        "python": {
-            "folder": ".",
-            "language": "python",
-            "recursive": True,
-            "exclude": [".venv", "docs", ".git", ".tox", ".pyastrx"],
-            "rules": {
-                "mutable-defaults": {
-                    "xpath": "//defaults/*[self::Dict or self::List or self::Set or self::Call]",  # noqa
-                    "description": "Can create bugs that are hard to find",
-                    "severity": "error",
-                    "why": "bad practice",
-                    "use_in_linter": True,
-                }
-            }
-        }
-    },
     "pagination": True
-
 }
 
-__available_yaml_folder = {
+__default_python_specs = {
+    "python": {
+        "folder": ".",
+        "language": "python",
+        "recursive": True,
+        "exclude": [".venv", "docs", ".git", ".tox", ".pyastrx"],
+        "rules": {
+            "mutable-defaults": {
+                "xpath": "//defaults/*[self::Dict or self::List or self::Set or self::Call]",  # noqa
+                "description": "Can create bugs that are hard to find",
+                "severity": "error",
+                "why": "bad practice",
+                "use_in_linter": True,
+            }
+        }
+    }
+}
+
+__default_spec_confs = {
     "folder": ".",
     "recursive": True,
-    "parallel": True,
+    "parallel": False,
     "exclude": [".venv", "docs", ".git", ".tox", ".pyastrx"],
 }

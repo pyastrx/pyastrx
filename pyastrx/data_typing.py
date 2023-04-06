@@ -97,9 +97,9 @@ class Specification:
     exclude: List[str]
     extensions: List[str]
     normalize_ast: bool = True
-    parallel: bool = True
     folder: str = "."
     recursive: bool = True
+    parallel: bool = True
     language: Literal["python", "yaml"] = "python"
 
 

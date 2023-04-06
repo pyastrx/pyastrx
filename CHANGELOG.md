@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.5.3] - 2023-05-02
+
+### Added
+
+- Now it's possible call PyASTrX in a watch mode. This mode will check the files every time they are modified. This is faster than calling PyASTrX every time you want to check the files.
+
+- Treat YAML and Python files with syntax
+errors.
+
+- VsCode output to be used in the upcoming extension.
+
 ## [0.5.2] - 2023-10-01
 
 
@@ -125,7 +136,8 @@ $ mypyq filename.py
 
 ### Changed
 
-[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.5.2...main
+[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.5.3...main
+[0.5.3]: https://github.com/pyastrx/pyastrx/compare/0.5.3...0.5.2
 [0.5.2]: https://github.com/pyastrx/pyastrx/compare/0.5.2...0.5.1
 [0.5.1]: https://github.com/pyastrx/pyastrx/compare/0.5.1...0.5.0
 [0.5.0]: https://github.com/pyastrx/pyastrx/compare/0.5.0...0.4.3
