@@ -9,7 +9,7 @@ pylint
 from rich import print as rprint
 
 __pkg_name__ = "PyASTrX"
-__version__ = '0.5.2'
+__version__ = '0.5.3'
 __author__ = 'Bruno Messias'
 __github_author__ = '@devmessias'
 __twitter__ = '@devmessias'

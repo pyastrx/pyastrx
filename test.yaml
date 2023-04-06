@@ -1,6 +1,6 @@
 quoting:
-  database: true
-  schema: 2
+  database: asdf
+  schema: asdfa
 models:
   "dev_something":
     persist_docs:
@@ -25,9 +25,9 @@ columns:
     length: 100
 sources:
   dev_something:
-    - svc_1
-    - svc_2
-    - errado
+    - dbe
+    - sve
+    - svd_errado
   dev_something_else:
     - svc_3
     - svc_4

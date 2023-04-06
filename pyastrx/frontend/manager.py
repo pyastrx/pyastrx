@@ -2,9 +2,7 @@ import json
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
-import yaml
 from rich import print as rprint
-from pyastrx.config import __available_yaml as available_yaml
 from pyastrx.data_typing import (
     Config,
     Files2Matches,
@@ -95,7 +93,7 @@ def matches2vscode_ext(rules, file2matches, filter_rules):
                 fileNode.match.line = line_number
                 fileNode.match.col = cols[0]
                 # convert all dataclass to dict
-                if rule_id:
+                if rule_id is not None:
                     rule_nodes[rule_id]["files"].append(fileNode.__dict__)
     return rule_nodes
 
@@ -167,16 +165,6 @@ class Manager:
     def reload_yaml(self) -> None:
         # TODO: REFACTOR TO USE SPECIFICATIONS
         raise NotImplementedError
-        with open(Path("pyastrx.yaml").resolve(), "r") as f:
-            _config = yaml.safe_load(f)
-        for k in ("rules", "interactive_files", "pagination"):
-            if k not in _config.keys():
-                _config[k] = available_yaml[k]
-            else:
-                setattr(self.config, k, _config[k])
-        self.config.rules = RulesDict({
-            k: RuleInfo(**v) for k, v in _config["rules"].items()
-        })
 
     def is_unique_file(self) -> bool:
         return len(self.repo.get_files()) == 1

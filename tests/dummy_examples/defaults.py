@@ -42,3 +42,8 @@ class Example:
 
     def dict_in_def(self, a={'a': 1}):
         return a
+
+
+def mutable_default(a=1, b=[]):
+    b.append(a)
+    return b

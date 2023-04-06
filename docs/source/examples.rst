@@ -24,7 +24,6 @@ The following example shows how to enforce that the `persist_docs` attribute of 
     specifications:
         my_dbt_specification:
             language: yaml
-            parallel: true
             folder: .
             rules:
                 persist_docs_should_be_a_dict:
@@ -44,7 +43,6 @@ Quoting database in dbt is a boolean attribute, so to check if it is a boolean, 
 
     my_dbt_specification:
         language: yaml
-        parallel: true
         folder: .
         rules:
             quoting_database_should_be_a_boolean:
@@ -78,7 +76,6 @@ want to enforce that each source model should be one that starts with `svc_` pat
 
     my_dbt_specification:
         language: yaml
-        parallel: true
         folder: .
         rules:
             sources-should-be-svc:

@@ -14,7 +14,7 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 from rich import print as rprint
 
-from pyastrx.config import __available_yaml, __available_yaml_folder
+from pyastrx.config import __default_conf, __default_spec_confs, __default_python_specs
 from pyastrx.data_typing import (
     Config,
     MatchParams,
@@ -183,7 +183,8 @@ def get_config_from_yaml() -> dict:
     """
     yml_file = Path(".").resolve() / "pyastrx.yaml"
     if not yml_file.exists():
-        config = __available_yaml
+        config = {**__default_conf, "specifications": __default_python_specs}
+        rprint(config)
         with open(yml_file, "w") as f:
             f.write(yaml.dump(config))
         return config
@@ -207,10 +208,12 @@ def get_extensions_from_spec(lang_spec: str) -> List[str]:
 
 def invoke_pyastrx(args: argparse.Namespace) -> None:
     rules: RulesDict
-    config: dict = {
-        "rules": {},
-    }
     yaml_config = get_config_from_yaml()
+    config = {}
+    for k, v in yaml_config.items():
+        if k not in __default_conf:
+            continue
+        config[k] = v
     specs_dict = {}
     rules_dict = {}
     if len(args.expr) > 0:
@@ -226,9 +229,11 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
         specs_dict[spec_name] = {
             "language": lang_spec,
             "extensions": extensions,
-            **__available_yaml_folder,
+            **__default_spec_confs,
         }
     else:
+        if "specifications" not in yaml_config:
+            raise ValueError("No specifications found in pyastrx.yaml")
         yaml_specs = yaml_config["specifications"]
         for spec_name, spec_config in yaml_specs.items():
             language = spec_config["language"]
@@ -244,7 +249,7 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
                 v["specification_name"] = spec_name
                 rules_dict[f"[{spec_name}]{xpath}"] = RuleInfo(**v)
             del spec_config["rules"]
-            for key, val in __available_yaml_folder.items():
+            for key, val in __default_spec_confs.items():
                 spec_config[key] = spec_config.get(key, val)
 
             spec_config["extensions"] = get_extensions_from_spec(language)
@@ -252,15 +257,11 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
 
     config["interactive"] = args.interactive
     for spec_name, spec_config in specs_dict.items():
-        for key, val in __available_yaml_folder.items():
+        for key, val in __default_spec_confs.items():
             if key in spec_config:
                 continue
         spec_config[key] = val
 
-    for key, val in __available_yaml.items():
-        if key in spec_config or key == "specifications":
-            continue
-        config[key] = val
     if args.linter:
         config["linter"] = True
         config["interactive"] = False
@@ -296,7 +297,7 @@ def invoke_pyastrx(args: argparse.Namespace) -> None:
                 ]
             spec["files"] = files
 
-        for key, val in __available_yaml_folder.items():
+        for key, val in __default_spec_confs.items():
             if key not in spec:
                 spec[key] = val
         if args.folder:

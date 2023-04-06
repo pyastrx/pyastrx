@@ -4,7 +4,6 @@ interactive_files: false
 pagination: true
 quiet: false
 vscode_output: true
-parallel: false
 specifications:
   pyastrx:
     language: yaml
@@ -48,7 +47,6 @@ specifications:
 
   dbt:
     language: yaml
-    parallel: true
     exclude:
     - .venv
     - .tox
@@ -75,7 +73,7 @@ specifications:
             not(self::BoolNode)
           ]
         severity: error
-        description: "Database quoting should be a boolean"
+        description: "Database quoting macaco should be a boolean"
       sources-should-be-svc:
         xpath:
           |
@@ -88,7 +86,7 @@ specifications:
           |
           //KeyNode[@name="sources"]
           //StrNode[not(pyastrx:match('dbt_*',text()))]
-        description: "Sources should be prefixed with dbt"
+        description: "Sources should be prefixed with dbt macaco"
         severity: error
   python:
     language: python
