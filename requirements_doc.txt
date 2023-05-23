@@ -38,7 +38,7 @@ python-slugify[unidecode]==6.1.2
     # via sphinx-material
 pytz==2022.1
     # via babel
-requests==2.27.1
+requests==2.31.0
     # via sphinx
 snowballstemmer==2.2.0
     # via sphinx
