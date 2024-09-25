@@ -4,7 +4,7 @@ try:
     import mypy.nodes
     from mypy.traverser import TraverserVisitor
 except ImportError:
-    TraverserVisitor = object
+    TraverserVisitor = object # type: ignore
 
 from pyastrx.data_typing import MypyType, TokenLoc
 
