@@ -228,18 +228,10 @@ class InterfaceMain(StateInterface):
             ("Export AST and aXML", "e", InterfaceExport),
             ("-", "-", ""),
             ("Reload files", "r", LoadFiles),
-            ("Reload YAML", "y", ReloadYAML),
             ("Help", "h", InterfaceHelp),
             ("Quit", "q", Exit)
         ]
         self.default_prompt(options)
-
-
-class ReloadYAML(State):
-    def run(self) -> None:
-        self.context.reload_yaml()
-        self.context.set_state(
-            InterfaceMain)
 
 
 class InterfaceExport(StateInterface):
