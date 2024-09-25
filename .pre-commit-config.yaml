@@ -11,14 +11,6 @@ repos:
         args: ["-q"]
         types: ["python"]
         description: Check for any violations using the pyastrx.yaml config
-      - id: pyastrx-yaml
-        name: PyASTrX linter
-        entry: ./.pre-commit-hook/main.py
-
-        language: script
-        args: ["-q"]
-        types: ["yaml"]
-        description: Check for any violations using the pyastrx.yaml config
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.4.0
     hooks:
