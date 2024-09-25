@@ -162,10 +162,6 @@ class Manager:
 
         self.set_current_file(self.repo.get_file())
 
-    def reload_yaml(self) -> None:
-        # TODO: REFACTOR TO USE SPECIFICATIONS
-        raise NotImplementedError
-
     def is_unique_file(self) -> bool:
         return len(self.repo.get_files()) == 1
 
