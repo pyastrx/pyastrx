@@ -20,7 +20,7 @@ def txt2axml(
     while not parsed:
         try:
             loader = Loader(txt)
-            xml_yaml = loader.get_single_node().xml_node(
+            xml_yaml = loader.get_single_node().get_xml_node(
                 module_node=True, file_path=file_path
             )
             parsed = True

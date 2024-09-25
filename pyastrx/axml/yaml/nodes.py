@@ -24,7 +24,7 @@ class Node(object):
         self.start_mark = start_mark
         self.end_mark = end_mark
 
-    def xml_node(
+    def get_xml_node(
         self, key_node=False, module_node=False, file_path=None
     ) -> etree._Element:
         """Return the XML node for the YAML node.
@@ -72,18 +72,18 @@ class Node(object):
                     xml_node.text = item
                     return xml_node
                 elif isinstance(item, Node):
-                    xml_node.append(item.xml_node())
+                    xml_node.append(item.get_xml_node())
                 elif isinstance(item, tuple):
                     assert len(item) == 2
-                    node_key = item[0].xml_node(key_node=True)
-                    node_value = item[1].xml_node()
+                    node_key = item[0].get_xml_node(key_node=True)
+                    node_value = item[1].get_xml_node()
                     node_key.append(node_value)
                     xml_node.append(node_key)
                 else:
                     raise ValueError("Unexpected type: %s" % type(item))
             return xml_node
         elif isinstance(value, Node):
-            xml_node.append(value.xml_node())
+            xml_node.append(value.get_xml_node())
             return xml_node
 
         raise ValueError("Unexpected type: %s" % type(value))
