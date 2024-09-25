@@ -183,7 +183,7 @@ def get_config_from_yaml() -> dict:
     """
     yml_file = Path(".").resolve() / "pyastrx.yaml"
     if not yml_file.exists():
-        config = {**__default_conf, "specifications": __default_python_specs}
+        config = {**__default_conf, "specifications": __default_python_specs} # type: ignore
         rprint(config)
         with open(yml_file, "w") as f:
             f.write(yaml.dump(config))

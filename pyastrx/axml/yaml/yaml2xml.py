@@ -25,6 +25,8 @@ def txt2axml(
             )
             parsed = True
         except yaml.scanner.ScannerError as err:
+            if err.problem_mark is None:
+                break
             lineno = err.problem_mark.line
             if num_tries > 1:
                 # return a empty ast

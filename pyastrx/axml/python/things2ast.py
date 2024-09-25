@@ -44,8 +44,9 @@ def txt2ast(
                 return ast.parse("")
             lines = txt.split("\n")
             # remove all the lines after the error
-            lines = lines[:lineno-1]
-            txt = "\n".join(lines)
+            if lineno is not None:
+                lines = lines[:lineno-1]
+                txt = "\n".join(lines)
             num_tries += 1
 
     return parsed_ast
