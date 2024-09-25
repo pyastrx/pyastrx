@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.6.0] - 2024-09-25
+
+### Removed
+
+- reload yaml option
+
+### Fixed
+
+- upgrade deps
+
 ## [0.5.3] - 2023-05-02
 
 ### Added
@@ -136,7 +146,8 @@ $ mypyq filename.py
 
 ### Changed
 
-[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.5.3...main
+[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.6.0...main
+[0.6.0]: https://github.com/pyastrx/pyastrx/compare/0.6.0...0.5.2
 [0.5.3]: https://github.com/pyastrx/pyastrx/compare/0.5.3...0.5.2
 [0.5.2]: https://github.com/pyastrx/pyastrx/compare/0.5.2...0.5.1
 [0.5.1]: https://github.com/pyastrx/pyastrx/compare/0.5.1...0.5.0
