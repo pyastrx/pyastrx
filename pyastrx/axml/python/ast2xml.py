@@ -53,7 +53,9 @@ def encode_type(
                 if value is None:
                     continue
                 xml_node.set(attr_name, value)
-            attrs = infered_type["attrs"]
+
+            attrs = infered_type.get("attrs", None)
+
             if attrs is None:
                 continue
             for attr in attrs:
@@ -174,10 +176,17 @@ def ast2xml(
     #  ast_node_name can be for example "FunctionDef", "ClassDef"...
     ast_node_name = node.__class__.__name__
     xml_node = etree.Element(ast_node_name)
-    node_fields = zip(
-        node._fields, (getattr(node, attr) for attr in node._fields))
+    node_field_names = []
+    node_field_values = []
+    for attr in node._fields:
+        if hasattr(node, attr):
+            node_field_names.append(attr)
+            node_field_values.append(getattr(node, attr))
+
+    node_fields = zip(node_field_names, node_field_values)
     encode_location(
         node, xml_node, txt_lines)
+
 
     try:
         el_loc = [
