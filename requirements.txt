@@ -12,11 +12,11 @@ lxml==5.3.0
     # via -r requirements.in
 prompt-toolkit==3.0.47
     # via -r requirements.in
-pygments==2.18.0
+pygments
     # via rich
 pyyaml==6.0.2
     # via -r requirements.in
-rich==13.8.1
+rich
     # via -r requirements.in
 typing-extensions==4.12.2
     # via -r requirements.in
