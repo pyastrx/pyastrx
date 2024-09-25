@@ -10,7 +10,6 @@ repos:
         language: script
         args: ["-q"]
         files: ^pyastrx/
-        exclude: ^tests/
         types: ["python"]
         description: Check for any violations using the pyastrx.yaml config
   - repo: https://github.com/pre-commit/pre-commit-hooks
