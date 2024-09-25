@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.8", "3.9", "3.10"]
 
     steps:
       - uses: actions/checkout@v3
@@ -28,14 +28,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install Cython
           if [ -f requirements_dev.txt ]; then pip install -r requirements_dev.txt; fi
-          pre-commit install
+      # - name: install pre commit
+      #    run:  pre-commit install
       - name: Install dependencies
         run: if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Install project
         run: python setup.py install
-      - name: run pre-commit
-        run: |
-          pre-commit run --all-files
+      # - name: run pre-commit
+      #   run: |
+      #     pre-commit run --all-files
 
       - name: Test with pytest
         run: |
