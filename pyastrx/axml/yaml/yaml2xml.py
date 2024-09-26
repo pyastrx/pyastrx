@@ -52,7 +52,7 @@ def file2axml(
 ) -> FileInfo:
     """Construct the FileInfo obj from a yaml file."""
     file_path = str(Path(filename).resolve())
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding='utf-8') as f:
         txt = f.read()
 
     xml_yaml = txt2axml(txt, file_path=file_path)
