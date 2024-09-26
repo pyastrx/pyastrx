@@ -8,6 +8,7 @@ import shutil
 
 from lxml import etree
 from rich.console import Console
+from rich import print as rprint
 
 from pyastrx.data_typing import AXML
 from pyastrx.xml.misc import el_lxml2str
@@ -17,14 +18,14 @@ def rich_paging(text: str) -> None:
     "Use rich to page the text through less and pydoc."
     if text == "":
         return
+    if shutil.which("less") is None:
+        rprint(text)
+        return
     console = Console()
     with console.capture() as capture:
         console.print(text)
     str_output = capture.get()
 
-    if shutil.which("less") is None:
-        print(str_output)
-        return
     pydoc.pipepager(str_output, cmd='less -R')
 
 

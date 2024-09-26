@@ -13,7 +13,7 @@ with open("requirements.txt", "r") as f:
 
 setup(
     name='pyastrx',
-    version='0.6.0',
+    version='0.6.1',
     long_description=README_TEXT,
     long_description_content_type="text/x-rst",
     description="'Simple projects are all alike; each complex"\
