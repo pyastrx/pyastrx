@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.6.1] - 2024-09-26
+
+### Fixed
+
+- utf-8 file encoding win10
+- output interactive mode win10
+
+
 ## [0.6.0] - 2024-09-25
 
 ### Removed
@@ -146,7 +154,8 @@ $ mypyq filename.py
 
 ### Changed
 
-[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.6.0...main
+[Unreleased]: https://github.com/pyastrx/pyastrx/compare/0.6.1...main
+[0.6.1]: https://github.com/pyastrx/pyastrx/compare/0.6.1...0.6.0
 [0.6.0]: https://github.com/pyastrx/pyastrx/compare/0.6.0...0.5.2
 [0.5.3]: https://github.com/pyastrx/pyastrx/compare/0.5.3...0.5.2
 [0.5.2]: https://github.com/pyastrx/pyastrx/compare/0.5.2...0.5.1
