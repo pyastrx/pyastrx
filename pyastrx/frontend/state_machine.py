@@ -512,7 +512,7 @@ class ExportXML(State):
             axml_str = el_lxml2str(axml)
             export_location = get_location_and_create(
                 ".pyastrx/export_data/axml/", filename, ".xml")
-            with open(export_location, "w") as f:
+            with open(export_location, "w", encoding='utf-8') as f:
                 f.write(axml_str)
         self.context.set_state(InterfaceMain)
 
@@ -531,7 +531,7 @@ class ExportAST(State):
                 export_location = get_location_and_create(
                     ".pyastrx/export_data/ast/", filename)
 
-                with open(export_location, "w") as f:
+                with open(export_location, "w", encoding='utf-8') as f:
                     f.write(ast_txt)
         self.context.set_state(InterfaceMain)
 

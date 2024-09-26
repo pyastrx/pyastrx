@@ -185,11 +185,11 @@ def get_config_from_yaml() -> dict:
     if not yml_file.exists():
         config = {**__default_conf, "specifications": __default_python_specs} # type: ignore
         rprint(config)
-        with open(yml_file, "w") as f:
+        with open(yml_file, "w", encoding='utf-8') as f:
             f.write(yaml.dump(config))
         return config
 
-    with open(yml_file, "r") as f:
+    with open(yml_file, "r", encoding='utf-8') as f:
         config = yaml.safe_load(f)
 
     return config

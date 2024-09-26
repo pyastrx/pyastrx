@@ -88,7 +88,7 @@ def file2ast(
         ast.AST
 
     """
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding='utf-8') as f:
         txt = f.read()
     parsed_ast = txt2ast(txt, filename, normalize_ast=normalize_ast)
     return parsed_ast
